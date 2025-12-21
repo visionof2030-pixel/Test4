@@ -93,26 +93,32 @@ body{background:white;padding:0}
   font-size:11pt;
 }
 
+/* ===== الهدف التربوي (مصغّر بشكل بسيط) ===== */
 .goal-section{
   background:linear-gradient(135deg,#e8f5e9,#f4fbf6);
   border-right:5px solid #2e7d32;
   border-radius:8px;
-  padding:12px;
-  margin-bottom:12px;
+
+  padding:8px 10px;        /* ⬅ تقليل الحشوة */
+  margin-bottom:10px;
+
   display:flex;
   flex-direction:column;
   justify-content:center;
   align-items:center;
-  min-height:90px;
+
+  min-height:70px;         /* ⬅ تصغير الارتفاع */
   text-align:center;
-  line-height:1.8;
+  line-height:1.7;
 }
+
 .goal-section strong{
   color:#1b5e20;
   font-size:12pt;
-  margin-bottom:8px;
+  margin-bottom:6px;
 }
 
+/* بقية الأقسام */
 .section{
   border:1px solid #ccc;
   padding:8px;
@@ -296,8 +302,7 @@ function renderFields(){
 }
 
 function syncReport(){
- const v=reportSelect.value;
- document.getElementById('reportTitle').textContent=v;
+ reportTitle.textContent=reportSelect.value;
 }
 
 function fill(k){
