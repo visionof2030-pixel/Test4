@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>🏆 كأس العالم 2026 – متتبع المباريات والتوقعات | مدرسة سعيد بن العاص</title>
   <style>
+    /* جميع التصميمات السابقة كما هي (بدون تغيير) */
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { background: linear-gradient(135deg, #0b2b2f 0%, #05181c 100%); font-family: 'Segoe UI', 'Cairo', system-ui, sans-serif; padding: 12px; min-height: 100vh; color: #f0f9ff; font-size: 14px; }
     .app-container { max-width: 800px; margin: 0 auto; width: 100%; }
@@ -139,7 +140,7 @@
 
 <script type="module">
   // =========================
-  // 1. Supabase client
+  // 1. Supabase client (بدون تغيير)
   // =========================
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
   const SUPABASE_URL = 'https://szjxwhsmefqpfcebtvei.supabase.co';
@@ -226,9 +227,9 @@
     { team1:"الأردن", team2:"الأرجنتين", time:"2026-06-28T05:00:00", round:"third" }
   ];
 
-  // إضافة match_id فريد لكل مباراة (رقم تسلسلي من 1)
+  // إضافة match_id فريد لكل مباراة (رقم تسلسلي من 1 كنص String لضمان التوافق)
   const matches = rawMatches.map((m, index) => ({
-    id: index + 1,
+    id: String(index + 1),   // تحويل إلى نص (String)
     team1: m.team1,
     team2: m.team2,
     time: m.time,
@@ -238,12 +239,12 @@
   }));
 
   // =========================
-  // 3. دوال Supabase للتوقعات (باستخدام match_id و predicted_team)
+  // 3. دوال Supabase للتوقعات (باستخدام match_id و team)
   // =========================
-  async function addPrediction(user_name, match_id, predicted_team) {
+  async function addPrediction(user_name, match_id, team) {
     const { data, error } = await supabase
       .from('predictions')
-      .insert([{ user_name, match_id, predicted_team }]);
+      .insert([{ user_name, match_id, team }]);   // ✅ العميل صحيح: team
     if (error) console.error("خطأ في الإضافة:", error);
     return { data, error };
   }
@@ -262,18 +263,20 @@
       listContainer.innerHTML = '<li class="empty-state" style="background:transparent; text-align:center;">📭 لا توجد توقعات حتى الآن. أضف توقعك!</li>';
       return;
     }
-    // إنشاء خريطة للمباريات بناءً على id
+    // إنشاء خريطة للمباريات باستخدام id كنص (String)
     const matchesMap = new Map();
     matches.forEach(m => matchesMap.set(m.id, { team1: m.team1, team2: m.team2 }));
 
     listContainer.innerHTML = predictions.map(p => {
-      const match = matchesMap.get(p.match_id);
-      const matchDisplay = match ? `${match.team1} vs ${match.team2}` : `مباراة غير معروفة (ID: ${p.match_id})`;
+      // p.match_id قد يكون رقمًا أو نصًا، نحوله إلى نص للمقارنة
+      const matchIdStr = String(p.match_id);
+      const match = matchesMap.get(matchIdStr);
+      const matchDisplay = match ? `${match.team1} vs ${match.team2}` : `مباراة غير معروفة (ID: ${matchIdStr})`;
       return `
         <li>
           👤 <strong>${escapeHtml(p.user_name)}</strong> | 
           🏆 ${escapeHtml(matchDisplay)} | 
-          ⚽ يتوقع فوز: <span style="color:#FFB347;">${escapeHtml(p.predicted_team)}</span>
+          ⚽ يتوقع فوز: <span style="color:#FFB347;">${escapeHtml(p.team)}</span>
         </li>
       `;
     }).join('');
@@ -285,7 +288,7 @@
     select.innerHTML = '<option value="">-- اختر المباراة --</option>';
     matches.forEach(match => {
       const option = document.createElement('option');
-      option.value = match.id;
+      option.value = match.id;   // قيمة نصية
       option.textContent = `${match.team1} vs ${match.team2}`;
       select.appendChild(option);
     });
@@ -295,7 +298,7 @@
   function updateTeamsDropdown() {
     const matchSelect = document.getElementById('predMatchSelect');
     const teamSelect = document.getElementById('predTeamSelect');
-    const selectedMatchId = parseInt(matchSelect.value);
+    const selectedMatchId = matchSelect.value;   // نص (String)
     if (!selectedMatchId) {
       teamSelect.innerHTML = '<option value="">-- الفريق --</option>';
       return;
@@ -324,7 +327,7 @@
   }
 
   // =========================
-  // 4. باقي دوال المتتبع (مباريات قادمة، سابقة، ترتيب) مع دعم match_id (اختياري)
+  // 4. باقي دوال المتتبع (مباريات قادمة، سابقة، ترتيب) - لم يتم تغييرها
   // =========================
   function now() { return new Date().getTime(); }
   function matchTime(t) { return new Date(t).getTime(); }
@@ -407,13 +410,13 @@
     document.getElementById('predMatchSelect').addEventListener('change', updateTeamsDropdown);
     document.getElementById('submitPrediction').addEventListener('click', async () => {
       const userName = document.getElementById('predUserName').value.trim();
-      const matchId = parseInt(document.getElementById('predMatchSelect').value);
-      const predictedTeam = document.getElementById('predTeamSelect').value;
-      if (!userName || !matchId || !predictedTeam) {
+      const matchId = document.getElementById('predMatchSelect').value;   // ✅ نص (String) بدون parseInt
+      const team = document.getElementById('predTeamSelect').value;
+      if (!userName || !matchId || !team) {
         alert("يرجى ملء جميع الحقول: اسم المستخدم، المباراة، الفريق");
         return;
       }
-      await addPrediction(userName, matchId, predictedTeam);
+      await addPrediction(userName, matchId, team);   // ✅ باستخدام team
       document.getElementById('predUserName').value = '';
       document.getElementById('predMatchSelect').value = '';
       document.getElementById('predTeamSelect').innerHTML = '<option value="">-- الفريق --</option>';
