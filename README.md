@@ -143,6 +143,28 @@
     .prediction-card { background: rgba(18, 38, 44, 0.75); backdrop-filter: blur(12px); border-radius: 32px; padding: 16px; border: 1px solid rgba(255, 180, 70, 0.3); }
     .prediction-card .pred-detail { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.85rem; }
 
+    /* رسالة التحميل */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #ffb347;
+      animation: spin 1s ease-in-out infinite;
+      margin-left: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .retry-badge {
+      background: #ffb34720;
+      border: 1px solid #ffb347;
+      padding: 2px 12px;
+      border-radius: 20px;
+      font-size: 0.65rem;
+      color: #ffb347;
+      margin-right: 8px;
+    }
+
     footer { margin-top: 45px; text-align: center; font-size: 0.7rem; color: #98bdc9; border-top: 1px solid #ffb34760; padding-top: 20px; }
 
     @media (max-width: 550px) { body { padding: 12px; } .hero h1 { font-size: 1.3rem; } .tab-btn { padding: 6px 14px; font-size: 0.75rem; gap: 4px; } .team { font-size: 0.7rem; white-space: normal; } .team span:first-child { font-size: 1rem; } .countdown-timer { font-size: 0.75rem; } .matches-grid { gap: 14px; } #predictionForm > div { flex-direction: column; align-items: stretch; } .teams-score { flex-wrap: wrap; justify-content: center; } .team { min-width: 80px; } }
@@ -578,14 +600,66 @@
   }
 
   // ============================================================
-  //  المباريات السابقة (جلب من API)
+  //  المباريات السابقة (جلب من API مع إعادة محاولة)
   // ============================================================
   let previousGamesData = [];
+  let isLoadingPrevious = false;
+  let retryCount = 0;
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY = 3000;
+
+  // تحميل البيانات من localStorage
+  function loadFromCache() {
+    try {
+      const cached = localStorage.getItem('previousGamesData');
+      if (cached) {
+        const data = JSON.parse(cached);
+        if (Array.isArray(data) && data.length > 0) {
+          previousGamesData = data;
+          console.log(`📦 تم تحميل ${data.length} مباراة من الكاش.`);
+          return true;
+        }
+      }
+    } catch (e) {
+      console.warn("⚠️ فشل تحميل الكاش:", e);
+    }
+    return false;
+  }
+
+  // حفظ البيانات في localStorage
+  function saveToCache(data) {
+    try {
+      localStorage.setItem('previousGamesData', JSON.stringify(data));
+      console.log("💾 تم حفظ البيانات في الكاش.");
+    } catch (e) {
+      console.warn("⚠️ فشل حفظ الكاش:", e);
+    }
+  }
 
   async function loadPreviousGames() {
+    // إذا كان هناك تحميل جارٍ، لا نكرره
+    if (isLoadingPrevious) {
+      console.log("⏳ تحميل جارٍ بالفعل...");
+      return;
+    }
+
     const containerPrev = document.getElementById('previousMatchesContainer');
+    isLoadingPrevious = true;
+
+    // إذا كانت هناك بيانات في الذاكرة، نعرضها فوراً
+    if (previousGamesData.length > 0) {
+      renderPreviousGamesFiltered();
+    } else {
+      // حاول تحميل من الكاش
+      if (loadFromCache()) {
+        renderPreviousGamesFiltered();
+      } else {
+        containerPrev.innerHTML = `<div class="empty-state">⏳ جاري تحميل المباريات السابقة... <span class="loading-spinner"></span></div>`;
+      }
+    }
+
     try {
-      console.log("🔄 جاري تحميل المباريات السابقة من API...");
+      console.log(`🔄 محاولة تحميل المباريات السابقة (${retryCount + 1}/${MAX_RETRIES})...`);
       const response = await fetch('https://worldcup26.ir/get/games');
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
@@ -598,10 +672,9 @@
       const finished = data.games.filter(g => g.finished === "TRUE");
       console.log(`✅ ${finished.length} مباراة منتهية.`);
 
-      previousGamesData = finished.map(game => {
+      const newData = finished.map(game => {
         let homeRaw = game.home_team_name_fa || game.home_team_name_en || "";
         let awayRaw = game.away_team_name_fa || game.away_team_name_en || "";
-        console.log(`🔍 home="${homeRaw}", away="${awayRaw}"`);
         let homeAr = translateToArabic(homeRaw);
         let awayAr = translateToArabic(awayRaw);
         let homeScore = parseInt(game.home_score, 10);
@@ -622,12 +695,64 @@
         }
         return { homeAr, awayAr, homeScore, awayScore, dayName, formattedDate, timeMatch };
       });
-      console.log(`📊 تم تحميل ${previousGamesData.length} مباراة.`);
+
+      // تحديث البيانات وحفظ الكاش
+      previousGamesData = newData;
+      saveToCache(newData);
+      retryCount = 0; // إعادة تعيين عدد المحاولات عند النجاح
+      console.log(`📊 تم تحميل ${newData.length} مباراة.`);
       renderPreviousGamesFiltered();
       calculateStandings();
+
     } catch (err) {
       console.error("❌ فشل تحميل المباريات السابقة:", err);
-      containerPrev.innerHTML = `<div class="empty-state">⚠️ فشل تحميل المباريات السابقة: ${err.message}</div>`;
+
+      // إذا كانت هناك بيانات في الكاش وعرضناها بالفعل، نكتفي بالتحذير
+      if (previousGamesData.length > 0) {
+        containerPrev.innerHTML = previousGamesData.length > 0 ? 
+          renderPreviousGamesFiltered() : 
+          `<div class="empty-state">⚠️ فشل التحديث: ${err.message}<br><small>يتم عرض البيانات المخزنة مؤقتاً</small></div>`;
+      } else {
+        // إذا لم تكن هناك بيانات، نعرض رسالة خطأ مع زر إعادة المحاولة
+        containerPrev.innerHTML = `
+          <div class="empty-state">
+            ⚠️ فشل تحميل المباريات السابقة: ${err.message}
+            <br>
+            <button onclick="loadPreviousGames()" style="
+              margin-top:12px;
+              background:#ffb347;
+              border:none;
+              padding:8px 24px;
+              border-radius:30px;
+              font-weight:bold;
+              cursor:pointer;
+              color:#1a2f2f;
+            ">
+              🔄 إعادة المحاولة
+            </button>
+            ${retryCount < MAX_RETRIES ? `<br><small>سيتم المحاولة تلقائياً بعد ${RETRY_DELAY/1000} ثوانٍ</small>` : ''}
+          </div>
+        `;
+      }
+
+      // إعادة المحاولة بعد التأخير (إذا لم نصل للحد الأقصى)
+      if (retryCount < MAX_RETRIES) {
+        retryCount++;
+        console.log(`⏳ إعادة المحاولة بعد ${RETRY_DELAY/1000} ثوانٍ (${retryCount}/${MAX_RETRIES})...`);
+        setTimeout(() => {
+          isLoadingPrevious = false;
+          loadPreviousGames();
+        }, RETRY_DELAY);
+      } else {
+        console.warn("⚠️ تم الوصول للحد الأقصى من المحاولات.");
+        retryCount = 0; // إعادة تعيين للمرة القادمة
+        isLoadingPrevious = false;
+      }
+    } finally {
+      // إذا نجح التحميل، نحرر القفل
+      if (retryCount === 0 || retryCount >= MAX_RETRIES) {
+        isLoadingPrevious = false;
+      }
     }
   }
 
@@ -638,7 +763,14 @@
       let filtered = games;
       if (searchText) filtered = games.filter(g => g.homeAr.includes(searchText) || g.awayAr.includes(searchText));
       const container = document.getElementById('previousMatchesContainer');
-      if (!filtered.length) { container.innerHTML = `<div class="empty-state">📋 لا توجد مباريات سابقة مطابقة.</div>`; return; }
+      if (!filtered.length) {
+        if (games.length === 0) {
+          container.innerHTML = `<div class="empty-state">📋 جاري تحميل المباريات السابقة... <span class="loading-spinner"></span></div>`;
+        } else {
+          container.innerHTML = `<div class="empty-state">📋 لا توجد مباريات سابقة مطابقة للبحث.</div>`;
+        }
+        return;
+      }
       container.innerHTML = filtered.map(g => {
         const dateTimeDisplay = g.timeMatch ? `${g.formattedDate} - ${g.timeMatch}` : g.formattedDate;
         return `<div class="match-card">
@@ -651,9 +783,11 @@
           <div class="info-row"><span class="round-tag">🏅 النتيجة النهائية</span><div class="countdown-timer" style="background:#2c4b55;">✅ انتهت</div></div>
         </div>`;
       }).join('');
+      return container.innerHTML;
     } catch (err) {
       console.error("❌ renderPreviousGamesFiltered:", err);
       document.getElementById('previousMatchesContainer').innerHTML = `<div class="empty-state">⚠️ حدث خطأ في عرض المباريات السابقة.</div>`;
+      return "";
     }
   }
 
@@ -936,7 +1070,17 @@
       renderUpcoming();
       startAutoUpdate();
       initTabs();
-      loadPreviousGames();
+      
+      // تحميل البيانات من الكاش أولاً
+      if (!loadFromCache()) {
+        console.log("📭 لا توجد بيانات في الكاش، جاري التحميل من API...");
+      }
+      
+      // ثم محاولة التحميل من API
+      setTimeout(() => {
+        loadPreviousGames();
+      }, 500);
+      
       loadMatchesForSelect();
       console.log("✅ التطبيق جاهز.");
     } catch (err) {
