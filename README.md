@@ -9,7 +9,60 @@
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { background: radial-gradient(circle at 10% 20%, #0a1f24, #030c10); font-family: 'Segoe UI', 'Cairo', 'Inter', system-ui, -apple-system, 'Roboto', sans-serif; padding: 20px 12px; min-height: 100vh; color: #f0f9ff; font-size: 14px; }
     .app-container { max-width: 1200px; margin: 0 auto; width: 100%; }
-    .hero { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border-radius: 48px; padding: 20px; margin-bottom: 28px; text-align: center; border: 1px solid rgba(255, 200, 100, 0.3); box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
+    
+    /* ===== شريط الأخبار المتحرك ===== */
+    .upper-bar {
+      background: linear-gradient(90deg, #1a2f2f, #2a414b, #1a2f2f);
+      border: 1px solid rgba(255, 180, 70, 0.3);
+      border-radius: 60px;
+      padding: 8px 16px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 0 20px rgba(255, 180, 70, 0.1);
+    }
+    .news-ticker {
+      display: inline-block;
+      white-space: nowrap;
+      animation: tickerScroll 42s linear infinite;
+      font-size: 0.85rem;
+      color: #FFE6B0;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+    .news-ticker span {
+      display: inline-block;
+      padding: 0 20px;
+    }
+    .news-ticker .highlight {
+      color: #ffb347;
+      font-weight: 700;
+    }
+    .news-ticker .emoji {
+      font-size: 1rem;
+    }
+    .news-ticker .separator {
+      color: #ffb34780;
+    }
+    @keyframes tickerScroll {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    /* إيقاف الحركة عند التمرير */
+    .upper-bar:hover .news-ticker {
+      animation-play-state: paused;
+    }
+    
+    .hero {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border-radius: 48px;
+      padding: 20px;
+      margin-bottom: 28px;
+      text-align: center;
+      border: 1px solid rgba(255, 200, 100, 0.3);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    }
     .hero h1 { font-size: 1.8rem; background: linear-gradient(135deg, #FFE6B0, #FFA559, #FF6A3D); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 8px; letter-spacing: -0.5px; }
     .school-badge { background: rgba(30, 74, 95, 0.7); backdrop-filter: blur(4px); display: inline-block; padding: 6px 20px; border-radius: 60px; font-size: 0.75rem; font-weight: 500; border: 1px solid #ffb34760; }
     .control-panel { background: rgba(10, 25, 30, 0.6); backdrop-filter: blur(16px); border-radius: 80px; padding: 8px 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 28px; border: 1px solid rgba(255, 200, 100, 0.25); }
@@ -164,6 +217,11 @@
       color: #1a2f2f;
     }
     #predictionForm button:hover { background: #ff9f1a; transform: scale(0.97); }
+    #predictionForm button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
     #predictionMessage {
       margin-top: 12px;
       font-size: 0.9rem;
@@ -327,6 +385,17 @@
 
     footer { margin-top: 45px; text-align: center; font-size: 0.7rem; color: #98bdc9; border-top: 1px solid #ffb34760; padding-top: 20px; }
 
+    /* ===== رسالة منع التوقع ===== */
+    .prediction-blocked {
+      background: rgba(255, 68, 68, 0.15);
+      border: 1px solid rgba(255, 68, 68, 0.3);
+      border-radius: 40px;
+      padding: 8px 16px;
+      color: #ff6b6b;
+      font-size: 0.8rem;
+      display: inline-block;
+    }
+
     @media (max-width: 550px) {
       body { padding: 12px; }
       .hero h1 { font-size: 1.3rem; }
@@ -342,14 +411,32 @@
       .prediction-card .pred-detail { flex-direction: column; gap: 8px; align-items: flex-start; }
       .leaderboard-item { flex-wrap: wrap; gap: 8px; }
       .leaderboard-item .player-name { margin: 0; width: 100%; }
+      .news-ticker { font-size: 0.7rem; }
+      .upper-bar { padding: 6px 12px; }
     }
   </style>
 </head>
 <body>
 <div class="app-container">
+  
+  <!-- ===== شريط الأخبار المتحرك ===== -->
+  <div class="upper-bar">
+    <div class="news-ticker">
+      <span>🗳️ طريقة التوقع: اختر المباراة → اختر (فوز الفريق الأول / فوز الفريق الثاني / تعادل) → اكتب اسمك → اضغط حفظ التوقع ✨</span>
+      <span class="separator">|</span>
+      <span>التوقعات تظهر للجميع مباشرة ويتم احتساب النقاط تلقائياً 🏆</span>
+      <span class="separator">|</span>
+      <span>⛔ لا يمكن التوقع على المباريات الجارية</span>
+      <span class="separator">|</span>
+      <span>🗳️ طريقة التوقع: اختر المباراة → اختر (فوز الفريق الأول / فوز الفريق الثاني / تعادل) → اكتب اسمك → اضغط حفظ التوقع ✨</span>
+      <span class="separator">|</span>
+      <span>التوقعات تظهر للجميع مباشرة ويتم احتساب النقاط تلقائياً 🏆</span>
+    </div>
+  </div>
+
   <div class="hero">
     <h1>🏆 كأس العالم 2026 ⚡</h1>
-    <div class="school-badge">📢 غرفة معلمي سعيد بن العاص | ترتيب مباشر من الـ API</div>
+    <div class="school-badge">📢 غرفة معلمي سعيد بن العاص</div>
   </div>
 
   <div class="control-panel">
@@ -406,6 +493,9 @@
         <button id="savePredictionBtn">💾 حفظ التوقع</button>
       </div>
       <div id="predictionMessage"></div>
+      <div id="matchStatusWarning" style="margin-top:8px; display:none;" class="prediction-blocked">
+        ⚠️ هذه المباراة تُلعب الآن، لا يمكنك التوقع عليها
+      </div>
     </div>
     <h3 style="margin: 20px 0 12px 0; color: #FFE6B0;">🗳️ جميع التوقعات</h3>
     <div id="allPredictions" class="matches-grid"><div class="empty-state">📭 جاري تحميل التوقعات...</div></div>
@@ -416,7 +506,7 @@
     <div id="leaderboardContainer" class="leaderboard-grid"><div class="empty-state">⏳ جاري تحميل الترتيب...</div></div>
   </div>
 
-  <footer>🔄 التحديث التلقائي | الترتيب يُحسب حصرياً من نتائج المباريات المنتهية (API) | التوقعات محفوظة في Supabase</footer>
+  <footer>🔄 التحديث التلقائي | التوقعات محفوظة في Supabase</footer>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -565,7 +655,6 @@
   function calculateLeaderboard(predictions, matches) {
     const scores = {};
 
-    // تهيئة النقاط لكل لاعب
     predictions.forEach(p => {
       if (!scores[p.user_name]) {
         scores[p.user_name] = { name: p.user_name, points: 0, correct: 0, total: 0 };
@@ -573,13 +662,11 @@
       scores[p.user_name].total += 1;
     });
 
-    // حساب النقاط
     predictions.forEach(p => {
       const parts = p.match_id.split('_');
       const team1 = parts[1];
       const team2 = parts[2];
 
-      // البحث عن المباراة في المباريات السابقة
       const match = matches.find(m =>
         (m.homeAr === team1 && m.awayAr === team2) ||
         (m.homeAr === team2 && m.awayAr === team1)
@@ -589,21 +676,19 @@
 
       let result = "";
       if (match.homeScore > match.awayScore) {
-        result = match.homeAr; // الفريق الفائز
+        result = match.homeAr;
       } else if (match.homeScore < match.awayScore) {
-        result = match.awayAr; // الفريق الفائز
+        result = match.awayAr;
       } else {
         result = "DRAW";
       }
 
-      // التحقق من صحة التوقع
       if (p.prediction === result) {
         scores[p.user_name].points += 1;
         scores[p.user_name].correct += 1;
       }
     });
 
-    // ترتيب اللاعبين حسب النقاط
     return Object.values(scores)
       .sort((a, b) => b.points - a.points)
       .map((player, index) => ({ ...player, rank: index + 1 }));
@@ -677,6 +762,7 @@
   function now() { return new Date().getTime(); }
   function matchTime(t) { return new Date(t).getTime(); }
   const MATCH_DURATION = 105 * 60 * 1000;
+  
   function getMatchStatus(m) {
     const start = matchTime(m.timeISO);
     const end = start + MATCH_DURATION;
@@ -690,6 +776,14 @@
     } else if (cur <= end) return { live: true, text: "🔴 تُلعب الآن 🔴" };
     else return { live: false, text: "✅ انتهت" };
   }
+  
+  function isMatchLive(timeISO) {
+    const start = matchTime(timeISO);
+    const end = start + MATCH_DURATION;
+    const cur = now();
+    return cur >= start && cur <= end;
+  }
+  
   function upcomingMatches(arr) { return arr.filter(m => (matchTime(m.timeISO)+MATCH_DURATION) > now()); }
   function filterRound(arr, r) { if (r==="all") return arr; return arr.filter(m => m.round === r); }
 
@@ -801,7 +895,7 @@
   }
 
   // ============================================================
-  //  بيانات المباريات القادمة
+  //  بيانات المباريات القادمة (بتوقيت +3 GMT)
   // ============================================================
   const rawMatches = [
     { team1:"المكسيك", team2:"جنوب أفريقيا", time:"2026-06-11T22:00:00", round:"first" },{ team1:"الأرجنتين", team2:"الجزائر", time:"2026-06-11T04:00:00", round:"first" },
@@ -842,7 +936,12 @@
     { team1:"الكونغو الديمقراطية", team2:"أوزبكستان", time:"2026-06-28T02:30:00", round:"third" },{ team1:"الجزائر", team2:"النمسا", time:"2026-06-28T05:00:00", round:"third" },
     { team1:"الأردن", team2:"الأرجنتين", time:"2026-06-28T05:00:00", round:"third" }
   ];
-  const matchesData = rawMatches.map(m => ({ ...m, timeISO: m.time + "+03:00", roundLabel: m.round === 'first' ? 'الجولة الأولى' : (m.round === 'second' ? 'الجولة الثانية' : 'الجولة الثالثة') }));
+  
+  const matchesData = rawMatches.map(m => ({ 
+    ...m, 
+    timeISO: m.time + "+03:00", 
+    roundLabel: m.round === 'first' ? 'الجولة الأولى' : (m.round === 'second' ? 'الجولة الثانية' : 'الجولة الثالثة') 
+  }));
 
   // ============================================================
   //  عرض المباريات القادمة
@@ -975,7 +1074,6 @@
       renderPreviousGamesFiltered();
       calculateStandings();
 
-      // تحديث Leaderboard بعد تحميل المباريات
       const activeTab = document.querySelector('.tab-btn.active')?.getAttribute('data-tab');
       if (activeTab === 'leaderboard') {
         renderLeaderboard();
@@ -1224,7 +1322,7 @@
   function getDateTimeDisplay(t) { return `${getDateFmt(t)} - ${getTimeFromISO(t)}`; }
 
   // ============================================================
-  //  دوال التوقعات (التحميل والعرض)
+  //  دوال التوقعات (التحميل والعرض مع منع المباريات الجارية)
   // ============================================================
   function loadMatchesForSelect() {
     try {
@@ -1235,14 +1333,39 @@
         return;
       }
       select.innerHTML = upcoming.map(m => {
-        const label = `${m.team1} 🆚 ${m.team2} (${getDateTimeDisplay(m.timeISO)})`;
+        const isLive = isMatchLive(m.timeISO);
+        const label = `${m.team1} 🆚 ${m.team2} (${getDateTimeDisplay(m.timeISO)})${isLive ? ' 🔴 جارية' : ''}`;
         const matchId = `${m.timeISO}_${m.team1}_${m.team2}`;
-        return `<option value="${matchId}">${label}</option>`;
+        return `<option value="${matchId}" ${isLive ? 'disabled style="color:#ff6b6b;"' : ''}>${label}</option>`;
       }).join('');
 
       updatePredictionOptions();
+      checkMatchStatus();
     } catch (err) {
       console.error("❌ loadMatchesForSelect:", err);
+    }
+  }
+
+  function checkMatchStatus() {
+    const matchSelect = document.getElementById('matchSelect');
+    const warningEl = document.getElementById('matchStatusWarning');
+    const saveBtn = document.getElementById('savePredictionBtn');
+    
+    if (!matchSelect || !matchSelect.value) {
+      warningEl.style.display = 'none';
+      saveBtn.disabled = false;
+      return;
+    }
+    
+    const parts = matchSelect.value.split('_');
+    const timeISO = parts[0];
+    
+    if (timeISO && isMatchLive(timeISO)) {
+      warningEl.style.display = 'inline-block';
+      saveBtn.disabled = true;
+    } else {
+      warningEl.style.display = 'none';
+      saveBtn.disabled = false;
     }
   }
 
@@ -1271,7 +1394,10 @@
     `;
   }
 
-  document.getElementById('matchSelect').addEventListener('change', updatePredictionOptions);
+  document.getElementById('matchSelect').addEventListener('change', function() {
+    updatePredictionOptions();
+    checkMatchStatus();
+  });
 
   // ============================================================
   //  أحداث النموذج
@@ -1297,12 +1423,19 @@
       return;
     }
 
+    // التحقق من أن المباراة ليست جارية
+    const parts = matchId.split('_');
+    const timeISO = parts[0];
+    if (timeISO && isMatchLive(timeISO)) {
+      showPredictionMessage('⛔ لا يمكن التوقع على مباراة جارية!', 'error');
+      return;
+    }
+
     const result = await savePrediction(userName, matchId, prediction);
     if (result.success) {
       showPredictionMessage('✅ تم حفظ توقعك بنجاح!', 'success');
       predictionSelect.value = '';
       await renderAllPredictions();
-      // تحديث Leaderboard بعد حفظ التوقع
       const activeTab = document.querySelector('.tab-btn.active')?.getAttribute('data-tab');
       if (activeTab === 'leaderboard') {
         renderLeaderboard();
