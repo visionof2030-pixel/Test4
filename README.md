@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>🏆 كأس العالم 2026 – متتبع المباريات + توقعات</title>
+  <title>🏆 كأس العالم 2026 – متتبع المباريات + توقعات + ترتيب</title>
   <style>
     /* ========== الأنماط الأساسية ========== */
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -248,6 +248,70 @@
       border-color: rgba(255, 152, 0, 0.5);
       color: white;
     }
+    
+    /* ===== تنسيق Leaderboard ===== */
+    .leaderboard-item {
+      background: rgba(18, 38, 44, 0.75);
+      backdrop-filter: blur(12px);
+      border-radius: 32px;
+      padding: 16px 20px;
+      border: 1px solid rgba(255, 180, 70, 0.3);
+      transition: 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .leaderboard-item:hover {
+      transform: translateX(-4px);
+      border-color: #ffb347aa;
+    }
+    .leaderboard-item .rank {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #ffb347;
+      min-width: 50px;
+    }
+    .leaderboard-item .rank.gold { color: #FFD700; }
+    .leaderboard-item .rank.silver { color: #C0C0C0; }
+    .leaderboard-item .rank.bronze { color: #CD7F32; }
+    .leaderboard-item .player-name {
+      font-size: 1rem;
+      font-weight: 600;
+      flex: 1;
+      margin: 0 12px;
+    }
+    .leaderboard-item .player-name .avatar-small {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffb347, #ff8c1a);
+      text-align: center;
+      line-height: 28px;
+      font-weight: 800;
+      color: #1a2f2f;
+      margin-left: 8px;
+      font-size: 0.8rem;
+    }
+    .leaderboard-item .points {
+      background: linear-gradient(135deg, #ffb347, #ff8c1a);
+      padding: 4px 18px;
+      border-radius: 40px;
+      font-weight: 800;
+      color: #1a2f2f;
+      font-size: 0.9rem;
+      min-width: 60px;
+      text-align: center;
+    }
+    .leaderboard-item .medal {
+      font-size: 1.5rem;
+      margin-left: 8px;
+    }
+    .leaderboard-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
 
     .loading-spinner {
       display: inline-block;
@@ -276,6 +340,8 @@
       .teams-score { flex-wrap: wrap; justify-content: center; }
       .team { min-width: 80px; }
       .prediction-card .pred-detail { flex-direction: column; gap: 8px; align-items: flex-start; }
+      .leaderboard-item { flex-wrap: wrap; gap: 8px; }
+      .leaderboard-item .player-name { margin: 0; width: 100%; }
     }
   </style>
 </head>
@@ -310,6 +376,7 @@
     <button class="tab-btn" data-tab="previous"><i>📋</i> المباريات السابقة</button>
     <button class="tab-btn" data-tab="standings"><i>📊</i> ترتيب المجموعات</button>
     <button class="tab-btn" data-tab="predictions"><i>🗳️</i> التوقعات</button>
+    <button class="tab-btn" data-tab="leaderboard"><i>🏆</i> الترتيب</button>
   </div>
 
   <div id="upcomingTab" class="tab-content active">
@@ -344,6 +411,11 @@
     <div id="allPredictions" class="matches-grid"><div class="empty-state">📭 جاري تحميل التوقعات...</div></div>
   </div>
 
+  <div id="leaderboardTab" class="tab-content">
+    <h3 style="margin: 0 0 16px 0; color: #FFE6B0;">🏆 ترتيب اللاعبين</h3>
+    <div id="leaderboardContainer" class="leaderboard-grid"><div class="empty-state">⏳ جاري تحميل الترتيب...</div></div>
+  </div>
+
   <footer>🔄 التحديث التلقائي | الترتيب يُحسب حصرياً من نتائج المباريات المنتهية (API) | التوقعات محفوظة في Supabase</footer>
 </div>
 
@@ -366,14 +438,13 @@
   }
 
   // ============================================================
-  //  1) حفظ التوقع (يخزن اسم الفريق مباشرة)
+  //  1) حفظ التوقع
   // ============================================================
   async function savePrediction(userName, matchId, prediction) {
     if (!supabaseClient) {
       return { success: false, message: "Supabase غير متصل." };
     }
 
-    // prediction الآن يحمل اسم الفريق (مثل "المكسيك" أو "البرازيل")
     if (!prediction || prediction === "") {
       return { success: false, message: "الرجاء اختيار فريق." };
     }
@@ -384,7 +455,7 @@
         .insert([{
           user_name: userName,
           match_id: matchId,
-          prediction: prediction  // يخزن اسم الفريق
+          prediction: prediction
         }]);
 
       if (error) {
@@ -428,7 +499,7 @@
   }
 
   // ============================================================
-  //  3) عرض كل التوقعات (يظهر اسم الفريق)
+  //  3) عرض كل التوقعات
   // ============================================================
   async function renderAllPredictions() {
     const container = document.getElementById('allPredictions');
@@ -444,19 +515,15 @@
       let text = "";
       let className = "";
 
-      // p.prediction هو اسم الفريق أو "DRAW"
       if (p.prediction === "DRAW") {
         text = "🤝 تعادل الفريقين";
         className = "draw";
       } else {
-        // عرض اسم الفريق الفائز مع العلم
         const flag = getFlag(p.prediction) || "🏁";
         text = `🏆 فوز ${flag} ${p.prediction}`;
-        // تحديد اللون بناءً على اسم الفريق (يمكن تحسينه لاحقاً)
-        className = "home"; // لون افتراضي
+        className = "home";
       }
 
-      // استخراج معلومات المباراة من match_id
       let matchInfo = "";
       if (p.match_id) {
         const parts = p.match_id.split('_');
@@ -493,7 +560,109 @@
   }
 
   // ============================================================
-  //  4) رسالة النجاح
+  //  4) Leaderboard System
+  // ============================================================
+  function calculateLeaderboard(predictions, matches) {
+    const scores = {};
+
+    // تهيئة النقاط لكل لاعب
+    predictions.forEach(p => {
+      if (!scores[p.user_name]) {
+        scores[p.user_name] = { name: p.user_name, points: 0, correct: 0, total: 0 };
+      }
+      scores[p.user_name].total += 1;
+    });
+
+    // حساب النقاط
+    predictions.forEach(p => {
+      const parts = p.match_id.split('_');
+      const team1 = parts[1];
+      const team2 = parts[2];
+
+      // البحث عن المباراة في المباريات السابقة
+      const match = matches.find(m =>
+        (m.homeAr === team1 && m.awayAr === team2) ||
+        (m.homeAr === team2 && m.awayAr === team1)
+      );
+
+      if (!match) return;
+
+      let result = "";
+      if (match.homeScore > match.awayScore) {
+        result = match.homeAr; // الفريق الفائز
+      } else if (match.homeScore < match.awayScore) {
+        result = match.awayAr; // الفريق الفائز
+      } else {
+        result = "DRAW";
+      }
+
+      // التحقق من صحة التوقع
+      if (p.prediction === result) {
+        scores[p.user_name].points += 1;
+        scores[p.user_name].correct += 1;
+      }
+    });
+
+    // ترتيب اللاعبين حسب النقاط
+    return Object.values(scores)
+      .sort((a, b) => b.points - a.points)
+      .map((player, index) => ({ ...player, rank: index + 1 }));
+  }
+
+  // ============================================================
+  //  5) عرض Leaderboard
+  // ============================================================
+  async function renderLeaderboard() {
+    const container = document.getElementById("leaderboardContainer");
+
+    const predictions = await getAllPredictions();
+
+    if (!previousGamesData || previousGamesData.length === 0) {
+      container.innerHTML = `<div class="empty-state">⏳ جاري تحميل النتائج...</div>`;
+      return;
+    }
+
+    if (!predictions || predictions.length === 0) {
+      container.innerHTML = `<div class="empty-state">📭 لا توجد توقعات لحساب الترتيب</div>`;
+      return;
+    }
+
+    const board = calculateLeaderboard(predictions, previousGamesData);
+
+    if (board.length === 0) {
+      container.innerHTML = `<div class="empty-state">📭 لا توجد بيانات كافية للترتيب</div>`;
+      return;
+    }
+
+    container.innerHTML = board.map((p, i) => {
+      let rankClass = "";
+      let medal = "";
+      if (i === 0) { rankClass = "gold"; medal = "🥇"; }
+      else if (i === 1) { rankClass = "silver"; medal = "🥈"; }
+      else if (i === 2) { rankClass = "bronze"; medal = "🥉"; }
+
+      const accuracy = p.total > 0 ? Math.round((p.correct / p.total) * 100) : 0;
+
+      return `
+        <div class="leaderboard-item">
+          <div class="rank ${rankClass}">
+            ${medal || `#${p.rank}`}
+          </div>
+          <div class="player-name">
+            <span class="avatar-small">${p.name.charAt(0).toUpperCase()}</span>
+            ${p.name}
+            <span style="font-size:0.7rem; color:#98bdc9; margin-right:8px;">
+              (${p.correct}/${p.total} • ${accuracy}%)
+            </span>
+          </div>
+          <div class="points">${p.points} نقطة</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ============================================================
+  //  6) رسالة النجاح
   // ============================================================
   function showPredictionMessage(msg, type = "success") {
     const el = document.getElementById("predictionMessage");
@@ -525,7 +694,7 @@
   function filterRound(arr, r) { if (r==="all") return arr; return arr.filter(m => m.round === r); }
 
   // ============================================================
-  //  ترجمة الأسماء (خريطة شاملة + مطابقة جزئية)
+  //  ترجمة الأسماء
   // ============================================================
   const nameMapping = new Map([
     ["مکزیک", "المكسيك"], ["Mexico", "المكسيك"], ["مكسيك", "المكسيك"],
@@ -805,6 +974,12 @@
       console.log(`📊 تم تحميل ${newData.length} مباراة.`);
       renderPreviousGamesFiltered();
       calculateStandings();
+
+      // تحديث Leaderboard بعد تحميل المباريات
+      const activeTab = document.querySelector('.tab-btn.active')?.getAttribute('data-tab');
+      if (activeTab === 'leaderboard') {
+        renderLeaderboard();
+      }
 
     } catch (err) {
       console.error("❌ فشل تحميل المباريات السابقة:", err);
@@ -1127,6 +1302,11 @@
       showPredictionMessage('✅ تم حفظ توقعك بنجاح!', 'success');
       predictionSelect.value = '';
       await renderAllPredictions();
+      // تحديث Leaderboard بعد حفظ التوقع
+      const activeTab = document.querySelector('.tab-btn.active')?.getAttribute('data-tab');
+      if (activeTab === 'leaderboard') {
+        renderLeaderboard();
+      }
     } else {
       showPredictionMessage(`❌ فشل الحفظ: ${result.message}`, 'error');
     }
@@ -1154,6 +1334,9 @@
           loadMatchesForSelect();
           renderAllPredictions();
         }
+        if (id === 'leaderboard') {
+          renderLeaderboard();
+        }
       });
     });
   }
@@ -1178,6 +1361,9 @@
         if (activeTab === 'predictions') {
           loadMatchesForSelect();
           renderAllPredictions();
+        }
+        if (activeTab === 'leaderboard') {
+          renderLeaderboard();
         }
       } catch (err) {
         console.error("❌ تحديث تلقائي:", err);
