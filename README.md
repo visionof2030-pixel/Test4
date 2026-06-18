@@ -134,14 +134,88 @@
     .quick-match-teams { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-weight: bold; font-size: 0.85rem; }
 
     /* ========== تنسيقات التوقعات ========== */
-    #predictionForm { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); padding: 20px; border-radius: 32px; margin-bottom: 24px; border: 1px solid rgba(255, 180, 70, 0.3); }
-    #predictionForm input, #predictionForm select { background: #fef9e6; border: none; padding: 10px 16px; border-radius: 60px; font-size: 0.9rem; outline: none; color: #1a2f2f; }
+    #predictionForm {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      padding: 20px;
+      border-radius: 32px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255, 180, 70, 0.3);
+    }
+    #predictionForm input, #predictionForm select {
+      background: #fef9e6;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 60px;
+      font-size: 0.9rem;
+      outline: none;
+      color: #1a2f2f;
+      min-width: 120px;
+    }
     #predictionForm input::placeholder { color: #555; }
-    #predictionForm button { background: #ffb347; border: none; padding: 10px 24px; border-radius: 60px; font-weight: bold; cursor: pointer; transition: 0.2s; color: #1a2f2f; }
+    #predictionForm select option { color: #1a2f2f; }
+    #predictionForm button {
+      background: #ffb347;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 60px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      color: #1a2f2f;
+    }
     #predictionForm button:hover { background: #ff9f1a; transform: scale(0.97); }
-    #predictionMessage { margin-top: 12px; font-size: 0.9rem; font-weight: 600; padding: 8px 16px; border-radius: 40px; background: rgba(0,0,0,0.3); }
-    .prediction-card { background: rgba(18, 38, 44, 0.75); backdrop-filter: blur(12px); border-radius: 32px; padding: 16px; border: 1px solid rgba(255, 180, 70, 0.3); }
-    .prediction-card .pred-detail { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.85rem; }
+    #predictionMessage {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 40px;
+      background: rgba(0,0,0,0.3);
+    }
+    
+    /* ===== تنسيق بطاقات التوقعات ===== */
+    .prediction-card {
+      background: rgba(18, 38, 44, 0.75);
+      backdrop-filter: blur(12px);
+      border-radius: 32px;
+      padding: 16px;
+      border: 1px solid rgba(255, 180, 70, 0.3);
+    }
+    .prediction-card .pred-detail {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 0.85rem;
+    }
+    .prediction-badge {
+      background: linear-gradient(135deg, #ffb347, #ff8c1a);
+      padding: 6px 20px;
+      border-radius: 40px;
+      font-weight: 800;
+      color: #1a2f2f;
+      display: inline-block;
+      font-size: 0.9rem;
+      box-shadow: 0 0 15px rgba(255, 180, 70, 0.2);
+      border: 1px solid rgba(255, 200, 100, 0.3);
+      letter-spacing: 0.5px;
+    }
+    .prediction-badge.home {
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      border-color: rgba(76, 175, 80, 0.5);
+      color: white;
+    }
+    .prediction-badge.away {
+      background: linear-gradient(135deg, #f44336, #d32f2f);
+      border-color: rgba(244, 67, 54, 0.5);
+      color: white;
+    }
+    .prediction-badge.draw {
+      background: linear-gradient(135deg, #FF9800, #F57C00);
+      border-color: rgba(255, 152, 0, 0.5);
+      color: white;
+    }
 
     /* رسالة التحميل */
     .loading-spinner {
@@ -155,19 +229,22 @@
       margin-left: 8px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .retry-badge {
-      background: #ffb34720;
-      border: 1px solid #ffb347;
-      padding: 2px 12px;
-      border-radius: 20px;
-      font-size: 0.65rem;
-      color: #ffb347;
-      margin-right: 8px;
-    }
 
     footer { margin-top: 45px; text-align: center; font-size: 0.7rem; color: #98bdc9; border-top: 1px solid #ffb34760; padding-top: 20px; }
 
-    @media (max-width: 550px) { body { padding: 12px; } .hero h1 { font-size: 1.3rem; } .tab-btn { padding: 6px 14px; font-size: 0.75rem; gap: 4px; } .team { font-size: 0.7rem; white-space: normal; } .team span:first-child { font-size: 1rem; } .countdown-timer { font-size: 0.75rem; } .matches-grid { gap: 14px; } #predictionForm > div { flex-direction: column; align-items: stretch; } .teams-score { flex-wrap: wrap; justify-content: center; } .team { min-width: 80px; } }
+    @media (max-width: 550px) {
+      body { padding: 12px; }
+      .hero h1 { font-size: 1.3rem; }
+      .tab-btn { padding: 6px 14px; font-size: 0.75rem; gap: 4px; }
+      .team { font-size: 0.7rem; white-space: normal; }
+      .team span:first-child { font-size: 1rem; }
+      .countdown-timer { font-size: 0.75rem; }
+      .matches-grid { gap: 14px; }
+      #predictionForm > div { flex-direction: column; align-items: stretch; }
+      #predictionForm input, #predictionForm select { min-width: unset; }
+      .teams-score { flex-wrap: wrap; justify-content: center; }
+      .team { min-width: 80px; }
+    }
   </style>
 </head>
 <body>
@@ -224,13 +301,15 @@
   </div>
 
   <div id="predictionsTab" class="tab-content">
-    <!-- نموذج إضافة توقع -->
+    <!-- نموذج إضافة توقع (محدث) -->
     <div id="predictionForm">
       <h3>📝 توقع نتيجة مباراة</h3>
       <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
         <input type="text" id="userNameInput" placeholder="👤 اسمك" style="flex:1; min-width:120px;">
         <select id="matchSelect" style="flex:2; min-width:180px;"></select>
-        <input type="text" id="predictionInput" placeholder="🔮 النتيجة (مثل 2-1)" style="flex:1; min-width:100px; text-align:center;">
+        <select id="predictionInput" style="flex:1.5; min-width:150px;">
+          <option value="">🔮 اختر توقعك</option>
+        </select>
         <button id="savePredictionBtn">💾 حفظ التوقع</button>
       </div>
       <div id="predictionMessage"></div>
@@ -262,19 +341,16 @@
   }
 
   // ============================================================
-  //  1) تحسين حفظ التوقع (تنظيف الإدخال)
+  //  1) تحسين حفظ التوقع (مع Dropdown)
   // ============================================================
   async function savePrediction(userName, matchId, prediction) {
     if (!supabaseClient) {
       return { success: false, message: "Supabase غير متصل." };
     }
 
-    const cleanPrediction = prediction
-      .replace(/[^\d\-]/g, "")
-      .trim();
-
-    if (!cleanPrediction) {
-      return { success: false, message: "النتيجة غير صالحة (مثال: 2-1)" };
+    // التحقق من صحة التوقع (يجب أن يكون HOME, AWAY, أو DRAW)
+    if (!["HOME", "AWAY", "DRAW"].includes(prediction)) {
+      return { success: false, message: "توقع غير صالح. اختر من القائمة المنسدلة." };
     }
 
     try {
@@ -283,7 +359,7 @@
         .insert([{
           user_name: userName,
           match_id: matchId,
-          prediction: cleanPrediction
+          prediction: prediction
         }]);
 
       if (error) {
@@ -336,7 +412,7 @@
   }
 
   // ============================================================
-  //  2) تحسين عرض التوقعات (UI أنظف)
+  //  عرض التوقعات (UI محدث)
   // ============================================================
   async function renderUserPredictions(userName) {
     const container = document.getElementById('userPredictions');
@@ -359,6 +435,26 @@
       const team1 = parts[1];
       const team2 = parts[2];
 
+      // تحديد النص والتصنيف حسب نوع التوقع
+      let predictionText, badgeClass;
+      switch(p.prediction) {
+        case "HOME":
+          predictionText = `🏆 فوز ${team1}`;
+          badgeClass = "home";
+          break;
+        case "AWAY":
+          predictionText = `🏆 فوز ${team2}`;
+          badgeClass = "away";
+          break;
+        case "DRAW":
+          predictionText = "🤝 تعادل الفريقين";
+          badgeClass = "draw";
+          break;
+        default:
+          predictionText = p.prediction;
+          badgeClass = "";
+      }
+
       return `
         <div class="prediction-card">
           <div class="teams-score">
@@ -374,15 +470,8 @@
 
           <div class="pred-detail">
             <span>🔮 توقعك</span>
-            <span style="
-              background:#ffb347;
-              padding:4px 18px;
-              border-radius:40px;
-              font-weight:bold;
-              color:#1a2f2f;
-              letter-spacing:1px;
-            ">
-              ${p.prediction}
+            <span class="prediction-badge ${badgeClass}">
+              ${predictionText}
             </span>
           </div>
 
@@ -608,7 +697,6 @@
   const MAX_RETRIES = 3;
   const RETRY_DELAY = 3000;
 
-  // تحميل البيانات من localStorage
   function loadFromCache() {
     try {
       const cached = localStorage.getItem('previousGamesData');
@@ -626,7 +714,6 @@
     return false;
   }
 
-  // حفظ البيانات في localStorage
   function saveToCache(data) {
     try {
       localStorage.setItem('previousGamesData', JSON.stringify(data));
@@ -637,7 +724,6 @@
   }
 
   async function loadPreviousGames() {
-    // إذا كان هناك تحميل جارٍ، لا نكرره
     if (isLoadingPrevious) {
       console.log("⏳ تحميل جارٍ بالفعل...");
       return;
@@ -646,11 +732,9 @@
     const containerPrev = document.getElementById('previousMatchesContainer');
     isLoadingPrevious = true;
 
-    // إذا كانت هناك بيانات في الذاكرة، نعرضها فوراً
     if (previousGamesData.length > 0) {
       renderPreviousGamesFiltered();
     } else {
-      // حاول تحميل من الكاش
       if (loadFromCache()) {
         renderPreviousGamesFiltered();
       } else {
@@ -696,10 +780,9 @@
         return { homeAr, awayAr, homeScore, awayScore, dayName, formattedDate, timeMatch };
       });
 
-      // تحديث البيانات وحفظ الكاش
       previousGamesData = newData;
       saveToCache(newData);
-      retryCount = 0; // إعادة تعيين عدد المحاولات عند النجاح
+      retryCount = 0;
       console.log(`📊 تم تحميل ${newData.length} مباراة.`);
       renderPreviousGamesFiltered();
       calculateStandings();
@@ -707,13 +790,11 @@
     } catch (err) {
       console.error("❌ فشل تحميل المباريات السابقة:", err);
 
-      // إذا كانت هناك بيانات في الكاش وعرضناها بالفعل، نكتفي بالتحذير
       if (previousGamesData.length > 0) {
         containerPrev.innerHTML = previousGamesData.length > 0 ? 
           renderPreviousGamesFiltered() : 
           `<div class="empty-state">⚠️ فشل التحديث: ${err.message}<br><small>يتم عرض البيانات المخزنة مؤقتاً</small></div>`;
       } else {
-        // إذا لم تكن هناك بيانات، نعرض رسالة خطأ مع زر إعادة المحاولة
         containerPrev.innerHTML = `
           <div class="empty-state">
             ⚠️ فشل تحميل المباريات السابقة: ${err.message}
@@ -735,7 +816,6 @@
         `;
       }
 
-      // إعادة المحاولة بعد التأخير (إذا لم نصل للحد الأقصى)
       if (retryCount < MAX_RETRIES) {
         retryCount++;
         console.log(`⏳ إعادة المحاولة بعد ${RETRY_DELAY/1000} ثوانٍ (${retryCount}/${MAX_RETRIES})...`);
@@ -745,11 +825,10 @@
         }, RETRY_DELAY);
       } else {
         console.warn("⚠️ تم الوصول للحد الأقصى من المحاولات.");
-        retryCount = 0; // إعادة تعيين للمرة القادمة
+        retryCount = 0;
         isLoadingPrevious = false;
       }
     } finally {
-      // إذا نجح التحميل، نحرر القفل
       if (retryCount === 0 || retryCount >= MAX_RETRIES) {
         isLoadingPrevious = false;
       }
@@ -951,7 +1030,7 @@
   function getDateTimeDisplay(t) { return `${getDateFmt(t)} - ${getTimeFromISO(t)}`; }
 
   // ============================================================
-  //  دوال التوقعات (التحميل والعرض)
+  //  دوال التوقعات (التحميل والعرض) - محدثة لعرض أسماء الفرق
   // ============================================================
   function loadMatchesForSelect() {
     try {
@@ -966,19 +1045,55 @@
         const matchId = `${m.timeISO}_${m.team1}_${m.team2}`;
         return `<option value="${matchId}">${label}</option>`;
       }).join('');
+
+      // تحديث القائمة المنسدلة للتوقعات عند تغيير المباراة
+      updatePredictionOptions();
     } catch (err) {
       console.error("❌ loadMatchesForSelect:", err);
     }
   }
 
+  // دالة جديدة لتحديث خيارات التوقع بناءً على المباراة المختارة
+  function updatePredictionOptions() {
+    const matchSelect = document.getElementById('matchSelect');
+    const predictionSelect = document.getElementById('predictionInput');
+    const selectedMatch = matchSelect.value;
+
+    if (!selectedMatch) {
+      predictionSelect.innerHTML = `
+        <option value="">🔮 اختر توقعك</option>
+        <option value="HOME">🏆 فوز الفريق الأول</option>
+        <option value="AWAY">🏆 فوز الفريق الثاني</option>
+        <option value="DRAW">🤝 تعادل الفريقين</option>
+      `;
+      return;
+    }
+
+    // استخراج أسماء الفرق من match_id
+    const parts = selectedMatch.split('_');
+    const team1 = parts[1] || 'الفريق الأول';
+    const team2 = parts[2] || 'الفريق الثاني';
+
+    predictionSelect.innerHTML = `
+      <option value="">🔮 اختر توقعك</option>
+      <option value="HOME">🏆 فوز ${team1}</option>
+      <option value="AWAY">🏆 فوز ${team2}</option>
+      <option value="DRAW">🤝 تعادل الفريقين</option>
+    `;
+  }
+
+  // ربط تغيير المباراة بتحديث خيارات التوقع
+  document.getElementById('matchSelect').addEventListener('change', updatePredictionOptions);
+
   // ============================================================
-  //  أحداث النموذج
+  //  أحداث النموذج (محدثة للـ Dropdown)
   // ============================================================
   document.getElementById('savePredictionBtn').addEventListener('click', async function() {
     const userName = document.getElementById('userNameInput').value.trim();
     const matchSelect = document.getElementById('matchSelect');
     const matchId = matchSelect.value;
-    const prediction = document.getElementById('predictionInput').value.trim();
+    const predictionSelect = document.getElementById('predictionInput');
+    const prediction = predictionSelect.value;
     const msg = document.getElementById('predictionMessage');
 
     if (!userName) {
@@ -990,14 +1105,14 @@
       return;
     }
     if (!prediction) {
-      showPredictionMessage('⚠️ الرجاء إدخال النتيجة المتوقعة (مثل 2-1).', 'warning');
+      showPredictionMessage('⚠️ الرجاء اختيار توقعك من القائمة.', 'warning');
       return;
     }
 
     const result = await savePrediction(userName, matchId, prediction);
     if (result.success) {
       showPredictionMessage('✅ تم حفظ توقعك بنجاح!', 'success');
-      document.getElementById('predictionInput').value = '';
+      predictionSelect.value = '';
       await renderUserPredictions(userName);
     } else {
       showPredictionMessage(`❌ فشل الحفظ: ${result.message}`, 'error');
@@ -1071,12 +1186,10 @@
       startAutoUpdate();
       initTabs();
       
-      // تحميل البيانات من الكاش أولاً
       if (!loadFromCache()) {
         console.log("📭 لا توجد بيانات في الكاش، جاري التحميل من API...");
       }
       
-      // ثم محاولة التحميل من API
       setTimeout(() => {
         loadPreviousGames();
       }, 500);
