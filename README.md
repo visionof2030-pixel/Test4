@@ -30,11 +30,84 @@
     .match-card { background: rgba(18, 38, 44, 0.75); backdrop-filter: blur(12px); border-radius: 32px; padding: 16px; border: 1px solid rgba(255, 180, 70, 0.3); transition: all 0.25s; box-shadow: 0 12px 24px -12px rgba(0,0,0,0.4); }
     .match-card:hover { transform: translateY(-3px); border-color: #ffb347aa; box-shadow: 0 20px 30px -12px black; }
     .match-card.live-card { border: 2px solid #ff4d4d; background: linear-gradient(135deg, #2a414b, #0f2e36); box-shadow: 0 0 12px rgba(255, 60, 30, 0.4); }
-    .teams { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(0, 0, 0, 0.3); padding: 10px 12px; border-radius: 80px; }
-    .team { background: rgba(0, 0, 0, 0.4); padding: 6px 12px; border-radius: 60px; flex: 1; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 0.85rem; white-space: nowrap; overflow-x: auto; }
+    
+    /* ===== تنسيق الفرق والنتيجة ===== */
+    .teams-score {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px 12px;
+      border-radius: 80px;
+    }
+    .team {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 6px 12px;
+      border-radius: 60px;
+      flex: 1;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      overflow-x: auto;
+    }
     .team span:first-child { font-size: 1.2rem; }
-    .vs { background: #ffb347; padding: 4px 12px; border-radius: 40px; font-weight: bold; font-size: 0.7rem; color: #1e2a2a; }
-    .datetime-row { display: flex; justify-content: space-between; gap: 10px; background: rgba(0, 0, 0, 0.35); padding: 8px 14px; border-radius: 50px; flex-wrap: wrap; margin-top: 6px; }
+    
+    /* تنسيق نتيجة المباراة في المنتصف */
+    .score-display {
+      background: linear-gradient(135deg, #ffb347, #ff8c1a);
+      padding: 4px 16px;
+      border-radius: 40px;
+      font-weight: 800;
+      font-size: 1rem;
+      color: #1a2f2f;
+      min-width: 50px;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(255, 180, 70, 0.3);
+      letter-spacing: 1px;
+      border: 1px solid rgba(255, 200, 100, 0.5);
+    }
+    .score-display.finished {
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+      border-color: rgba(76, 175, 80, 0.5);
+    }
+    .score-display.live-score {
+      background: linear-gradient(135deg, #ff4444, #cc0000);
+      animation: scorePulse 1s infinite;
+      box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+      border-color: rgba(255, 68, 68, 0.7);
+    }
+    @keyframes scorePulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .vs-badge {
+      background: rgba(255, 180, 70, 0.2);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 0.6rem;
+      color: #ffb347;
+      font-weight: 600;
+    }
+    
+    .datetime-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 8px 14px;
+      border-radius: 50px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
     .match-day { background: #1e4a5f; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: 600; }
     .match-full-date { background: rgba(0, 0, 0, 0.5); padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; display: flex; gap: 6px; align-items: baseline; }
     .info-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
@@ -42,6 +115,7 @@
     .countdown-timer { background: #00000070; font-family: monospace; font-size: 0.9rem; font-weight: bold; padding: 4px 14px; border-radius: 60px; text-align: center; letter-spacing: 0.5px; }
     .live-status { animation: pulse 1.2s infinite; background: #d32f2f; }
     @keyframes pulse { 0% { opacity: 0.75; background: #b71c1c; box-shadow: 0 0 0 0 #ff5e5e; } 50% { opacity: 1; background: #f44336; box-shadow: 0 0 0 3px rgba(255, 68, 34, 0.4); } 100% { opacity: 0.75; background: #b71c1c; } }
+    
     .empty-state { grid-column: 1/-1; text-align: center; background: rgba(12, 34, 40, 0.7); backdrop-filter: blur(8px); padding: 40px 20px; border-radius: 60px; font-size: 1rem; border: 1px dashed #ffb34780; }
     .filter-bar { margin-bottom: 24px; background: rgba(0, 0, 0, 0.25); padding: 8px 16px; border-radius: 80px; display: flex; }
     .filter-bar input { background: #fef7e0; border: none; padding: 12px 20px; border-radius: 60px; width: 100%; font-size: 0.85rem; outline: none; }
@@ -65,13 +139,13 @@
     #predictionForm input::placeholder { color: #555; }
     #predictionForm button { background: #ffb347; border: none; padding: 10px 24px; border-radius: 60px; font-weight: bold; cursor: pointer; transition: 0.2s; color: #1a2f2f; }
     #predictionForm button:hover { background: #ff9f1a; transform: scale(0.97); }
-    #predictionMessage { margin-top: 12px; font-size: 0.9rem; font-weight: 600; }
+    #predictionMessage { margin-top: 12px; font-size: 0.9rem; font-weight: 600; padding: 8px 16px; border-radius: 40px; background: rgba(0,0,0,0.3); }
     .prediction-card { background: rgba(18, 38, 44, 0.75); backdrop-filter: blur(12px); border-radius: 32px; padding: 16px; border: 1px solid rgba(255, 180, 70, 0.3); }
     .prediction-card .pred-detail { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.85rem; }
 
     footer { margin-top: 45px; text-align: center; font-size: 0.7rem; color: #98bdc9; border-top: 1px solid #ffb34760; padding-top: 20px; }
 
-    @media (max-width: 550px) { body { padding: 12px; } .hero h1 { font-size: 1.3rem; } .tab-btn { padding: 6px 14px; font-size: 0.75rem; gap: 4px; } .team { font-size: 0.7rem; white-space: normal; } .team span:first-child { font-size: 1rem; } .countdown-timer { font-size: 0.75rem; } .matches-grid { gap: 14px; } #predictionForm > div { flex-direction: column; align-items: stretch; } }
+    @media (max-width: 550px) { body { padding: 12px; } .hero h1 { font-size: 1.3rem; } .tab-btn { padding: 6px 14px; font-size: 0.75rem; gap: 4px; } .team { font-size: 0.7rem; white-space: normal; } .team span:first-child { font-size: 1rem; } .countdown-timer { font-size: 0.75rem; } .matches-grid { gap: 14px; } #predictionForm > div { flex-direction: column; align-items: stretch; } .teams-score { flex-wrap: wrap; justify-content: center; } .team { min-width: 80px; } }
   </style>
 </head>
 <body>
@@ -150,7 +224,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   // ============================================================
-  //  بيانات اتصال Supabase (تم إدخالها)
+  //  بيانات اتصال Supabase
   // ============================================================
   const SUPABASE_URL = "https://szjxwhsmefqpfcebtvei.supabase.co";
   const SUPABASE_KEY = "sb_publishable_0um28lgPMHcjDOThT0UgDA_K-Y7Wmx3";
@@ -166,21 +240,35 @@
   }
 
   // ============================================================
-  //  دوال التوقعات (مع معالجة أخطاء متقدمة)
+  //  1) تحسين حفظ التوقع (تنظيف الإدخال)
   // ============================================================
   async function savePrediction(userName, matchId, prediction) {
     if (!supabaseClient) {
       return { success: false, message: "Supabase غير متصل." };
     }
+
+    const cleanPrediction = prediction
+      .replace(/[^\d\-]/g, "")
+      .trim();
+
+    if (!cleanPrediction) {
+      return { success: false, message: "النتيجة غير صالحة (مثال: 2-1)" };
+    }
+
     try {
       const { data, error } = await supabaseClient
         .from("predictions")
-        .insert([{ user_name: userName, match_id: matchId, prediction: prediction }]);
+        .insert([{
+          user_name: userName,
+          match_id: matchId,
+          prediction: cleanPrediction
+        }]);
 
       if (error) {
         console.error("❌ خطأ Supabase:", error.message);
         return { success: false, message: error.message };
       }
+
       console.log("✅ تم حفظ التوقع:", data);
       return { success: true, data };
     } catch (err) {
@@ -189,6 +277,9 @@
     }
   }
 
+  // ============================================================
+  //  جلب التوقعات
+  // ============================================================
   async function getPredictionsByUser(userName) {
     if (!supabaseClient) {
       console.warn("⚠️ Supabase غير متاح.");
@@ -210,6 +301,75 @@
       console.error("❌ استثناء:", err);
       return [];
     }
+  }
+
+  // ============================================================
+  //  3) رسالة النجاح (شكل أنظف)
+  // ============================================================
+  function showPredictionMessage(msg, type = "success") {
+    const el = document.getElementById("predictionMessage");
+    el.innerHTML = msg;
+    el.style.color = type === "success" ? "#8bc34a" : type === "error" ? "#ff5252" : "#ffb347";
+    el.style.background = type === "success" ? "rgba(139,195,74,0.15)" : type === "error" ? "rgba(255,82,82,0.15)" : "rgba(255,179,71,0.15)";
+  }
+
+  // ============================================================
+  //  2) تحسين عرض التوقعات (UI أنظف)
+  // ============================================================
+  async function renderUserPredictions(userName) {
+    const container = document.getElementById('userPredictions');
+
+    if (!userName || userName.trim() === '') {
+      container.innerHTML = `<div class="empty-state">👤 اكتب اسمك لعرض توقعاتك</div>`;
+      return;
+    }
+
+    const predictions = await getPredictionsByUser(userName);
+
+    if (!predictions.length) {
+      container.innerHTML = `<div class="empty-state">📭 لا توجد توقعات بعد</div>`;
+      return;
+    }
+
+    container.innerHTML = predictions.map(p => {
+      const parts = p.match_id.split('_');
+      const timeISO = parts[0];
+      const team1 = parts[1];
+      const team2 = parts[2];
+
+      return `
+        <div class="prediction-card">
+          <div class="teams-score">
+            <div class="team"><span>${getFlag(team1)}</span> ${team1}</div>
+            <span class="vs-badge">🆚</span>
+            <div class="team"><span>${getFlag(team2)}</span> ${team2}</div>
+          </div>
+
+          <div class="datetime-row">
+            <div class="match-day">${getDay(timeISO)}</div>
+            <div class="match-full-date">${getDateTimeDisplay(timeISO)}</div>
+          </div>
+
+          <div class="pred-detail">
+            <span>🔮 توقعك</span>
+            <span style="
+              background:#ffb347;
+              padding:4px 18px;
+              border-radius:40px;
+              font-weight:bold;
+              color:#1a2f2f;
+              letter-spacing:1px;
+            ">
+              ${p.prediction}
+            </span>
+          </div>
+
+          <div style="font-size:11px; color:#aaa; margin-top:6px;">
+            🕒 ${new Date(p.created_at).toLocaleString('ar')}
+          </div>
+        </div>
+      `;
+    }).join('');
   }
 
   // ============================================================
@@ -240,7 +400,7 @@
   const nameMapping = new Map([
     ["مکزیک", "المكسيك"], ["Mexico", "المكسيك"], ["مكسيك", "المكسيك"],
     ["آفریقای جنوبی", "جنوب أفريقيا"], ["South Africa", "جنوب أفريقيا"], ["افریقای جنوبی", "جنوب أفريقيا"],
-    ["أفريقيا الشمالية", "جنوب أفريقيا"], // تصحيح الخطأ الإملائي من API
+    ["أفريقيا الشمالية", "جنوب أفريقيا"],
     ["آرژانتین", "الأرجنتين"], ["Argentina", "الأرجنتين"], ["ارژانتین", "الأرجنتين"],
     ["الجزایر", "الجزائر"], ["Algeria", "الجزائر"], ["الجزائر", "الجزائر"],
     ["اتریش", "النمسا"], ["Austria", "النمسا"], ["اتریش", "النمسا"],
@@ -342,7 +502,7 @@
   }
 
   // ============================================================
-  //  بيانات المباريات القادمة (مأخوذة من الجدول)
+  //  بيانات المباريات القادمة
   // ============================================================
   const rawMatches = [
     { team1:"المكسيك", team2:"جنوب أفريقيا", time:"2026-06-11T22:00:00", round:"first" },{ team1:"الأرجنتين", team2:"الجزائر", time:"2026-06-11T04:00:00", round:"first" },
@@ -399,10 +559,16 @@
       container.innerHTML = active.map(m => {
         const st = getMatchStatus(m);
         const dateTimeDisplay = getDateTimeDisplay(m.timeISO);
-        return `<div class="match-card ${st.live ? 'live-card' : ''}">
-          <div class="teams"><div class="team"><span>${getFlag(m.team1)}</span> ${m.team1}</div><span class="vs">🆚</span><div class="team"><span>${getFlag(m.team2)}</span> ${m.team2}</div></div>
+        const isLive = st.live;
+        const scoreClass = isLive ? 'live-score' : '';
+        return `<div class="match-card ${isLive ? 'live-card' : ''}">
+          <div class="teams-score">
+            <div class="team"><span>${getFlag(m.team1)}</span> ${m.team1}</div>
+            <div class="score-display ${scoreClass}">${isLive ? '🔴 LIVE' : '🆚'}</div>
+            <div class="team"><span>${getFlag(m.team2)}</span> ${m.team2}</div>
+          </div>
           <div class="datetime-row"><div class="match-day">${getDay(m.timeISO)}</div><div class="match-full-date"><span>${dateTimeDisplay}</span></div></div>
-          <div class="info-row"><span class="round-tag">🏅 ${m.roundLabel}</span><div class="countdown-timer ${st.live ? 'live-status' : ''}">${st.live ? '🔴 تُلعب الآن 🔴' : st.text}</div></div>
+          <div class="info-row"><span class="round-tag">🏅 ${m.roundLabel}</span><div class="countdown-timer ${isLive ? 'live-status' : ''}">${isLive ? '🔴 تُلعب الآن 🔴' : st.text}</div></div>
         </div>`;
       }).join('');
     } catch (err) {
@@ -476,9 +642,13 @@
       container.innerHTML = filtered.map(g => {
         const dateTimeDisplay = g.timeMatch ? `${g.formattedDate} - ${g.timeMatch}` : g.formattedDate;
         return `<div class="match-card">
-          <div class="teams"><div class="team"><span>${getFlag(g.homeAr)}</span> ${g.homeAr}</div><span class="vs">🆚</span><div class="team"><span>${getFlag(g.awayAr)}</span> ${g.awayAr}</div></div>
+          <div class="teams-score">
+            <div class="team"><span>${getFlag(g.homeAr)}</span> ${g.homeAr}</div>
+            <div class="score-display finished">${g.homeScore} - ${g.awayScore}</div>
+            <div class="team"><span>${getFlag(g.awayAr)}</span> ${g.awayAr}</div>
+          </div>
           <div class="datetime-row"><div class="match-day">${g.dayName}</div><div class="match-full-date"><span>${dateTimeDisplay}</span></div></div>
-          <div class="info-row"><span class="round-tag">🏅 النتيجة النهائية</span><div class="countdown-timer" style="background:#2c4b55;">${g.homeScore} - ${g.awayScore}</div></div>
+          <div class="info-row"><span class="round-tag">🏅 النتيجة النهائية</span><div class="countdown-timer" style="background:#2c4b55;">✅ انتهت</div></div>
         </div>`;
       }).join('');
     } catch (err) {
@@ -592,18 +762,24 @@
           upcomingFiltered.forEach(m => {
             const st = getMatchStatus(m);
             const dateTimeDisplay = getDateTimeDisplay(m.timeISO);
-            html += `<div class="quick-match-card"><div class="quick-match-teams"><span>${getFlag(m.team1)}</span> ${m.team1} 🆚 ${m.team2} <span>${getFlag(m.team2)}</span></div>
-              <div class="quick-result">${st.live ? '🔴 تُلعب الآن' : (st.text.includes('h') ? '⏳ ' + st.text : '✅ انتهت')}</div>
-              <div style="font-size:0.7rem; text-align:center;">${getDay(m.timeISO)} ${dateTimeDisplay}</div></div>`;
+            const isLive = st.live;
+            const scoreDisplay = isLive ? '🔴 LIVE' : '🆚';
+            html += `<div class="quick-match-card">
+              <div class="quick-match-teams"><span>${getFlag(m.team1)}</span> ${m.team1} <span style="background:#ffb347;padding:0 8px;border-radius:12px;font-weight:bold;color:#1a2f2f;">${scoreDisplay}</span> ${m.team2} <span>${getFlag(m.team2)}</span></div>
+              <div class="quick-result">${isLive ? '🔴 تُلعب الآن' : (st.text.includes('h') ? '⏳ ' + st.text : '✅ انتهت')}</div>
+              <div style="font-size:0.7rem; text-align:center;">${getDay(m.timeISO)} ${dateTimeDisplay}</div>
+            </div>`;
           });
         }
         if (previousFiltered.length) {
           html += `<div style="grid-column:1/-1; margin:15px 0 8px 0; font-weight:bold; color:#FFE0A3;">📋 المباريات السابقة (${previousFiltered.length})</div>`;
           previousFiltered.forEach(g => {
             const dateTimeDisplay = g.timeMatch ? `${g.formattedDate} - ${g.timeMatch}` : g.formattedDate;
-            html += `<div class="quick-match-card"><div class="quick-match-teams"><span>${getFlag(g.homeAr)}</span> ${g.homeAr} 🆚 ${g.awayAr} <span>${getFlag(g.awayAr)}</span></div>
-              <div class="quick-result">النتيجة: ${g.homeScore} - ${g.awayScore}</div>
-              <div style="font-size:0.7rem; text-align:center;">${g.dayName} ${dateTimeDisplay}</div></div>`;
+            html += `<div class="quick-match-card">
+              <div class="quick-match-teams"><span>${getFlag(g.homeAr)}</span> ${g.homeAr} <span style="background:#4CAF50;padding:0 8px;border-radius:12px;font-weight:bold;color:white;">${g.homeScore}-${g.awayScore}</span> ${g.awayAr} <span>${getFlag(g.awayAr)}</span></div>
+              <div class="quick-result">النتيجة النهائية</div>
+              <div style="font-size:0.7rem; text-align:center;">${g.dayName} ${dateTimeDisplay}</div>
+            </div>`;
           });
         }
       }
@@ -661,37 +837,6 @@
     }
   }
 
-  async function renderUserPredictions(userName) {
-    try {
-      const container = document.getElementById('userPredictions');
-      if (!userName || userName.trim() === '') {
-        container.innerHTML = `<div class="empty-state">👤 أدخل اسمك أولاً ثم اضغط "حفظ" لعرض توقعاتك.</div>`;
-        return;
-      }
-      const predictions = await getPredictionsByUser(userName);
-      if (predictions.length === 0) {
-        container.innerHTML = `<div class="empty-state">📭 لا توجد توقعات مسجلة لك حتى الآن.</div>`;
-        return;
-      }
-      container.innerHTML = predictions.map(p => {
-        const parts = p.match_id.split('_');
-        const timeISO = parts[0];
-        const team1 = parts[1];
-        const team2 = parts[2];
-        const dateDisplay = timeISO ? getDateTimeDisplay(timeISO) : 'تاريخ غير معروف';
-        return `<div class="prediction-card">
-          <div class="teams"><div class="team"><span>${getFlag(team1)}</span> ${team1}</div><span class="vs">🆚</span><div class="team"><span>${getFlag(team2)}</span> ${team2}</div></div>
-          <div class="datetime-row"><div class="match-day">${getDay(timeISO)}</div><div class="match-full-date"><span>${dateDisplay}</span></div></div>
-          <div class="pred-detail"><span>🔮 توقعك:</span><span style="background:#ffb347; padding:2px 16px; border-radius:40px; font-weight:bold; color:#1a2f2f;">${p.prediction}</span></div>
-          <div style="font-size:0.7rem; text-align:left; color:#98bdc9; margin-top:6px;">🕒 ${new Date(p.created_at).toLocaleString('ar')}</div>
-        </div>`;
-      }).join('');
-    } catch (err) {
-      console.error("❌ renderUserPredictions:", err);
-      document.getElementById('userPredictions').innerHTML = `<div class="empty-state">⚠️ حدث خطأ في عرض التوقعات.</div>`;
-    }
-  }
-
   // ============================================================
   //  أحداث النموذج
   // ============================================================
@@ -702,19 +847,26 @@
     const prediction = document.getElementById('predictionInput').value.trim();
     const msg = document.getElementById('predictionMessage');
 
-    if (!userName) { msg.innerHTML = '⚠️ الرجاء إدخال اسمك.'; msg.style.color = '#ffb347'; return; }
-    if (!matchId) { msg.innerHTML = '⚠️ الرجاء اختيار مباراة.'; msg.style.color = '#ffb347'; return; }
-    if (!prediction) { msg.innerHTML = '⚠️ الرجاء إدخال النتيجة المتوقعة (مثل 2-1).'; msg.style.color = '#ffb347'; return; }
+    if (!userName) {
+      showPredictionMessage('⚠️ الرجاء إدخال اسمك.', 'warning');
+      return;
+    }
+    if (!matchId) {
+      showPredictionMessage('⚠️ الرجاء اختيار مباراة.', 'warning');
+      return;
+    }
+    if (!prediction) {
+      showPredictionMessage('⚠️ الرجاء إدخال النتيجة المتوقعة (مثل 2-1).', 'warning');
+      return;
+    }
 
     const result = await savePrediction(userName, matchId, prediction);
     if (result.success) {
-      msg.innerHTML = '✅ تم حفظ توقعك بنجاح!';
-      msg.style.color = '#8bc34a';
+      showPredictionMessage('✅ تم حفظ توقعك بنجاح!', 'success');
       document.getElementById('predictionInput').value = '';
       await renderUserPredictions(userName);
     } else {
-      msg.innerHTML = `❌ فشل الحفظ: ${result.message}`;
-      msg.style.color = '#ff5252';
+      showPredictionMessage(`❌ فشل الحفظ: ${result.message}`, 'error');
     }
   });
 
