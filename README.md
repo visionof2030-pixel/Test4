@@ -10,46 +10,166 @@
     body { background: radial-gradient(circle at 10% 20%, #0a1f24, #030c10); font-family: 'Segoe UI', 'Cairo', 'Inter', system-ui, -apple-system, 'Roboto', sans-serif; padding: 20px 12px; min-height: 100vh; color: #f0f9ff; font-size: 14px; }
     .app-container { max-width: 1200px; margin: 0 auto; width: 100%; }
     
-    /* ===== شريط الأخبار المتحرك ===== */
+    /* ===== الهيدر العلوي الكامل مع خلفية الصورة ===== */
+    .main-header {
+      width: 100%;
+      height: 80px;
+      min-height: 80px;
+      padding: 0;
+      border-radius: 80px 89px 0 0;
+      overflow: hidden;
+      margin-bottom: 0;
+      position: relative;
+      background-image: url('https://i.ibb.co/7dmWpzn2/IMG-3949.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    
+    /* طبقة تغطية رئيسية فوق الصورة بالكامل - لحل مشكلة النص العلوي */
+    .main-header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(180deg, 
+        rgba(10, 20, 25, 0.95) 0%, 
+        rgba(10, 20, 25, 0.85) 30%,
+        rgba(10, 20, 25, 0.5) 60%,
+        rgba(10, 20, 25, 0.3) 100%
+      );
+      border-radius: 48px 48px 0 0;
+      z-index: 1;
+    }
+    
+    /* طبقة إضافية لتغطية الجزء العلوي بشكل كامل */
+    .main-header .top-cover {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 45px;
+      background: rgba(10, 20, 25, 0.92);
+      border-radius: 48px 48px 0 0;
+      z-index: 2;
+      backdrop-filter: blur(4px);
+    }
+    
+    /* إخفاء النص العلوي تماماً */
+    .main-header .header-text,
+    .main-header h1,
+    .main-header .world-cup-text,
+    .main-header [class*="world"],
+    .main-header [class*="cup"] {
+      display: none !important;
+    }
+    
+    /* ===== البار العلوي ===== */
     .upper-bar {
-      background: linear-gradient(90deg, #1a2f2f, #2a414b, #1a2f2f);
-      border: 1px solid rgba(255, 180, 70, 0.3);
-      border-radius: 60px;
+      background: rgba(10, 20, 25, 0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 0 0 48px 48px;
+      padding: 0 24px;
+      margin-bottom: 16px;
+      position: relative;
+      height: 80px;
+      min-height: 80px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-top: none;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      z-index: 3;
+    }
+    .upper-bar .bar-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      width: 100%;
+    }
+    .upper-bar .title-section h1 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #FFE6B0;
+      text-shadow: 0 2px 15px rgba(0, 0, 0, 0.5);
+      letter-spacing: -0.5px;
+      margin: 0;
+    }
+    .upper-bar .developer-credit {
+      font-size: 0.7rem;
+      color: rgba(255, 230, 176, 0.8);
+      text-align: center;
+      margin-top: 2px;
+      font-style: italic;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 10px rgba(0, 0, 0, 0.3);
+    }
+    .upper-bar .header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .upper-bar .bar-btn {
+      background: rgba(255, 255, 255, 0.08);
+      color: #FFE6B0;
+      border: 1px solid rgba(255, 255, 255, 0.15);
       padding: 8px 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(10px);
+      font-size: 0.8rem;
+      text-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
+    }
+    .upper-bar .bar-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+      box-shadow: 0 0 25px rgba(255, 180, 70, 0.2);
+      border-color: rgba(255, 180, 70, 0.3);
+    }
+    
+    /* ===== شريط الأخبار المتحرك ===== */
+    .news-ticker-wrapper {
+      background: linear-gradient(90deg, rgba(26, 47, 47, 0.9), rgba(42, 65, 75, 0.9), rgba(26, 47, 47, 0.9));
+      border: 1px solid rgba(255, 180, 70, 0.2);
+      border-radius: 60px;
+      padding: 6px 16px;
       margin-bottom: 16px;
       overflow: hidden;
       position: relative;
-      box-shadow: 0 0 20px rgba(255, 180, 70, 0.1);
+      box-shadow: 0 0 20px rgba(255, 180, 70, 0.05);
+      backdrop-filter: blur(10px);
     }
     .news-ticker {
       display: inline-block;
       white-space: nowrap;
       animation: tickerScroll 42s linear infinite;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: #FFE6B0;
       font-weight: 500;
       letter-spacing: 0.3px;
     }
     .news-ticker span {
       display: inline-block;
-      padding: 0 20px;
-    }
-    .news-ticker .highlight {
-      color: #ffb347;
-      font-weight: 700;
-    }
-    .news-ticker .emoji {
-      font-size: 1rem;
+      padding: 0 16px;
     }
     .news-ticker .separator {
-      color: #ffb34780;
+      color: #ffb34760;
     }
     @keyframes tickerScroll {
       0% { transform: translateX(-100%); }
       100% { transform: translateX(100%); }
     }
-    /* إيقاف الحركة عند التمرير */
-    .upper-bar:hover .news-ticker {
+    .news-ticker-wrapper:hover .news-ticker {
       animation-play-state: paused;
     }
     
@@ -63,8 +183,41 @@
       border: 1px solid rgba(255, 200, 100, 0.3);
       box-shadow: 0 15px 35px rgba(0,0,0,0.2);
     }
-    .hero h1 { font-size: 1.8rem; background: linear-gradient(135deg, #FFE6B0, #FFA559, #FF6A3D); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 8px; letter-spacing: -0.5px; }
-    .school-badge { background: rgba(30, 74, 95, 0.7); backdrop-filter: blur(4px); display: inline-block; padding: 6px 20px; border-radius: 60px; font-size: 0.75rem; font-weight: 500; border: 1px solid #ffb34760; }
+    .hero h1 { 
+      font-size: 1.8rem; 
+      background: linear-gradient(135deg, #FFE6B0, #FFA559, #FF6A3D); 
+      -webkit-background-clip: text; 
+      background-clip: text; 
+      color: transparent; 
+      margin-bottom: 8px; 
+      letter-spacing: -0.5px; 
+    }
+    .school-badge { 
+      background: rgba(30, 74, 95, 0.7); 
+      backdrop-filter: blur(4px); 
+      display: inline-block; 
+      padding: 6px 20px; 
+      border-radius: 60px; 
+      font-size: 0.75rem; 
+      font-weight: 500; 
+      border: 1px solid #ffb34760; 
+    }
+    
+    .leaderboard-section { background: rgba(18, 38, 44, 0.85); backdrop-filter: blur(12px); border-radius: 32px; padding: 20px; margin-bottom: 28px; border: 2px solid rgba(255, 180, 70, 0.4); box-shadow: 0 0 30px rgba(255, 180, 70, 0.1); }
+    .leaderboard-section .section-title { font-size: 1.5rem; font-weight: 800; color: #FFE6B0; text-align: center; margin-bottom: 16px; letter-spacing: -0.5px; }
+    .leaderboard-section .section-title .trophy { font-size: 1.8rem; }
+    .leaderboard-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .leaderboard-item { background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(8px); border-radius: 24px; padding: 14px 18px; border: 1px solid rgba(255, 180, 70, 0.2); transition: 0.2s; display: flex; justify-content: space-between; align-items: center; }
+    .leaderboard-item:hover { transform: translateX(-4px); border-color: #ffb347aa; }
+    .leaderboard-item .rank { font-size: 1.2rem; font-weight: 800; color: #ffb347; min-width: 50px; }
+    .leaderboard-item .rank.gold { color: #FFD700; }
+    .leaderboard-item .rank.silver { color: #C0C0C0; }
+    .leaderboard-item .rank.bronze { color: #CD7F32; }
+    .leaderboard-item .player-name { font-size: 1rem; font-weight: 600; flex: 1; margin: 0 12px; }
+    .leaderboard-item .player-name .avatar-small { display: inline-block; width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #ffb347, #ff8c1a); text-align: center; line-height: 28px; font-weight: 800; color: #1a2f2f; margin-left: 8px; font-size: 0.8rem; }
+    .leaderboard-item .points { background: linear-gradient(135deg, #ffb347, #ff8c1a); padding: 4px 18px; border-radius: 40px; font-weight: 800; color: #1a2f2f; font-size: 0.9rem; min-width: 60px; text-align: center; }
+    .leaderboard-item .medal { font-size: 1.5rem; margin-left: 8px; }
+    
     .control-panel { background: rgba(10, 25, 30, 0.6); backdrop-filter: blur(16px); border-radius: 80px; padding: 8px 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 28px; border: 1px solid rgba(255, 200, 100, 0.25); }
     .search-group { flex: 2; min-width: 160px; }
     .search-group input { width: 100%; padding: 12px 20px; border-radius: 60px; border: none; background: #fef9e6; text-align: right; outline: none; font-size: 0.85rem; font-weight: 500; transition: 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
@@ -84,82 +237,18 @@
     .match-card:hover { transform: translateY(-3px); border-color: #ffb347aa; box-shadow: 0 20px 30px -12px black; }
     .match-card.live-card { border: 2px solid #ff4d4d; background: linear-gradient(135deg, #2a414b, #0f2e36); box-shadow: 0 0 12px rgba(255, 60, 30, 0.4); }
     
-    /* ===== تنسيق الفرق والنتيجة ===== */
-    .teams-score {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 10px 12px;
-      border-radius: 80px;
-    }
-    .team {
-      background: rgba(0, 0, 0, 0.4);
-      padding: 6px 12px;
-      border-radius: 60px;
-      flex: 1;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-weight: 700;
-      font-size: 0.85rem;
-      white-space: nowrap;
-      overflow-x: auto;
-    }
+    .teams-score { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(0, 0, 0, 0.3); padding: 10px 12px; border-radius: 80px; }
+    .team { background: rgba(0, 0, 0, 0.4); padding: 6px 12px; border-radius: 60px; flex: 1; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 0.85rem; white-space: nowrap; overflow-x: auto; }
     .team span:first-child { font-size: 1.2rem; }
     
-    .score-display {
-      background: linear-gradient(135deg, #ffb347, #ff8c1a);
-      padding: 4px 16px;
-      border-radius: 40px;
-      font-weight: 800;
-      font-size: 1rem;
-      color: #1a2f2f;
-      min-width: 50px;
-      text-align: center;
-      box-shadow: 0 0 15px rgba(255, 180, 70, 0.3);
-      letter-spacing: 1px;
-      border: 1px solid rgba(255, 200, 100, 0.5);
-    }
-    .score-display.finished {
-      background: linear-gradient(135deg, #4CAF50, #45a049);
-      box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
-      border-color: rgba(76, 175, 80, 0.5);
-    }
-    .score-display.live-score {
-      background: linear-gradient(135deg, #ff4444, #cc0000);
-      animation: scorePulse 1s infinite;
-      box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
-      border-color: rgba(255, 68, 68, 0.7);
-    }
-    @keyframes scorePulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
+    .score-display { background: linear-gradient(135deg, #ffb347, #ff8c1a); padding: 4px 16px; border-radius: 40px; font-weight: 800; font-size: 1rem; color: #1a2f2f; min-width: 50px; text-align: center; box-shadow: 0 0 15px rgba(255, 180, 70, 0.3); letter-spacing: 1px; border: 1px solid rgba(255, 200, 100, 0.5); }
+    .score-display.finished { background: linear-gradient(135deg, #4CAF50, #45a049); box-shadow: 0 0 15px rgba(76, 175, 80, 0.3); border-color: rgba(76, 175, 80, 0.5); }
+    .score-display.live-score { background: linear-gradient(135deg, #ff4444, #cc0000); animation: scorePulse 1s infinite; box-shadow: 0 0 20px rgba(255, 68, 68, 0.5); border-color: rgba(255, 68, 68, 0.7); }
+    @keyframes scorePulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     
-    .vs-badge {
-      background: rgba(255, 180, 70, 0.2);
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-size: 0.6rem;
-      color: #ffb347;
-      font-weight: 600;
-    }
+    .vs-badge { background: rgba(255, 180, 70, 0.2); padding: 2px 8px; border-radius: 20px; font-size: 0.6rem; color: #ffb347; font-weight: 600; }
     
-    .datetime-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      background: rgba(0, 0, 0, 0.35);
-      padding: 8px 14px;
-      border-radius: 50px;
-      flex-wrap: wrap;
-      margin-top: 6px;
-    }
+    .datetime-row { display: flex; justify-content: space-between; gap: 10px; background: rgba(0, 0, 0, 0.35); padding: 8px 14px; border-radius: 50px; flex-wrap: wrap; margin-top: 6px; }
     .match-day { background: #1e4a5f; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: 600; }
     .match-full-date { background: rgba(0, 0, 0, 0.5); padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; display: flex; gap: 6px; align-items: baseline; }
     .info-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
@@ -185,216 +274,133 @@
     .quick-match-card { background: #0f3e4a; border-radius: 28px; padding: 12px; transition: 0.1s; }
     .quick-match-teams { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-weight: bold; font-size: 0.85rem; }
 
-    /* ========== تنسيقات التوقعات ========== */
-    #predictionForm {
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(8px);
-      padding: 20px;
-      border-radius: 32px;
-      margin-bottom: 24px;
-      border: 1px solid rgba(255, 180, 70, 0.3);
-    }
-    #predictionForm input, #predictionForm select {
-      background: #fef9e6;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 60px;
-      font-size: 0.9rem;
-      outline: none;
-      color: #1a2f2f;
-      min-width: 120px;
-    }
-    #predictionForm input::placeholder { color: #555; }
-    #predictionForm select option { color: #1a2f2f; }
-    #predictionForm button {
-      background: #ffb347;
-      border: none;
-      padding: 10px 24px;
-      border-radius: 60px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
-      color: #1a2f2f;
-    }
-    #predictionForm button:hover { background: #ff9f1a; transform: scale(0.97); }
-    #predictionForm button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-    #predictionMessage {
-      margin-top: 12px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      padding: 8px 16px;
-      border-radius: 40px;
-      background: rgba(0,0,0,0.3);
-    }
-    
-    /* ===== تنسيق بطاقات التوقعات ===== */
-    .prediction-card {
-      background: rgba(18, 38, 44, 0.75);
-      backdrop-filter: blur(12px);
-      border-radius: 32px;
-      padding: 16px;
-      border: 1px solid rgba(255, 180, 70, 0.3);
-      transition: 0.2s;
-    }
-    .prediction-card:hover {
-      transform: translateY(-2px);
-      border-color: #ffb347aa;
-    }
-    .prediction-card .user-name {
+    /* ===== أزرار التوقع والاستعراض ===== */
+    .match-actions {
       display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid rgba(255, 180, 70, 0.2);
-      font-size: 0.95rem;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
     }
-    .prediction-card .user-name .avatar {
-      background: linear-gradient(135deg, #ffb347, #ff8c1a);
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
+    .match-actions .btn {
+      flex: 1;
+      min-width: 140px;
+      padding: 12px 16px;
+      border-radius: 60px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      letter-spacing: 0.3px;
+      backdrop-filter: blur(4px);
+      border: 2px solid transparent;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      color: #1a2f2f;
-      font-size: 0.9rem;
+      gap: 8px;
     }
-    .prediction-card .pred-detail {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 4px;
-      font-size: 0.85rem;
-    }
-    .prediction-card .match-info {
-      font-size: 0.75rem;
-      color: #98bdc9;
-      margin-top: 6px;
-      padding-top: 6px;
-      border-top: 1px solid rgba(255,255,255,0.05);
-    }
-    .prediction-badge {
-      background: linear-gradient(135deg, #ffb347, #ff8c1a);
-      padding: 6px 20px;
-      border-radius: 40px;
-      font-weight: 800;
-      color: #1a2f2f;
-      display: inline-block;
-      font-size: 0.85rem;
-      box-shadow: 0 0 15px rgba(255, 180, 70, 0.2);
-      border: 1px solid rgba(255, 200, 100, 0.3);
-      letter-spacing: 0.5px;
-    }
-    .prediction-badge.home {
-      background: linear-gradient(135deg, #4CAF50, #45a049);
-      border-color: rgba(76, 175, 80, 0.5);
-      color: white;
-    }
-    .prediction-badge.away {
-      background: linear-gradient(135deg, #f44336, #d32f2f);
-      border-color: rgba(244, 67, 54, 0.5);
-      color: white;
-    }
-    .prediction-badge.draw {
-      background: linear-gradient(135deg, #FF9800, #F57C00);
-      border-color: rgba(255, 152, 0, 0.5);
-      color: white;
-    }
-    
-    /* ===== تنسيق Leaderboard ===== */
-    .leaderboard-item {
-      background: rgba(18, 38, 44, 0.75);
-      backdrop-filter: blur(12px);
-      border-radius: 32px;
-      padding: 16px 20px;
-      border: 1px solid rgba(255, 180, 70, 0.3);
-      transition: 0.2s;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .leaderboard-item:hover {
-      transform: translateX(-4px);
-      border-color: #ffb347aa;
-    }
-    .leaderboard-item .rank {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: #ffb347;
-      min-width: 50px;
-    }
-    .leaderboard-item .rank.gold { color: #FFD700; }
-    .leaderboard-item .rank.silver { color: #C0C0C0; }
-    .leaderboard-item .rank.bronze { color: #CD7F32; }
-    .leaderboard-item .player-name {
-      font-size: 1rem;
-      font-weight: 600;
-      flex: 1;
-      margin: 0 12px;
-    }
-    .leaderboard-item .player-name .avatar-small {
-      display: inline-block;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #ffb347, #ff8c1a);
-      text-align: center;
-      line-height: 28px;
-      font-weight: 800;
-      color: #1a2f2f;
-      margin-left: 8px;
-      font-size: 0.8rem;
-    }
-    .leaderboard-item .points {
-      background: linear-gradient(135deg, #ffb347, #ff8c1a);
-      padding: 4px 18px;
-      border-radius: 40px;
-      font-weight: 800;
-      color: #1a2f2f;
-      font-size: 0.9rem;
-      min-width: 60px;
-      text-align: center;
-    }
-    .leaderboard-item .medal {
-      font-size: 1.5rem;
-      margin-left: 8px;
-    }
-    .leaderboard-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
+    .match-actions .btn:active { transform: scale(0.97); }
+    .match-actions .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    .loading-spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
-      border-top-color: #ffb347;
-      animation: spin 1s ease-in-out infinite;
-      margin-left: 8px;
+    /* زر التوقع */
+    .btn-predict {
+      background: linear-gradient(135deg, rgba(255, 180, 70, 0.2), rgba(255, 140, 26, 0.1));
+      border-color: rgba(255, 180, 70, 0.5);
+      color: #FFE6B0;
     }
+    .btn-predict:hover:not(:disabled) {
+      background: linear-gradient(135deg, rgba(255, 180, 70, 0.35), rgba(255, 140, 26, 0.2));
+      border-color: #ffb347;
+      box-shadow: 0 0 30px rgba(255, 180, 70, 0.15);
+      transform: scale(1.02);
+    }
+    .btn-predict.live-blocked {
+      border-color: rgba(255, 68, 68, 0.3);
+      background: rgba(255, 68, 68, 0.08);
+      color: #ff6b6b;
+    }
+    .btn-predict.already-predicted {
+      border-color: #4CAF50;
+      background: rgba(76, 175, 80, 0.15);
+      color: #8bc34a;
+      cursor: default;
+    }
+    .btn-predict.already-predicted:hover { transform: none; box-shadow: none; }
+    .btn-predict .icon { font-size: 1.1rem; }
+
+    /* زر الاستعراض */
+    .btn-view-predictions {
+      background: linear-gradient(135deg, rgba(33, 150, 243, 0.15), rgba(25, 118, 210, 0.08));
+      border-color: rgba(33, 150, 243, 0.4);
+      color: #64b5f6;
+    }
+    .btn-view-predictions:hover:not(:disabled) {
+      background: linear-gradient(135deg, rgba(33, 150, 243, 0.3), rgba(25, 118, 210, 0.2));
+      border-color: #42a5f5;
+      box-shadow: 0 0 30px rgba(33, 150, 243, 0.15);
+      transform: scale(1.02);
+    }
+    .btn-view-predictions .icon { font-size: 1.1rem; }
+
+    .predict-trigger-btn { display: block; width: 100%; margin-top: 12px; padding: 12px 16px; background: linear-gradient(135deg, rgba(255, 180, 70, 0.15), rgba(255, 140, 26, 0.08)); border: 2px solid rgba(255, 180, 70, 0.4); border-radius: 60px; color: #FFE6B0; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-align: center; letter-spacing: 0.5px; box-shadow: 0 0 20px rgba(255, 180, 70, 0.05); backdrop-filter: blur(4px); }
+    .predict-trigger-btn:hover:not(.already-predicted):not(.live-blocked) { background: linear-gradient(135deg, rgba(255, 180, 70, 0.25), rgba(255, 140, 26, 0.15)); border-color: #ffb347; box-shadow: 0 0 30px rgba(255, 180, 70, 0.15); transform: scale(1.01); }
+    .predict-trigger-btn:active { transform: scale(0.97); }
+    .predict-trigger-btn .icon { font-size: 1.1rem; margin-left: 8px; }
+    .predict-trigger-btn .arrow { font-size: 0.8rem; margin-right: 8px; opacity: 0.7; }
+    .predict-trigger-btn.live-blocked { opacity: 0.5; cursor: not-allowed; border-color: rgba(255, 68, 68, 0.3); background: rgba(255, 68, 68, 0.05); }
+    .predict-trigger-btn.live-blocked:hover { transform: none; box-shadow: none; }
+    .predict-trigger-btn.already-predicted { opacity: 0.8; border-color: #4CAF50; background: rgba(76, 175, 80, 0.15); cursor: default; color: #8bc34a; }
+    .predict-trigger-btn.already-predicted:hover { transform: none; box-shadow: none; }
+    .predict-trigger-btn .already-icon { color: #4CAF50; margin-left: 6px; }
+
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(12px); z-index: 9999; justify-content: center; align-items: center; animation: modalFadeIn 0.3s ease; }
+    .modal-overlay.active { display: flex; }
+    @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    .modal-content { background: linear-gradient(145deg, rgba(18, 38, 44, 0.95), rgba(10, 25, 30, 0.98)); backdrop-filter: blur(24px); border-radius: 40px; padding: 30px; max-width: 480px; width: 95%; max-height: 90vh; overflow-y: auto; border: 1px solid rgba(255, 180, 70, 0.3); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 40px rgba(255, 180, 70, 0.05); position: relative; }
+    .modal-close { position: absolute; top: 16px; left: 16px; background: rgba(255, 255, 255, 0.05); border: none; color: #98bdc9; font-size: 1.5rem; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .modal-close:hover { background: rgba(255, 68, 68, 0.2); color: #ff6b6b; transform: rotate(90deg); }
+    .modal-title { text-align: center; font-size: 1.2rem; font-weight: 700; color: #FFE6B0; margin-bottom: 20px; padding-top: 10px; }
+    .modal-teams { display: flex; justify-content: center; align-items: center; gap: 12px; background: rgba(0, 0, 0, 0.3); padding: 14px; border-radius: 60px; margin-bottom: 16px; }
+    .modal-teams .m-team { font-weight: 700; font-size: 1rem; display: flex; align-items: center; gap: 6px; }
+    .modal-teams .m-team span:first-child { font-size: 1.4rem; }
+    .modal-teams .m-vs { background: rgba(255, 180, 70, 0.2); padding: 2px 12px; border-radius: 20px; font-size: 0.7rem; color: #ffb347; font-weight: 600; }
+    .modal-datetime { text-align: center; font-size: 0.8rem; color: #98bdc9; margin-bottom: 20px; background: rgba(0, 0, 0, 0.2); padding: 6px 12px; border-radius: 40px; display: inline-block; width: 100%; }
+    .modal-predict-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+    .modal-predict-options label { display: flex; align-items: center; gap: 12px; background: rgba(255, 255, 255, 0.03); padding: 12px 16px; border-radius: 60px; cursor: pointer; transition: 0.2s; border: 2px solid transparent; }
+    .modal-predict-options label:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 180, 70, 0.2); }
+    .modal-predict-options input[type="radio"] { appearance: none; width: 20px; height: 20px; border: 2px solid #555; border-radius: 50%; position: relative; cursor: pointer; flex-shrink: 0; transition: 0.2s; }
+    .modal-predict-options input[type="radio"]:checked { border-color: #ffb347; background: #ffb347; }
+    .modal-predict-options input[type="radio"]:checked::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #1a2f2f; font-size: 12px; font-weight: 800; }
+    .modal-predict-options .option-label { font-weight: 600; font-size: 0.9rem; }
+    .modal-predict-options .option-sub { font-size: 0.7rem; color: #98bdc9; }
+    .modal-user-input { margin-bottom: 16px; }
+    .modal-user-input input { width: 100%; padding: 12px 16px; border-radius: 60px; border: 2px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.05); color: #f0f9ff; font-size: 0.9rem; outline: none; transition: 0.2s; }
+    .modal-user-input input:focus { border-color: #ffb347; background: rgba(255, 255, 255, 0.08); box-shadow: 0 0 20px rgba(255, 180, 70, 0.05); }
+    .modal-user-input input::placeholder { color: #666; }
+    .modal-submit-btn { width: 100%; padding: 14px; border: none; border-radius: 60px; background: linear-gradient(135deg, #ffb347, #ff8c1a); color: #1a2f2f; font-weight: 800; font-size: 1rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .modal-submit-btn:hover { transform: scale(1.02); box-shadow: 0 0 30px rgba(255, 180, 70, 0.3); }
+    .modal-submit-btn:active { transform: scale(0.97); }
+    .modal-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .modal-message { margin-top: 12px; text-align: center; font-size: 0.9rem; font-weight: 600; padding: 8px 12px; border-radius: 40px; }
+    .modal-message.success { color: #8bc34a; background: rgba(139,195,74,0.1); }
+    .modal-message.error { color: #ff5252; background: rgba(255,82,82,0.1); }
+    .modal-message.warning { color: #ffb347; background: rgba(255,179,71,0.1); }
+
+    .prediction-card { background: rgba(18, 38, 44, 0.75); backdrop-filter: blur(12px); border-radius: 32px; padding: 16px; border: 1px solid rgba(255, 180, 70, 0.3); transition: 0.2s; }
+    .prediction-card:hover { transform: translateY(-2px); border-color: #ffb347aa; }
+    .prediction-card .user-name { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(255, 180, 70, 0.2); font-size: 0.95rem; }
+    .prediction-card .user-name .avatar { background: linear-gradient(135deg, #ffb347, #ff8c1a); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #1a2f2f; font-size: 0.9rem; }
+    .prediction-card .pred-detail { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; font-size: 0.85rem; }
+    .prediction-card .match-info { font-size: 0.75rem; color: #98bdc9; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); }
+    .prediction-badge { background: linear-gradient(135deg, #ffb347, #ff8c1a); padding: 6px 20px; border-radius: 40px; font-weight: 800; color: #1a2f2f; display: inline-block; font-size: 0.85rem; box-shadow: 0 0 15px rgba(255, 180, 70, 0.2); border: 1px solid rgba(255, 200, 100, 0.3); letter-spacing: 0.5px; }
+    .prediction-badge.home { background: linear-gradient(135deg, #4CAF50, #45a049); border-color: rgba(76, 175, 80, 0.5); color: white; }
+    .prediction-badge.away { background: linear-gradient(135deg, #f44336, #d32f2f); border-color: rgba(244, 67, 54, 0.5); color: white; }
+    .prediction-badge.draw { background: linear-gradient(135deg, #FF9800, #F57C00); border-color: rgba(255, 152, 0, 0.5); color: white; }
+
+    .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #ffb347; animation: spin 1s ease-in-out infinite; margin-left: 8px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     footer { margin-top: 45px; text-align: center; font-size: 0.7rem; color: #98bdc9; border-top: 1px solid #ffb34760; padding-top: 20px; }
-
-    /* ===== رسالة منع التوقع ===== */
-    .prediction-blocked {
-      background: rgba(255, 68, 68, 0.15);
-      border: 1px solid rgba(255, 68, 68, 0.3);
-      border-radius: 40px;
-      padding: 8px 16px;
-      color: #ff6b6b;
-      font-size: 0.8rem;
-      display: inline-block;
-    }
 
     @media (max-width: 550px) {
       body { padding: 12px; }
@@ -404,23 +410,51 @@
       .team span:first-child { font-size: 1rem; }
       .countdown-timer { font-size: 0.75rem; }
       .matches-grid { gap: 14px; }
-      #predictionForm > div { flex-direction: column; align-items: stretch; }
-      #predictionForm input, #predictionForm select { min-width: unset; }
       .teams-score { flex-wrap: wrap; justify-content: center; }
       .team { min-width: 80px; }
       .prediction-card .pred-detail { flex-direction: column; gap: 8px; align-items: flex-start; }
       .leaderboard-item { flex-wrap: wrap; gap: 8px; }
       .leaderboard-item .player-name { margin: 0; width: 100%; }
-      .news-ticker { font-size: 0.7rem; }
-      .upper-bar { padding: 6px 12px; }
+      .news-ticker { font-size: 0.65rem; }
+      .upper-bar { padding: 0 16px; height: 70px; min-height: 70px; }
+      .upper-bar .title-section h1 { font-size: 1rem; }
+      .upper-bar .bar-btn { padding: 4px 10px; font-size: 0.7rem; }
+      .upper-bar .developer-credit { font-size: 0.6rem; }
+      .leaderboard-section .section-title { font-size: 1.2rem; }
+      .modal-content { padding: 20px; }
+      .modal-teams { flex-wrap: wrap; }
+      .main-header { height: 70px; min-height: 70px; }
+      .match-actions .btn { min-width: 100px; font-size: 0.75rem; padding: 10px 12px; }
     }
   </style>
 </head>
 <body>
 <div class="app-container">
   
-  <!-- ===== شريط الأخبار المتحرك ===== -->
+  <!-- ===== الهيدر العلوي الكامل مع خلفية الصورة ===== -->
+  <div class="main-header">
+    <!-- طبقة تغطية إضافية للجزء العلوي -->
+    <div class="top-cover"></div>
+  </div>
+  
+  <!-- ===== البار العلوي ===== -->
   <div class="upper-bar">
+    <div class="bar-content">
+      <div class="title-section">
+        <h1>🏆 كأس العالم 2026</h1>
+        <div class="developer-credit">⚡ غرفة معلمي سعيد بن العاص</div>
+      </div>
+      <div class="header-actions">
+        <button class="bar-btn" onclick="location.reload()">
+          <i class="fas fa-sync-alt"></i>
+          <span style="display: none;">تحديث</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ===== شريط الأخبار المتحرك ===== -->
+  <div class="news-ticker-wrapper">
     <div class="news-ticker">
       <span>🗳️ طريقة التوقع: اختر المباراة → اختر (فوز الفريق الأول / فوز الفريق الثاني / تعادل) → اكتب اسمك → اضغط حفظ التوقع ✨</span>
       <span class="separator">|</span>
@@ -431,6 +465,16 @@
       <span>🗳️ طريقة التوقع: اختر المباراة → اختر (فوز الفريق الأول / فوز الفريق الثاني / تعادل) → اكتب اسمك → اضغط حفظ التوقع ✨</span>
       <span class="separator">|</span>
       <span>التوقعات تظهر للجميع مباشرة ويتم احتساب النقاط تلقائياً 🏆</span>
+    </div>
+  </div>
+
+  <!-- ===== ترتيب أصحاب التوقعات الصحيحة ===== -->
+  <div class="leaderboard-section" id="leaderboardSection">
+    <div class="section-title">
+      <span class="trophy">🏆</span> ترتيب أصحاب التوقعات الصحيحة
+    </div>
+    <div id="leaderboardContainer" class="leaderboard-grid">
+      <div class="empty-state">⏳ جاري تحميل الترتيب...</div>
     </div>
   </div>
 
@@ -462,8 +506,7 @@
     <button class="tab-btn active" data-tab="upcoming"><i>⚡</i> القادمة والجارية</button>
     <button class="tab-btn" data-tab="previous"><i>📋</i> المباريات السابقة</button>
     <button class="tab-btn" data-tab="standings"><i>📊</i> ترتيب المجموعات</button>
-    <button class="tab-btn" data-tab="predictions"><i>🗳️</i> التوقعات</button>
-    <button class="tab-btn" data-tab="leaderboard"><i>🏆</i> الترتيب</button>
+    <button class="tab-btn" data-tab="predictions"><i>🗳️</i> جميع التوقعات</button>
   </div>
 
   <div id="upcomingTab" class="tab-content active">
@@ -482,31 +525,77 @@
   </div>
 
   <div id="predictionsTab" class="tab-content">
-    <div id="predictionForm">
-      <h3>📝 توقع نتيجة مباراة</h3>
-      <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
-        <input type="text" id="userNameInput" placeholder="👤 اسمك" style="flex:1; min-width:120px;">
-        <select id="matchSelect" style="flex:2; min-width:180px;"></select>
-        <select id="predictionInput" style="flex:1.5; min-width:150px;">
-          <option value="">🔮 اختر توقعك</option>
-        </select>
-        <button id="savePredictionBtn">💾 حفظ التوقع</button>
-      </div>
-      <div id="predictionMessage"></div>
-      <div id="matchStatusWarning" style="margin-top:8px; display:none;" class="prediction-blocked">
-        ⚠️ هذه المباراة تُلعب الآن، لا يمكنك التوقع عليها
-      </div>
-    </div>
-    <h3 style="margin: 20px 0 12px 0; color: #FFE6B0;">🗳️ جميع التوقعات</h3>
+    <h3 style="margin: 0 0 16px 0; color: #FFE6B0;">🗳️ جميع توقعات اللاعبين</h3>
     <div id="allPredictions" class="matches-grid"><div class="empty-state">📭 جاري تحميل التوقعات...</div></div>
   </div>
 
-  <div id="leaderboardTab" class="tab-content">
-    <h3 style="margin: 0 0 16px 0; color: #FFE6B0;">🏆 ترتيب اللاعبين</h3>
-    <div id="leaderboardContainer" class="leaderboard-grid"><div class="empty-state">⏳ جاري تحميل الترتيب...</div></div>
-  </div>
-
   <footer>🔄 التحديث التلقائي | التوقعات محفوظة في Supabase</footer>
+</div>
+
+<!-- ===== نافذة التوقع المنبثقة ===== -->
+<div class="modal-overlay" id="predictionModal">
+  <div class="modal-content">
+    <button class="modal-close" id="modalCloseBtn">✕</button>
+    <div class="modal-title">📝 توقع نتيجة المباراة</div>
+    
+    <div class="modal-teams" id="modalTeams">
+      <div class="m-team"><span>🏁</span> <span id="modalTeam1">الفريق الأول</span></div>
+      <div class="m-vs">🆚</div>
+      <div class="m-team"><span>🏁</span> <span id="modalTeam2">الفريق الثاني</span></div>
+    </div>
+    
+    <div class="modal-datetime" id="modalDateTime">📅 التاريخ والوقت</div>
+    
+    <div class="modal-predict-options" id="modalOptions">
+      <label>
+        <input type="radio" name="prediction" value="HOME">
+        <span class="option-label">🏆 <span id="optTeam1">الفريق الأول</span></span>
+        <span class="option-sub">فوز</span>
+      </label>
+      <label>
+        <input type="radio" name="prediction" value="AWAY">
+        <span class="option-label">🏆 <span id="optTeam2">الفريق الثاني</span></span>
+        <span class="option-sub">فوز</span>
+      </label>
+      <label>
+        <input type="radio" name="prediction" value="DRAW">
+        <span class="option-label">🤝 تعادل</span>
+        <span class="option-sub">النتيجة متساوية</span>
+      </label>
+    </div>
+    
+    <div class="modal-user-input">
+      <input type="text" id="modalUserName" placeholder="👤 أدخل اسمك" maxlength="30">
+    </div>
+    
+    <button class="modal-submit-btn" id="modalSubmitBtn">
+      💾 حفظ التوقع
+    </button>
+    
+    <div class="modal-message" id="modalMessage"></div>
+  </div>
+</div>
+
+<!-- ===== نافذة استعراض التوقعات ===== -->
+<div class="modal-overlay" id="viewPredictionsModal">
+  <div class="modal-content">
+    <button class="modal-close" id="viewModalCloseBtn">✕</button>
+    <div class="modal-title">📋 توقعات المباراة</div>
+    
+    <div class="modal-teams" id="viewModalTeams">
+      <div class="m-team"><span>🏁</span> <span id="viewTeam1">الفريق الأول</span></div>
+      <div class="m-vs">🆚</div>
+      <div class="m-team"><span>🏁</span> <span id="viewTeam2">الفريق الثاني</span></div>
+    </div>
+    
+    <div style="margin: 16px 0 12px; text-align: center; font-size: 0.8rem; color: #98bdc9;">
+      عدد التوقعات: <span id="viewPredictionsCount">0</span>
+    </div>
+    
+    <div id="viewPredictionsList" style="max-height: 400px; overflow-y: auto;">
+      <div class="empty-state" style="padding: 20px;">📭 لا توجد توقعات لهذه المباراة بعد</div>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -528,18 +617,82 @@
   }
 
   // ============================================================
-  //  1) حفظ التوقع
+  //  دوال localStorage للتوقعات (منع التكرار)
+  // ============================================================
+  function getLocalPredictions() {
+    try {
+      const data = localStorage.getItem('predictions');
+      return data ? JSON.parse(data) : {};
+    } catch (e) {
+      console.warn("⚠️ فشل تحميل التوقعات من localStorage:", e);
+      return {};
+    }
+  }
+
+  function saveLocalPrediction(userName, matchId, prediction) {
+    try {
+      const predictions = getLocalPredictions();
+      const key = `${userName}_${matchId}`;
+      predictions[key] = {
+        userName: userName,
+        matchId: matchId,
+        prediction: prediction,
+        timestamp: new Date().toISOString()
+      };
+      localStorage.setItem('predictions', JSON.stringify(predictions));
+      return true;
+    } catch (e) {
+      console.warn("⚠️ فشل حفظ التوقع في localStorage:", e);
+      return false;
+    }
+  }
+
+  function hasUserPredicted(userName, matchId) {
+    if (!userName) return false;
+    const predictions = getLocalPredictions();
+    const key = `${userName}_${matchId}`;
+    return !!predictions[key];
+  }
+
+  function getUserPrediction(userName, matchId) {
+    if (!userName) return null;
+    const predictions = getLocalPredictions();
+    const key = `${userName}_${matchId}`;
+    return predictions[key] || null;
+  }
+
+  // ============================================================
+  //  متغيرات النافذة المنبثقة
+  // ============================================================
+  let currentMatchId = null;
+  let currentTeam1 = '';
+  let currentTeam2 = '';
+  let currentTimeISO = '';
+
+  // ============================================================
+  //  1) حفظ التوقع (مع منع التكرار)
   // ============================================================
   async function savePrediction(userName, matchId, prediction) {
     if (!supabaseClient) {
       return { success: false, message: "Supabase غير متصل." };
     }
 
+    // التحقق من التكرار في localStorage أولاً
+    if (hasUserPredicted(userName, matchId)) {
+      const existing = getUserPrediction(userName, matchId);
+      return { 
+        success: false, 
+        message: `⚠️ لقد توقعت مسبقاً على هذه المباراة! توقعك السابق: ${existing.prediction === 'DRAW' ? 'تعادل' : existing.prediction}`,
+        duplicate: true
+      };
+    }
+
     if (!prediction || prediction === "") {
-      return { success: false, message: "الرجاء اختيار فريق." };
+      return { success: false, message: "الرجاء اختيار توقع." };
     }
 
     try {
+      // حفظ في Supabase
       const { data, error } = await supabaseClient
         .from("predictions")
         .insert([{
@@ -552,6 +705,9 @@
         console.error("❌ خطأ Supabase:", error.message);
         return { success: false, message: error.message };
       }
+
+      // حفظ في localStorage بعد نجاح الحفظ في Supabase
+      saveLocalPrediction(userName, matchId, prediction);
 
       console.log("✅ تم حفظ التوقع:", data);
       return { success: true, data };
@@ -589,7 +745,32 @@
   }
 
   // ============================================================
-  //  3) عرض كل التوقعات
+  //  3) جلب توقعات مباراة محددة
+  // ============================================================
+  async function getPredictionsForMatch(matchId) {
+    if (!supabaseClient) return [];
+
+    try {
+      const { data, error } = await supabaseClient
+        .from("predictions")
+        .select("*")
+        .eq("match_id", matchId)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("❌ خطأ جلب توقعات المباراة:", error);
+        return [];
+      }
+
+      return data || [];
+    } catch (err) {
+      console.error("❌ استثناء:", err);
+      return [];
+    }
+  }
+
+  // ============================================================
+  //  4) عرض كل التوقعات
   // ============================================================
   async function renderAllPredictions() {
     const container = document.getElementById('allPredictions');
@@ -650,7 +831,7 @@
   }
 
   // ============================================================
-  //  4) Leaderboard System
+  //  5) Leaderboard System
   // ============================================================
   function calculateLeaderboard(predictions, matches) {
     const scores = {};
@@ -695,7 +876,7 @@
   }
 
   // ============================================================
-  //  5) عرض Leaderboard
+  //  6) عرض Leaderboard
   // ============================================================
   async function renderLeaderboard() {
     const container = document.getElementById("leaderboardContainer");
@@ -744,16 +925,6 @@
         </div>
       `;
     }).join('');
-  }
-
-  // ============================================================
-  //  6) رسالة النجاح
-  // ============================================================
-  function showPredictionMessage(msg, type = "success") {
-    const el = document.getElementById("predictionMessage");
-    el.innerHTML = msg;
-    el.style.color = type === "success" ? "#8bc34a" : type === "error" ? "#ff5252" : "#ffb347";
-    el.style.background = type === "success" ? "rgba(139,195,74,0.15)" : type === "error" ? "rgba(255,82,82,0.15)" : "rgba(255,179,71,0.15)";
   }
 
   // ============================================================
@@ -944,7 +1115,7 @@
   }));
 
   // ============================================================
-  //  عرض المباريات القادمة
+  //  عرض المباريات القادمة (مع أزرار التوقع والاستعراض)
   // ============================================================
   function renderUpcoming() {
     try {
@@ -954,11 +1125,41 @@
       active.sort((a,b) => matchTime(a.timeISO) - matchTime(b.timeISO));
       const container = document.getElementById('matchesContainer');
       if (!active.length) { container.innerHTML = `<div class="empty-state">📭 لا توجد مباريات قادمة</div>`; return; }
+      
       container.innerHTML = active.map(m => {
         const st = getMatchStatus(m);
         const dateTimeDisplay = getDateTimeDisplay(m.timeISO);
         const isLive = st.live;
         const scoreClass = isLive ? 'live-score' : '';
+        const matchId = `${m.timeISO}_${m.team1}_${m.team2}`;
+        const isLiveMatch = isMatchLive(m.timeISO);
+        
+        // التحقق من وجود توقع سابق للمستخدم الحالي
+        const savedUserName = localStorage.getItem('lastUserName') || '';
+        const hasPredicted = savedUserName && hasUserPredicted(savedUserName, matchId);
+        
+        // زر التوقع
+        let predictBtnClass = 'btn btn-predict';
+        let predictBtnHtml = '';
+        let predictDisabled = false;
+        
+        if (isLiveMatch) {
+          predictBtnClass += ' live-blocked';
+          predictBtnHtml = `<span class="icon">📝</span> توقع الآن ⛔ جارية`;
+          predictDisabled = true;
+        } else if (hasPredicted) {
+          const existing = getUserPrediction(savedUserName, matchId);
+          const predText = existing.prediction === 'DRAW' ? 'تعادل' : existing.prediction;
+          predictBtnClass += ' already-predicted';
+          predictBtnHtml = `<span class="icon">✅</span> تم التوقع: ${predText} <span class="already-icon">✔️</span>`;
+          predictDisabled = true;
+        } else {
+          predictBtnHtml = `<span class="icon">📝</span> توقع الآن`;
+        }
+        
+        // زر الاستعراض
+        const viewBtnHtml = `<span class="icon">📋</span> استعراض التوقعات`;
+        
         return `<div class="match-card ${isLive ? 'live-card' : ''}">
           <div class="teams-score">
             <div class="team"><span>${getFlag(m.team1)}</span> ${m.team1}</div>
@@ -967,13 +1168,273 @@
           </div>
           <div class="datetime-row"><div class="match-day">${getDay(m.timeISO)}</div><div class="match-full-date"><span>${dateTimeDisplay}</span></div></div>
           <div class="info-row"><span class="round-tag">🏅 ${m.roundLabel}</span><div class="countdown-timer ${isLive ? 'live-status' : ''}">${isLive ? '🔴 تُلعب الآن 🔴' : st.text}</div></div>
+          
+          <div class="match-actions">
+            <button class="${predictBtnClass}" 
+                    data-matchid="${matchId}"
+                    data-team1="${m.team1}"
+                    data-team2="${m.team2}"
+                    data-timeiso="${m.timeISO}"
+                    ${predictDisabled ? 'disabled' : ''}>
+              ${predictBtnHtml}
+            </button>
+            
+            <button class="btn btn-view-predictions"
+                    data-matchid="${matchId}"
+                    data-team1="${m.team1}"
+                    data-team2="${m.team2}"
+                    data-timeiso="${m.timeISO}">
+              ${viewBtnHtml}
+            </button>
+          </div>
         </div>`;
       }).join('');
+      
+      // ربط أحداث أزرار التوقع
+      document.querySelectorAll('.btn-predict:not(:disabled)').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const matchId = this.dataset.matchid;
+          const team1 = this.dataset.team1;
+          const team2 = this.dataset.team2;
+          const timeISO = this.dataset.timeiso;
+          openPredictionModal(matchId, team1, team2, timeISO);
+        });
+      });
+      
+      // ربط أحداث أزرار الاستعراض
+      document.querySelectorAll('.btn-view-predictions').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const matchId = this.dataset.matchid;
+          const team1 = this.dataset.team1;
+          const team2 = this.dataset.team2;
+          openViewPredictionsModal(matchId, team1, team2);
+        });
+      });
+      
     } catch (err) {
       console.error("❌ renderUpcoming:", err);
       document.getElementById('matchesContainer').innerHTML = `<div class="empty-state">⚠️ حدث خطأ في عرض المباريات القادمة.</div>`;
     }
   }
+
+  // ============================================================
+  //  فتح نافذة التوقع
+  // ============================================================
+  function openPredictionModal(matchId, team1, team2, timeISO) {
+    currentMatchId = matchId;
+    currentTeam1 = team1;
+    currentTeam2 = team2;
+    currentTimeISO = timeISO;
+    
+    const savedUserName = localStorage.getItem('lastUserName') || '';
+    document.getElementById('modalUserName').value = savedUserName;
+    
+    // التحقق من وجود توقع سابق
+    if (savedUserName && hasUserPredicted(savedUserName, matchId)) {
+      const existing = getUserPrediction(savedUserName, matchId);
+      const predText = existing.prediction === 'DRAW' ? 'تعادل' : existing.prediction;
+      document.getElementById('modalMessage').textContent = `⚠️ لقد توقعت مسبقاً على هذه المباراة! توقعك السابق: ${predText}`;
+      document.getElementById('modalMessage').className = 'modal-message warning';
+      document.getElementById('modalSubmitBtn').disabled = true;
+    } else {
+      document.getElementById('modalMessage').textContent = '';
+      document.getElementById('modalMessage').className = 'modal-message';
+      document.getElementById('modalSubmitBtn').disabled = false;
+    }
+    
+    document.getElementById('modalTeam1').textContent = team1;
+    document.getElementById('modalTeam2').textContent = team2;
+    document.getElementById('optTeam1').textContent = team1;
+    document.getElementById('optTeam2').textContent = team2;
+    document.getElementById('modalDateTime').textContent = `📅 ${getDateTimeDisplay(timeISO)}`;
+    
+    const team1Flag = getFlag(team1) || '🏁';
+    const team2Flag = getFlag(team2) || '🏁';
+    document.querySelector('#modalTeams .m-team:first-child span:first-child').textContent = team1Flag;
+    document.querySelector('#modalTeams .m-team:last-child span:first-child').textContent = team2Flag;
+    
+    document.querySelectorAll('input[name="prediction"]').forEach(el => el.checked = false);
+    
+    document.getElementById('predictionModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // ============================================================
+  //  فتح نافذة استعراض التوقعات
+  // ============================================================
+  async function openViewPredictionsModal(matchId, team1, team2) {
+    document.getElementById('viewTeam1').textContent = team1;
+    document.getElementById('viewTeam2').textContent = team2;
+    
+    const team1Flag = getFlag(team1) || '🏁';
+    const team2Flag = getFlag(team2) || '🏁';
+    document.querySelector('#viewModalTeams .m-team:first-child span:first-child').textContent = team1Flag;
+    document.querySelector('#viewModalTeams .m-team:last-child span:first-child').textContent = team2Flag;
+    
+    const listContainer = document.getElementById('viewPredictionsList');
+    const countSpan = document.getElementById('viewPredictionsCount');
+    
+    listContainer.innerHTML = `<div class="empty-state" style="padding: 20px;">⏳ جاري تحميل التوقعات...</div>`;
+    countSpan.textContent = '...';
+    
+    const predictions = await getPredictionsForMatch(matchId);
+    
+    countSpan.textContent = predictions.length;
+    
+    if (!predictions || predictions.length === 0) {
+      listContainer.innerHTML = `<div class="empty-state" style="padding: 20px;">📭 لا توجد توقعات لهذه المباراة بعد</div>`;
+    } else {
+      listContainer.innerHTML = predictions.map(p => {
+        let text = "";
+        let className = "";
+        
+        if (p.prediction === "DRAW") {
+          text = "🤝 تعادل الفريقين";
+          className = "draw";
+        } else {
+          const flag = getFlag(p.prediction) || "🏁";
+          text = `🏆 فوز ${flag} ${p.prediction}`;
+          className = "home";
+        }
+        
+        return `
+          <div class="prediction-card" style="margin-bottom: 10px;">
+            <div class="user-name">
+              <div class="avatar">${p.user_name ? p.user_name.charAt(0).toUpperCase() : '👤'}</div>
+              <b>${p.user_name || 'مجهول'}</b>
+            </div>
+            <div class="pred-detail">
+              <span>🔮 التوقع</span>
+              <span class="prediction-badge ${className}">${text}</span>
+            </div>
+            <div class="match-info">
+              🕒 ${p.created_at ? new Date(p.created_at).toLocaleString('ar') : 'تاريخ غير معروف'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    document.getElementById('viewPredictionsModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // ============================================================
+  //  إغلاق النوافذ المنبثقة
+  // ============================================================
+  function closePredictionModal() {
+    document.getElementById('predictionModal').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function closeViewPredictionsModal() {
+    document.getElementById('viewPredictionsModal').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  // ============================================================
+  //  أحداث النوافذ المنبثقة
+  // ============================================================
+  document.getElementById('modalCloseBtn').addEventListener('click', closePredictionModal);
+  document.getElementById('viewModalCloseBtn').addEventListener('click', closeViewPredictionsModal);
+  
+  document.getElementById('predictionModal').addEventListener('click', function(e) {
+    if (e.target === this) closePredictionModal();
+  });
+  
+  document.getElementById('viewPredictionsModal').addEventListener('click', function(e) {
+    if (e.target === this) closeViewPredictionsModal();
+  });
+  
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closePredictionModal();
+      closeViewPredictionsModal();
+    }
+  });
+
+  // ============================================================
+  //  حفظ التوقع من النافذة المنبثقة (مع منع التكرار)
+  // ============================================================
+  document.getElementById('modalSubmitBtn').addEventListener('click', async function() {
+    const userName = document.getElementById('modalUserName').value.trim();
+    const selectedOption = document.querySelector('input[name="prediction"]:checked');
+    const messageEl = document.getElementById('modalMessage');
+    
+    if (!userName) {
+      messageEl.textContent = '⚠️ الرجاء إدخال اسمك.';
+      messageEl.className = 'modal-message warning';
+      return;
+    }
+    
+    // حفظ اسم المستخدم في localStorage
+    localStorage.setItem('lastUserName', userName);
+    
+    if (!selectedOption) {
+      messageEl.textContent = '⚠️ الرجاء اختيار توقعك.';
+      messageEl.className = 'modal-message warning';
+      return;
+    }
+    
+    let predictionValue;
+    if (selectedOption.value === 'HOME') {
+      predictionValue = currentTeam1;
+    } else if (selectedOption.value === 'AWAY') {
+      predictionValue = currentTeam2;
+    } else {
+      predictionValue = 'DRAW';
+    }
+    
+    if (currentTimeISO && isMatchLive(currentTimeISO)) {
+      messageEl.textContent = '⛔ لا يمكن التوقع على مباراة جارية!';
+      messageEl.className = 'modal-message error';
+      return;
+    }
+    
+    // التحقق من التكرار مرة أخرى
+    if (hasUserPredicted(userName, currentMatchId)) {
+      const existing = getUserPrediction(userName, currentMatchId);
+      const predText = existing.prediction === 'DRAW' ? 'تعادل' : existing.prediction;
+      messageEl.textContent = `⚠️ لقد توقعت مسبقاً على هذه المباراة! توقعك السابق: ${predText}`;
+      messageEl.className = 'modal-message warning';
+      this.disabled = true;
+      return;
+    }
+    
+    this.disabled = true;
+    messageEl.textContent = '⏳ جاري الحفظ...';
+    messageEl.className = 'modal-message';
+    
+    const result = await savePrediction(userName, currentMatchId, predictionValue);
+    
+    if (result.success) {
+      messageEl.textContent = '✅ تم حفظ توقعك بنجاح! 🎉';
+      messageEl.className = 'modal-message success';
+      this.disabled = false;
+      
+      await renderAllPredictions();
+      await renderLeaderboard();
+      
+      // تحديث واجهة البطاقة - إعادة تحميل المباريات لتحديث زر التوقع
+      setTimeout(() => {
+        renderUpcoming();
+      }, 500);
+      
+      setTimeout(() => {
+        closePredictionModal();
+      }, 1500);
+    } else {
+      if (result.duplicate) {
+        messageEl.textContent = result.message;
+        messageEl.className = 'modal-message warning';
+        this.disabled = true;
+      } else {
+        messageEl.textContent = `❌ فشل الحفظ: ${result.message}`;
+        messageEl.className = 'modal-message error';
+        this.disabled = false;
+      }
+    }
+  });
 
   // ============================================================
   //  المباريات السابقة (جلب من API مع إعادة محاولة)
@@ -1074,10 +1535,7 @@
       renderPreviousGamesFiltered();
       calculateStandings();
 
-      const activeTab = document.querySelector('.tab-btn.active')?.getAttribute('data-tab');
-      if (activeTab === 'leaderboard') {
-        renderLeaderboard();
-      }
+      await renderLeaderboard();
 
     } catch (err) {
       console.error("❌ فشل تحميل المباريات السابقة:", err);
@@ -1322,130 +1780,6 @@
   function getDateTimeDisplay(t) { return `${getDateFmt(t)} - ${getTimeFromISO(t)}`; }
 
   // ============================================================
-  //  دوال التوقعات (التحميل والعرض مع منع المباريات الجارية)
-  // ============================================================
-  function loadMatchesForSelect() {
-    try {
-      const select = document.getElementById('matchSelect');
-      const upcoming = upcomingMatches(matchesData);
-      if (upcoming.length === 0) {
-        select.innerHTML = '<option value="">لا توجد مباريات قادمة</option>';
-        return;
-      }
-      select.innerHTML = upcoming.map(m => {
-        const isLive = isMatchLive(m.timeISO);
-        const label = `${m.team1} 🆚 ${m.team2} (${getDateTimeDisplay(m.timeISO)})${isLive ? ' 🔴 جارية' : ''}`;
-        const matchId = `${m.timeISO}_${m.team1}_${m.team2}`;
-        return `<option value="${matchId}" ${isLive ? 'disabled style="color:#ff6b6b;"' : ''}>${label}</option>`;
-      }).join('');
-
-      updatePredictionOptions();
-      checkMatchStatus();
-    } catch (err) {
-      console.error("❌ loadMatchesForSelect:", err);
-    }
-  }
-
-  function checkMatchStatus() {
-    const matchSelect = document.getElementById('matchSelect');
-    const warningEl = document.getElementById('matchStatusWarning');
-    const saveBtn = document.getElementById('savePredictionBtn');
-    
-    if (!matchSelect || !matchSelect.value) {
-      warningEl.style.display = 'none';
-      saveBtn.disabled = false;
-      return;
-    }
-    
-    const parts = matchSelect.value.split('_');
-    const timeISO = parts[0];
-    
-    if (timeISO && isMatchLive(timeISO)) {
-      warningEl.style.display = 'inline-block';
-      saveBtn.disabled = true;
-    } else {
-      warningEl.style.display = 'none';
-      saveBtn.disabled = false;
-    }
-  }
-
-  function updatePredictionOptions() {
-    const matchSelect = document.getElementById('matchSelect');
-    const predictionSelect = document.getElementById('predictionInput');
-    const selectedMatch = matchSelect.value;
-
-    if (!selectedMatch) {
-      predictionSelect.innerHTML = `
-        <option value="">🔮 اختر توقعك</option>
-        <option value="DRAW">🤝 تعادل الفريقين</option>
-      `;
-      return;
-    }
-
-    const parts = selectedMatch.split('_');
-    const team1 = parts[1] || 'الفريق الأول';
-    const team2 = parts[2] || 'الفريق الثاني';
-
-    predictionSelect.innerHTML = `
-      <option value="">🔮 اختر الفريق الفائز</option>
-      <option value="${team1}">🏆 ${team1}</option>
-      <option value="${team2}">🏆 ${team2}</option>
-      <option value="DRAW">🤝 تعادل الفريقين</option>
-    `;
-  }
-
-  document.getElementById('matchSelect').addEventListener('change', function() {
-    updatePredictionOptions();
-    checkMatchStatus();
-  });
-
-  // ============================================================
-  //  أحداث النموذج
-  // ============================================================
-  document.getElementById('savePredictionBtn').addEventListener('click', async function() {
-    const userName = document.getElementById('userNameInput').value.trim();
-    const matchSelect = document.getElementById('matchSelect');
-    const matchId = matchSelect.value;
-    const predictionSelect = document.getElementById('predictionInput');
-    const prediction = predictionSelect.value;
-    const msg = document.getElementById('predictionMessage');
-
-    if (!userName) {
-      showPredictionMessage('⚠️ الرجاء إدخال اسمك.', 'warning');
-      return;
-    }
-    if (!matchId) {
-      showPredictionMessage('⚠️ الرجاء اختيار مباراة.', 'warning');
-      return;
-    }
-    if (!prediction) {
-      showPredictionMessage('⚠️ الرجاء اختيار توقعك من القائمة.', 'warning');
-      return;
-    }
-
-    // التحقق من أن المباراة ليست جارية
-    const parts = matchId.split('_');
-    const timeISO = parts[0];
-    if (timeISO && isMatchLive(timeISO)) {
-      showPredictionMessage('⛔ لا يمكن التوقع على مباراة جارية!', 'error');
-      return;
-    }
-
-    const result = await savePrediction(userName, matchId, prediction);
-    if (result.success) {
-      showPredictionMessage('✅ تم حفظ توقعك بنجاح!', 'success');
-      predictionSelect.value = '';
-      await renderAllPredictions();
-      const activeTab = document.querySelector('.tab-btn.active')?.getAttribute('data-tab');
-      if (activeTab === 'leaderboard') {
-        renderLeaderboard();
-      }
-    } else {
-      showPredictionMessage(`❌ فشل الحفظ: ${result.message}`, 'error');
-    }
-  });
-
-  // ============================================================
   //  إدارة التبويبات
   // ============================================================
   function initTabs() {
@@ -1464,11 +1798,7 @@
           else calculateStandings();
         }
         if (id === 'predictions') {
-          loadMatchesForSelect();
           renderAllPredictions();
-        }
-        if (id === 'leaderboard') {
-          renderLeaderboard();
         }
       });
     });
@@ -1485,19 +1815,16 @@
 
   function startAutoUpdate() {
     setInterval(renderUpcoming, 1000);
-    setInterval(() => {
+    setInterval(async () => {
       try {
         const activeTab = document.querySelector('.tab-btn.active')?.getAttribute('data-tab');
         if (activeTab === 'previous') loadPreviousGames();
         if (activeTab === 'standings') { if (previousGamesData.length) calculateStandings(); else loadPreviousGames(); }
         performGlobalSearch();
         if (activeTab === 'predictions') {
-          loadMatchesForSelect();
           renderAllPredictions();
         }
-        if (activeTab === 'leaderboard') {
-          renderLeaderboard();
-        }
+        await renderLeaderboard();
       } catch (err) {
         console.error("❌ تحديث تلقائي:", err);
       }
@@ -1507,7 +1834,7 @@
   // ============================================================
   //  التهيئة
   // ============================================================
-  function init() {
+  async function init() {
     try {
       console.log("🚀 تهيئة التطبيق...");
       bindEvents();
@@ -1519,12 +1846,17 @@
         console.log("📭 لا توجد بيانات في الكاش، جاري التحميل من API...");
       }
       
+      const savedUserName = localStorage.getItem('lastUserName') || '';
+      if (savedUserName) {
+        document.getElementById('modalUserName').value = savedUserName;
+      }
+      
       setTimeout(() => {
         loadPreviousGames();
       }, 500);
       
-      loadMatchesForSelect();
       renderAllPredictions();
+      await renderLeaderboard();
       console.log("✅ التطبيق جاهز.");
     } catch (err) {
       console.error("❌ فشل التهيئة:", err);
