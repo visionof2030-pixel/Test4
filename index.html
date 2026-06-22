@@ -6,7 +6,7 @@
     <title>🏆 كأس العالم 2026</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* ===== الأنماط العامة (كما هي سابقاً) ===== */
+        /* ===== الأنماط العامة ===== */
         * {
             margin: 0;
             padding: 0;
@@ -641,7 +641,7 @@
             font-weight: 600;
         }
 
-        /* ===== لوحة المتصدرين (مستبدلة بالكامل) ===== */
+        /* ===== لوحة المتصدرين ===== */
         .leaderboard-section {
             background: linear-gradient(145deg, rgba(10, 22, 40, 0.95), rgba(20, 40, 70, 0.9));
             border: 1px solid var(--border-gold);
@@ -1192,7 +1192,69 @@
                 opacity: 0.5;
             }
         }
-        .share-link-btn {
+
+        /* ===== زر التوقع وحالة "تم التوقع" ===== */
+        .predict-btn-wrap {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .predict-btn-wrap .predict-btn {
+            flex: 1;
+            justify-content: center;
+            padding: 10px 12px;
+            font-size: 0.75rem;
+            border-radius: 60px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid rgba(240, 180, 41, 0.2);
+            background: rgba(240, 180, 41, 0.08);
+            color: var(--gold-light);
+        }
+        .predict-btn-wrap .predict-btn:hover:not(:disabled) {
+            background: rgba(240, 180, 41, 0.18);
+            transform: translateY(-1px);
+        }
+        .predict-btn-wrap .predict-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: rgba(100, 100, 100, 0.15);
+            color: var(--text-secondary);
+            border-color: rgba(100, 100, 100, 0.2);
+            transform: none !important;
+        }
+        .predict-btn-wrap .predict-btn.submitted {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: rgba(100, 100, 100, 0.15);
+            color: var(--text-secondary);
+            border-color: rgba(100, 100, 100, 0.2);
+        }
+        .predict-btn-wrap .predict-btn.submitted::after {
+            content: " ✅";
+        }
+        .predict-btn-wrap .view-btn {
+            flex: 1;
+            justify-content: center;
+            padding: 10px 12px;
+            font-size: 0.75rem;
+            border-radius: 60px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid rgba(52, 152, 219, 0.15);
+            background: rgba(52, 152, 219, 0.06);
+            color: #5dade2;
+        }
+        .predict-btn-wrap .view-btn:hover {
+            background: rgba(52, 152, 219, 0.15);
+            border-color: #5dade2;
+        }
+        .predict-btn-wrap .share-link-btn {
             background: rgba(52, 152, 219, 0.1);
             border: 1px solid rgba(52, 152, 219, 0.2);
             color: #5dade2;
@@ -1207,7 +1269,7 @@
             align-items: center;
             gap: 5px;
         }
-        .share-link-btn:hover {
+        .predict-btn-wrap .share-link-btn:hover {
             background: rgba(52, 152, 219, 0.2);
             border-color: #5dade2;
             transform: translateY(-1px);
@@ -1338,7 +1400,7 @@
             border-bottom: none;
         }
 
-        /* ===== المخطط (مسار البطولة) ===== */
+        /* ===== المخطط ===== */
         .bracket-container {
             display: flex;
             flex-direction: column;
@@ -1476,6 +1538,7 @@
             padding: 16px;
             border: 1px solid var(--border-color);
             transition: var(--transition);
+            cursor: pointer;
         }
         .prediction-card:hover {
             border-color: var(--border-gold);
@@ -2224,6 +2287,11 @@
                 font-size: 0.55rem;
                 padding: 1px 6px;
             }
+            .predict-btn-wrap .predict-btn,
+            .predict-btn-wrap .view-btn {
+                font-size: 0.6rem !important;
+                padding: 6px 8px !important;
+            }
         }
         @media (min-width: 768px) {
             .matches-grid {
@@ -2242,7 +2310,6 @@
             }
         }
 
-        /* تذييل إضافي للتصحيح */
         .click-hint {
             font-size: 0.6rem;
             color: var(--text-secondary);
@@ -2283,7 +2350,7 @@
             </div>
         </header>
 
-        <!-- شريط الأخبار محدث -->
+        <!-- شريط الأخبار -->
         <div class="news-ticker-wrapper">
             <div class="news-ticker">
                 <span>🏆 كأس العالم 2026 — تابع المباريات وتوقع النتائج</span>
@@ -2560,6 +2627,30 @@
         }
 
         // ============================================================
+        //  SUBMITTED MATCHES - localStorage persistence
+        // ============================================================
+        function getSubmittedMatches() {
+            try {
+                const raw = localStorage.getItem('submitted_matches');
+                if (!raw) return [];
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch { return []; }
+        }
+
+        function addSubmittedMatch(matchId) {
+            const current = getSubmittedMatches();
+            if (!current.includes(matchId)) {
+                current.push(matchId);
+                localStorage.setItem('submitted_matches', JSON.stringify(current));
+            }
+        }
+
+        function isMatchSubmitted(matchId) {
+            return getSubmittedMatches().includes(matchId);
+        }
+
+        // ============================================================
         //  LOAD DATA
         // ============================================================
         async function loadPreviousGames() {
@@ -2586,10 +2677,15 @@
                 state.openfootballMatches = cached;
                 return;
             }
-            const res = await fetch("https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json");
-            const data = await res.json();
-            state.openfootballMatches = data.matches || [];
-            setCache("openfootball", state.openfootballMatches);
+            try {
+                const res = await fetch("https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json");
+                const data = await res.json();
+                state.openfootballMatches = data.matches || [];
+                setCache("openfootball", state.openfootballMatches);
+            } catch (e) {
+                console.warn("⚠️ فشل تحميل بيانات openfootball:", e);
+                state.openfootballMatches = [];
+            }
         }
 
         async function getAllPredictions() {
@@ -2599,16 +2695,21 @@
                 return;
             }
             if (!supabaseClient) { state.predictions = []; return; }
-            const { data } = await supabaseClient
-                .from("predictions")
-                .select("*")
-                .limit(300);
-            state.predictions = data || [];
-            setCache("predictions", state.predictions);
+            try {
+                const { data } = await supabaseClient
+                    .from("predictions")
+                    .select("*")
+                    .limit(300);
+                state.predictions = data || [];
+                setCache("predictions", state.predictions);
+            } catch (e) {
+                console.warn("⚠️ فشل تحميل التوقعات:", e);
+                state.predictions = [];
+            }
         }
 
         // ============================================================
-        //  INIT - مع تشغيل التبويبات
+        //  INIT
         // ============================================================
         async function init() {
             console.log("🚀 INIT START (محسن)");
@@ -2619,6 +2720,9 @@
             ]);
             state.loaded = true;
 
+            // تحديث الهدافين من البيانات المحملة
+            updateScorers();
+
             renderLeaderboard();
             renderUpcoming();
             calculateStandings();
@@ -2626,14 +2730,8 @@
             renderScorers();
             renderBracket();
             renderAllPredictions();
-
-            // تفعيل التبويبات
             initTabs();
-
-            // التحقق من رابط المباراة
             checkUrlForMatch();
-
-            // التحديث التلقائي
             startAutoUpdate();
 
             console.log("✅ INIT DONE (محسن)");
@@ -2659,7 +2757,6 @@
         let isOpenfootballLoaded = false;
         let isLoadingPrevious = false;
 
-        // بيانات الملاعب
         const stadiums = {
             "1": "ملعب آزتيكا (المكسيك)",
             "2": "ملعب سيول (كوريا)",
@@ -3231,7 +3328,7 @@
         };
 
         // ============================================================
-        //  دوال التوقعات المحلية و Supabase
+        //  دوال التوقعات المحلية (للحفاظ على التوافق مع الكود القديم)
         // ============================================================
         function getLocalPredictions() { try { const data = localStorage.getItem('predictions'); return data ? JSON.parse(
                     data) : {}; } catch (e) { return {}; } }
@@ -3241,7 +3338,9 @@
                     .toISOString() };
                 localStorage.setItem('predictions', JSON.stringify(predictions)); return true; } catch (e) { return false; } }
 
-        function hasUserPredicted(userName, matchId) { if (!userName) return false; return !!getLocalPredictions()[
+        // نستخدم الآن isMatchSubmitted من localStorage بدلاً من hasUserPredicted
+        // لكن نحتفظ بالدوال القديمة للتوافق
+        function hasUserPredictedOld(userName, matchId) { if (!userName) return false; return !!getLocalPredictions()[
                 `${userName}_${matchId}`]; }
 
         function getUserPrediction(userName, matchId) { if (!userName) return null; return getLocalPredictions()[
@@ -3297,6 +3396,7 @@
             } else {
                 return { success: false, message: "⛔ مباراة غير معروفة" };
             }
+            // التحقق من الاسم في Supabase
             async function isUserNameExists(userName) {
                 if (!supabaseClient || !userName) return false;
                 try {
@@ -3314,15 +3414,16 @@
                         message: `⚠️ هذا الاسم "${userName}" مسجل لمستخدم آخر. الرجاء استخدام اسم مختلف أو تأكيد أنك أنت صاحب الاسم.` };
                 }
             }
-            if (hasUserPredicted(userName, matchId)) {
-                const existing = getUserPrediction(userName, matchId);
-                return { success: false, message: `⚠️ توقعت مسبقاً: ${existing.prediction === 'DRAW' ? 'تعادل' : existing.prediction}`,
-                    duplicate: true };
+            // التحقق من التكرار باستخدام localStorage
+            if (isMatchSubmitted(matchId)) {
+                return { success: false, message: `⚠️ توقعت مسبقاً هذه المباراة`, duplicate: true };
             }
             try {
                 const { error } = await supabaseClient.from("predictions").insert([{ user_name: userName, match_id: matchId,
                         prediction }]);
                 if (error) throw error;
+                // حفظ في localStorage
+                addSubmittedMatch(matchId);
                 saveLocalPrediction(userName, matchId, prediction);
                 localStorage.removeItem("wc_cache_v2_predictions");
                 await getAllPredictions();
@@ -3384,8 +3485,10 @@
             const isFinished = st.finished;
             const matchId = `${m.timeISO}_${m.team1}_${m.team2}`;
             const savedUserName = localStorage.getItem('lastUserName') || '';
-            const hasPredicted = savedUserName && hasUserPredicted(savedUserName, matchId);
+            // استخدام localStorage للمتابعة
+            const submitted = isMatchSubmitted(matchId);
             const canPredictNow = isUpcoming && !isLive && !isFinished && canPredict(m.timeISO);
+
             let scoreDisplay = '🆚',
                 scoreClass = 'upcoming',
                 matchClass = '';
@@ -3407,25 +3510,43 @@
                     scoreClass = 'finished';
                     matchClass = 'finished-match'; }
             }
-            let predictBtnHtml = `<span>📝</span> توقع الآن`,
-                predictDisabled = false,
-                predictBtnClass = '';
-            if (!canPredictNow) {
+
+            // بناء الأزرار
+            let predictBtnHtml = 'توقع الآن';
+            let predictDisabled = false;
+            let predictBtnClass = 'predict-btn';
+            let predictBtnExtra = '';
+
+            if (submitted) {
                 predictDisabled = true;
-                if (isFinished) { predictBtnHtml = `<span>📋</span> عرض التوقعات`;
-                    predictBtnClass = 'style="opacity:0.7;cursor:pointer;"'; } else if (isLive) { predictBtnHtml =
-                        `<span>⛔</span> جارية`;
-                    predictBtnClass = 'style="opacity:0.5;cursor:not-allowed;"'; } else if (!canPredict(m.timeISO) && !isFinished &&
-                    !isLive) { predictBtnHtml = `<span>⏳</span> قريباً (أقل من 5 دقائق)`;
-                    predictBtnClass = 'style="opacity:0.5;cursor:not-allowed;"'; } else { predictBtnHtml =
-                        `<span>⏳</span> قريباً`;
-                    predictBtnClass = 'style="opacity:0.7;cursor:pointer;"'; }
-            } else if (hasPredicted) {
-                const existing = getUserPrediction(savedUserName, matchId);
+                predictBtnHtml = 'تم التوقع ✅';
+                predictBtnClass += ' submitted';
+                predictBtnExtra = 'disabled';
+            } else if (!canPredictNow) {
                 predictDisabled = true;
-                predictBtnHtml = `<span>✅</span> تم التوقع: ${existing.prediction === 'DRAW' ? 'تعادل' : existing.prediction}`;
-                predictBtnClass = 'style="border-color:#2ecc71;color:#2ecc71;cursor:default;"';
+                if (isFinished) {
+                    predictBtnHtml = '📋 عرض التوقعات';
+                    predictBtnClass += ' view-btn';
+                    predictBtnExtra = 'onclick="openMatchPredictions(\'' + matchId + '\', \'' + m.team1 + '\', \'' + m.team2 +
+                        '\', ' + homeScore + ', ' + awayScore + ')"';
+                } else if (isLive) {
+                    predictBtnHtml = '⛔ جارية';
+                    predictBtnClass += ' view-btn';
+                    predictBtnExtra = 'disabled';
+                } else if (!canPredict(m.timeISO) && !isFinished && !isLive) {
+                    predictBtnHtml = '⏳ قريباً (أقل من 5 دقائق)';
+                    predictBtnClass += ' view-btn';
+                    predictBtnExtra = 'disabled';
+                } else {
+                    predictBtnHtml = '⏳ قريباً';
+                    predictBtnClass += ' view-btn';
+                    predictBtnExtra = 'disabled';
+                }
+            } else {
+                predictBtnExtra = 'onclick="openPredictionModal(\'' + matchId + '\', \'' + m.team1 + '\', \'' + m.team2 +
+                    '\', \'' + m.timeISO + '\')"';
             }
+
             const groupName = Object.keys(finalGroups).find(g => finalGroups[g].includes(m.team1)) || '';
             const isToday = isMatchToday(m.timeISO);
             const dayLabel = isToday ? '📌 اليوم' : (isMatchTodayOrTomorrow(m.timeISO) ? '📌 غداً' : '');
@@ -3443,6 +3564,7 @@
             const onclickAttr = (isFinished && matchResult) ?
                 `onclick="openMatchPredictions('${matchId}', '${m.team1}', '${m.team2}', ${homeScore}, ${awayScore})"` :
                 '';
+
             return `
             <div class="match-card ${matchClass}" ${onclickAttr}>
               <div class="match-teams">
@@ -3462,19 +3584,15 @@
                 ${ground ? `<span class="tag stadium-tag">🏟️ ${ground}</span>` : ''}
               </div>
               ${isUpcoming ? `
-                <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
-                  <button class="tab-btn" style="flex:1;justify-content:center;padding:10px 12px;font-size:0.75rem;background:rgba(240,180,41,0.08);border-color:rgba(240,180,41,0.2);color:var(--gold-light);" 
-                          data-matchid="${matchId}" data-team1="${m.team1}" data-team2="${m.team2}" data-timeiso="${m.timeISO}"
-                          ${predictDisabled ? 'disabled' : ''} ${predictBtnClass}>
+                <div class="predict-btn-wrap">
+                  <button class="${predictBtnClass}" ${predictBtnExtra} data-matchid="${matchId}">
                     ${predictBtnHtml}
                   </button>
-                  <button class="tab-btn" style="flex:1;justify-content:center;padding:10px 12px;font-size:0.75rem;background:rgba(52,152,219,0.06);border-color:rgba(52,152,219,0.15);color:#5dade2;"
-                          data-matchid="${matchId}" data-team1="${m.team1}" data-team2="${m.team2}" 
-                          onclick="openViewPredictionsModal('${matchId}','${m.team1}','${m.team2}')">
-                    <span>📋</span> استعراض التوقعات
+                  <button class="view-btn" onclick="openViewPredictionsModal('${matchId}','${m.team1}','${m.team2}')">
+                    📋 استعراض التوقعات
                   </button>
                   <button class="share-link-btn" onclick="copyMatchLink('${m.id}', '${m.team1}', '${m.team2}')">
-                    <span class="icon">🔗</span> مشاركة الرابط
+                    🔗 مشاركة
                   </button>
                 </div>
               ` : ''}
@@ -3928,11 +4046,12 @@
                 closeBracketModal(); });
 
         // ============================================================
-        //  دوال عرض قائمة الهدافين
+        //  دوال عرض قائمة الهدافين (محسنة من الـ API)
         // ============================================================
         function updateScorers() {
             scorersDict = {};
             playerTeamMap = {};
+            // 1- من openfootball
             for (let match of state.openfootballMatches) {
                 const homeTeam = translateToArabic(match.team1 || '');
                 const awayTeam = translateToArabic(match.team2 || '');
@@ -3948,6 +4067,43 @@
                     if (team && !playerTeamMap[normalizedName]) playerTeamMap[normalizedName] = team;
                 }
             }
+            // 2- من API الرئيسي (worldcup26.ir) إذا كان يحتوي على بيانات الهدافين
+            // بعض الـ APIs قد لا تحتوي على بيانات الهدافين، لكن نحاول استخراجها من وصف المباريات
+            for (let game of state.allGames) {
+                if (game.finished === "TRUE" && game.scorers) {
+                    try {
+                        const scorersData = game.scorers;
+                        const homeTeam = translateToArabic(game.home_team_name_fa || game.home_team_name_en || '');
+                        const awayTeam = translateToArabic(game.away_team_name_fa || game.away_team_name_en || '');
+                        // محاولة استخراج الهدافين من النص
+                        const scorerMatches = scorersData.match(/([^\d,]+?)\s*(\d+['’]?)/g);
+                        if (scorerMatches) {
+                            for (let sm of scorerMatches) {
+                                const parts = sm.match(/^(.+?)\s*(\d+['’]?)$/);
+                                if (parts) {
+                                    let name = parts[1].trim();
+                                    let normalizedName = normalizeName(name);
+                                    if (!scorersDict[normalizedName]) scorersDict[normalizedName] = 0;
+                                    scorersDict[normalizedName]++;
+                                    // محاولة تحديد الفريق
+                                    if (!playerTeamMap[normalizedName]) {
+                                        if (game.home_team_name_en && name.includes(game.home_team_name_en)) playerTeamMap[
+                                            normalizedName] = homeTeam;
+                                        else if (game.away_team_name_en && name.includes(game.away_team_name_en))
+                                            playerTeamMap[normalizedName] = awayTeam;
+                                        else if (game.home_team_name_fa && name.includes(game.home_team_name_fa))
+                                            playerTeamMap[normalizedName] = homeTeam;
+                                        else if (game.away_team_name_fa && name.includes(game.away_team_name_fa))
+                                            playerTeamMap[normalizedName] = awayTeam;
+                                    }
+                                }
+                            }
+                        }
+                    } catch (e) { /* تجاهل */ }
+                }
+            }
+            // تحديث العرض
+            renderScorers();
         }
 
         function renderScorers() {
@@ -4015,6 +4171,8 @@
                 renderTeamStats();
                 renderBracket();
                 renderLeaderboard();
+                // تحديث الهدافين بعد تحميل البيانات
+                updateScorers();
             } catch (e) {
                 console.error("❌ تحميل السابقة:", e);
                 if (state.previousGamesData.length === 0) {
@@ -4400,7 +4558,7 @@
                 hidePasswordOverlay(); });
 
         // ============================================================
-        //  التبويبات - تم إصلاحها
+        //  التبويبات
         // ============================================================
         function initTabs() {
             console.log("🔹 تفعيل التبويبات");
@@ -4409,19 +4567,14 @@
                 btn.addEventListener('click', function() {
                     const id = this.dataset.tab;
                     console.log("🔹 تبويب مختار:", id);
-                    // إخفاء كل المحتويات
                     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-                    // إظهار المحتوى المطلوب
                     const target = document.getElementById(`${id}Tab`);
                     if (target) target.classList.add('active');
-                    // تحديث الأزرار
                     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
-                    // تحديث فلتر اليوم
                     const dayFilter = document.getElementById('dayFilterTabs');
                     if (id === 'upcoming') dayFilter.classList.add('visible');
                     else dayFilter.classList.remove('visible');
-                    // تحميل المحتوى حسب التبويب
                     if (id === 'previous' && !state.previousGamesData.length) loadPreviousGamesFull();
                     if (id === 'standings' && state.previousGamesData.length) calculateStandings();
                     if (id === 'scorers') renderScorers();
@@ -4430,7 +4583,6 @@
                     if (id === 'predictions') renderAllPredictions();
                 });
             });
-            // تفعيل التبويب النشط افتراضياً
             const activeTab = document.querySelector('.tab-btn.active');
             if (activeTab) {
                 const id = activeTab.dataset.tab;
@@ -4556,22 +4708,6 @@
                     const isUpcoming = (matchTime(m.timeISO) + MATCH_DURATION) > now();
                     return renderMatchCard(m, isUpcoming);
                 }).join('');
-                document.querySelectorAll('[data-matchid][data-team1]').forEach(btn => {
-                    if (!btn.disabled && !btn.onclick) {
-                        btn.addEventListener('click', function() {
-                            const matchId = this.dataset.matchid,
-                                team1 = this.dataset.team1,
-                                team2 = this.dataset.team2,
-                                timeISO = this.dataset.timeiso;
-                            if (isMatchFinished(timeISO)) { showCopyToast(
-                                    '⛔ هذه المباراة انتهت، لا يمكن التوقع.'); return; }
-                            if (!canPredict(timeISO)) { showCopyToast(
-                                    '⛔ لا يمكن التوقع الآن، المباراة على وشك البدء أو بدأت بالفعل (يُسمح حتى 5 دقائق قبل البداية).'
-                                    ); return; }
-                            openPredictionModal(matchId, team1, team2, timeISO);
-                        });
-                    }
-                });
                 updateShareAllCount();
             } catch (e) { console.error("renderUpcoming:", e);
                 document.getElementById('matchesContainer').innerHTML =
@@ -4603,9 +4739,8 @@
                 msgEl.textContent = '';
                 msgEl.className = 'modal-message';
             }
-            if (savedUserName && hasUserPredicted(savedUserName, matchId)) {
-                const existing = getUserPrediction(savedUserName, matchId);
-                msgEl.textContent = `⚠️ توقعت سابقاً: ${existing.prediction === 'DRAW' ? 'تعادل' : existing.prediction}`;
+            if (isMatchSubmitted(matchId)) {
+                msgEl.textContent = `⚠️ توقعت مسبقاً هذه المباراة`;
                 msgEl.className = 'modal-message warning';
                 document.getElementById('modalSubmitBtn').disabled = true;
             } else {
@@ -4665,6 +4800,11 @@
             if (!canPredict(currentTimeISO)) { msgEl.textContent =
                     '⛔ لا يمكن التوقع الآن، المباراة على وشك البدء أو بدأت بالفعل (يُسمح حتى 5 دقائق قبل البداية).';
                 msgEl.className = 'modal-message error'; return; }
+            if (isMatchSubmitted(currentMatchId)) {
+                msgEl.textContent = '⚠️ لقد توقعت هذه المباراة مسبقاً';
+                msgEl.className = 'modal-message warning';
+                return;
+            }
             this.disabled = true;
             msgEl.textContent = '⏳ جاري الحفظ...';
             msgEl.className = 'modal-message';
@@ -4673,9 +4813,10 @@
                 msgEl.textContent = '✅ تم حفظ التوقع بنجاح! 🎉';
                 msgEl.className = 'modal-message success';
                 this.disabled = false;
+                // تحديث الواجهة
                 await renderAllPredictions();
                 renderLeaderboard();
-                setTimeout(() => { renderUpcoming(); }, 300);
+                renderUpcoming();
                 setTimeout(closePredictionModal, 1200);
             } else {
                 msgEl.textContent = result.message || '❌ فشل الحفظ';
@@ -4734,7 +4875,7 @@
         }
 
         // ============================================================
-        //  لوحة المتصدرين مع إمكانية النقر على اللاعبين
+        //  لوحة المتصدرين
         // ============================================================
         async function renderLeaderboard() {
             const container = document.getElementById("leaderboardContainer");
