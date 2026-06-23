@@ -2,6 +2,7 @@
 import { getCache, setCache } from './storage.js';
 import { translateToArabic } from './translations.js';
 
+// جلب البيانات من openfootball (تستخدم داخلياً)
 export async function fetchOpenfootballData() {
     const cached = getCache("openfootball");
     if (cached) return cached;
@@ -17,28 +18,74 @@ export async function fetchOpenfootballData() {
     }
 }
 
+// الدالة الرئيسية لجلب المباريات وتحويلها إلى تنسيق gamesData
 export async function fetchGamesFromAPI() {
     const cached = getCache("games");
     if (cached) return cached;
     try {
-        const res = await fetch("https://worldcup26.ir/get/games");
-        const data = await res.json();
-        if (!data?.games) throw new Error('تنسيق غير صحيح');
-        const finished = data.games.filter(g => g.finished === "TRUE");
-        const games = finished.map(game => ({
-            homeAr: translateToArabic(game.home_team_name_fa || game.home_team_name_en || ''),
-            awayAr: translateToArabic(game.away_team_name_fa || game.away_team_name_en || ''),
-            homeScore: parseInt(game.home_score || 0),
-            awayScore: parseInt(game.away_score || 0),
-            local_date: game.local_date || '',
-            scorers: game.scorers || '',
-            stadium_id: game.stadium_id || null,
-            home_team_name_en: game.home_team_name_en || '',
-            away_team_name_en: game.away_team_name_en || '',
-            home_team_name_fa: game.home_team_name_fa || '',
-            away_team_name_fa: game.away_team_name_fa || '',
-            finished: game.finished === "TRUE"
-        }));
+        const rawMatches = await fetchOpenfootballData();
+        if (!rawMatches || rawMatches.length === 0) return [];
+
+        // تحويل كل مباراة إلى التنسيق المطلوب
+        const games = rawMatches.map(m => {
+            // استخراج النتيجة (إذا كانت المباراة منتهية)
+            let homeScore = 0, awayScore = 0;
+            let finished = false;
+
+            // محاولة الحصول على النتيجة من الحقول المختلفة
+            if (m.goals1 && m.goals2) {
+                homeScore = m.goals1.length;
+                awayScore = m.goals2.length;
+                finished = true; // وجود أهداف يعني انتهاء المباراة غالباً
+            } else if (m.home_score !== undefined && m.away_score !== undefined) {
+                homeScore = parseInt(m.home_score) || 0;
+                awayScore = parseInt(m.away_score) || 0;
+                finished = true;
+            } else {
+                // إذا لم تكن هناك أهداف، نعتبر المباراة لم تنته بعد
+                finished = false;
+            }
+
+            // معالجة التاريخ
+            let dateStr = m.date || m.local_date || '';
+            let dayName = '', formattedDate = '', timeMatch = '';
+            if (dateStr) {
+                try {
+                    const d = new Date(dateStr);
+                    if (!isNaN(d)) {
+                        dayName = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'][d.getDay()];
+                        formattedDate = `${d.getDate()} ${['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'][d.getMonth()]} ${d.getFullYear()}`;
+                        timeMatch = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+                    }
+                } catch(e) {}
+            }
+
+            // ترجمة أسماء الفرق
+            const homeAr = translateToArabic(m.team1 || m.home_team_name || '');
+            const awayAr = translateToArabic(m.team2 || m.away_team_name || '');
+
+            return {
+                homeAr,
+                awayAr,
+                homeScore,
+                awayScore,
+                finished,
+                local_date: dateStr,
+                dayName,
+                formattedDate,
+                timeMatch,
+                stadium_id: m.stadium_id || null,
+                scorers: m.scorers || '',
+                home_team_name_en: m.team1 || m.home_team_name || '',
+                away_team_name_en: m.team2 || m.away_team_name || '',
+                home_team_name_fa: homeAr,
+                away_team_name_fa: awayAr,
+                round: m.round || m.stage || '',
+                stage: m.stage || '',
+                raw: m // الاحتفاظ بالبيانات الأصلية للمخطط
+            };
+        });
+
         setCache("games", games);
         return games;
     } catch (e) {
