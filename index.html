@@ -4548,7 +4548,7 @@
         }
 
         // ============================================================
-        //  حفظ وتحديث التوقعات في Supabase (تم إزالة updated_at)
+        //  حفظ وتحديث التوقعات في Supabase (إصلاح التحديث باستخدام id)
         // ============================================================
         async function savePrediction(userName, matchId, prediction) {
             if (!supabaseClient) return { success: false, message: "Supabase غير متصل" };
@@ -4562,46 +4562,35 @@
                 return { success: false, message: "⛔ مباراة غير معروفة" };
             }
 
-            async function isUserNameExists(userName) {
-                if (!supabaseClient || !userName) return false;
-                try {
-                    const { data, error } = await supabaseClient.from("predictions").select("user_name").eq("user_name",
-                        userName).limit(1);
-                    if (error) throw error;
-                    return data && data.length > 0;
-                } catch (e) { console.error("❌ التحقق من الاسم:", e); return false; }
-            }
-
+            // جلب التوقع الحالي (إن وجد) باستخدام user_name و match_id
             const existing = await getUserPrediction(userName, matchId);
 
             if (existing) {
+                // تحديث التوقع باستخدام id الفريد
                 try {
-                    // تم إزالة updated_at لأن العمود غير موجود في الجدول
                     const { error } = await supabaseClient
                         .from("predictions")
                         .update({ prediction: prediction })
                         .eq("id", existing.id);
                     if (error) throw error;
+                    // تحديث التخزين المحلي
                     saveLocalPrediction(userName, matchId, prediction);
                     addSubmittedMatch(matchId);
+                    // مسح الكاش
                     localStorage.removeItem("predictions");
                     await getAllPredictions();
                     return { success: true, updated: true };
-                } catch (e) { return { success: false, message: e.message }; }
+                } catch (e) {
+                    console.error("❌ تحديث التوقع:", e);
+                    return { success: false, message: e.message };
+                }
             } else {
+                // إضافة توقع جديد
                 if (isMatchSubmitted(matchId)) {
                     return { success: false, message: `⚠️ توقعت مسبقاً هذه المباراة`, duplicate: true };
                 }
 
-                const exists = await isUserNameExists(userName);
-                if (exists) {
-                    const storedUserName = localStorage.getItem('lastUserName') || '';
-                    if (storedUserName !== userName) {
-                        return { success: false,
-                            message: `⚠️ هذا الاسم "${userName}" مسجل لمستخدم آخر. الرجاء استخدام اسم مختلف أو تأكيد أنك أنت صاحب الاسم.` };
-                    }
-                }
-
+                // التحقق من وجود المستخدم (لتجنب الإدراج المكرر)
                 try {
                     const { error } = await supabaseClient.from("predictions").insert([{ user_name: userName,
                         match_id: matchId, prediction }]);
@@ -4611,7 +4600,10 @@
                     localStorage.removeItem("predictions");
                     await getAllPredictions();
                     return { success: true, updated: false };
-                } catch (e) { return { success: false, message: e.message }; }
+                } catch (e) {
+                    console.error("❌ إضافة توقع:", e);
+                    return { success: false, message: e.message };
+                }
             }
         }
 
@@ -5235,7 +5227,7 @@
         }
 
         // ============================================================
-        //  مسار البطولة (شجرة محسّنة مع منع التكرار بشكل أقوى)
+        //  مسار البطولة (شجرة محسّنة مع منع التكرار بشكل نهائي)
         // ============================================================
         function renderBracket() {
             const container = document.getElementById('bracketContainer');
@@ -5255,40 +5247,70 @@
                 allMatches = [...allMatches, ...extra];
             }
 
-            // إزالة التكرارات باستخدام مفتاح قوي (الفريقين + التاريخ + الوقت)
+            // إزالة التكرارات باستخدام مفتاح قوي (الفريقين + الدور)
             const uniqueMap = new Map();
             allMatches.forEach(m => {
+                // نحدد الدور أولاً
+                let roundKey = null;
+                if (m.round) {
+                    const roundMap = {
+                        'Round of 32': 'R32',
+                        'R32': 'R32',
+                        'Round of 16': 'R16',
+                        'R16': 'R16',
+                        'Quarter-finals': 'QF',
+                        'Quarterfinal': 'QF',
+                        'QF': 'QF',
+                        'Semi-finals': 'SF',
+                        'Semifinal': 'SF',
+                        'SF': 'SF',
+                        'Final': 'FINAL',
+                        'FINAL': 'FINAL',
+                        '3rd Place': '3RD',
+                        'Third Place': '3RD',
+                        '3RD': '3RD'
+                    };
+                    roundKey = roundMap[m.round] || null;
+                }
+                if (!roundKey && m.stage) {
+                    const s = m.stage.toLowerCase();
+                    if (s.includes('round of 32') || s.includes('r32')) roundKey = 'R32';
+                    else if (s.includes('round of 16') || s.includes('r16')) roundKey = 'R16';
+                    else if (s.includes('quarter')) roundKey = 'QF';
+                    else if (s.includes('semi')) roundKey = 'SF';
+                    else if (s.includes('final')) roundKey = 'FINAL';
+                    else if (s.includes('third')) roundKey = '3RD';
+                }
+                if (!roundKey && m.group) {
+                    const g = m.group.toUpperCase();
+                    if (['R32', 'R16', 'QF', 'SF', '3RD', 'FINAL'].includes(g)) roundKey = g;
+                }
+                if (!roundKey && m.type) {
+                    if (m.type.toLowerCase() === 'final') roundKey = 'FINAL';
+                    else if (m.type.toLowerCase() === 'third') roundKey = '3RD';
+                }
+                if (!roundKey && m._id && m._id.toString().startsWith('r32_')) roundKey = 'R32';
+
+                // إذا لم نجد دوراً، نتجاوز هذه المباراة
+                if (!roundKey) return;
+
+                // المفتاح: اسم الفريقين (مرتبين) + الدور
                 const t1 = (m.team1 || m.home_team_name_en || m.home_team_name_fa || m.home_team_label || '').trim();
                 const t2 = (m.team2 || m.away_team_name_en || m.away_team_name_fa || m.away_team_label || '').trim();
-                const date = (m.date || m.time || m.local_date || '').trim();
-                // نضيف أيضاً الوقت إذا كان موجوداً لتفادي التكرار في نفس اليوم
-                const time = (m.time || '').trim();
-                const key = `${t1}|${t2}|${date}|${time}`;
-                // نفضل المباريات المنتهية أو تلك التي تحتوي على نتيجة
-                if (!uniqueMap.has(key) || (m.finished === true || m.finished === "TRUE" || m.status === 'finished' || m.home_score !== undefined)) {
+                // ترتيب الفريقين لتوحيد المفتاح
+                const sortedTeams = [t1, t2].sort().join('|');
+                const key = `${sortedTeams}|${roundKey}`;
+
+                // نفضل المباريات المنتهية أو التي تحتوي على نتيجة
+                const isFinished = m.finished === true || m.finished === "TRUE" || m.status === 'finished';
+                const hasScore = m.home_score !== undefined && m.away_score !== undefined;
+                if (!uniqueMap.has(key) || isFinished || hasScore) {
                     uniqueMap.set(key, m);
                 }
             });
             allMatches = Array.from(uniqueMap.values());
 
-            const roundMapping = {
-                'Round of 32': 'R32',
-                'R32': 'R32',
-                'Round of 16': 'R16',
-                'R16': 'R16',
-                'Quarter-finals': 'QF',
-                'Quarterfinal': 'QF',
-                'QF': 'QF',
-                'Semi-finals': 'SF',
-                'Semifinal': 'SF',
-                'SF': 'SF',
-                'Final': 'FINAL',
-                'FINAL': 'FINAL',
-                '3rd Place': '3RD',
-                'Third Place': '3RD',
-                '3RD': '3RD'
-            };
-
+            // تصنيف المباريات حسب الأدوار
             const roundOrder = ['R32', 'R16', 'QF', 'SF', '3RD', 'FINAL'];
             const roundNames = {
                 'R32': 'دور الـ 32',
@@ -5304,7 +5326,26 @@
 
             for (let match of allMatches) {
                 let roundKey = null;
-                if (match.round) roundKey = roundMapping[match.round] || null;
+                if (match.round) {
+                    const roundMap = {
+                        'Round of 32': 'R32',
+                        'R32': 'R32',
+                        'Round of 16': 'R16',
+                        'R16': 'R16',
+                        'Quarter-finals': 'QF',
+                        'Quarterfinal': 'QF',
+                        'QF': 'QF',
+                        'Semi-finals': 'SF',
+                        'Semifinal': 'SF',
+                        'SF': 'SF',
+                        'Final': 'FINAL',
+                        'FINAL': 'FINAL',
+                        '3rd Place': '3RD',
+                        'Third Place': '3RD',
+                        '3RD': '3RD'
+                    };
+                    roundKey = roundMap[match.round] || null;
+                }
                 if (!roundKey && match.stage) {
                     const s = match.stage.toLowerCase();
                     if (s.includes('round of 32') || s.includes('r32')) roundKey = 'R32';
