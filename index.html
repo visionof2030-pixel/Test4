@@ -3361,6 +3361,10 @@
         // ============================================================
         async function init() {
             console.log("🚀 INIT START (محسن)");
+            
+            // Setup modal close handlers FIRST
+            setupModalCloseHandlers();
+            
             await Promise.all([
                 loadPreviousGamesFull(),
                 fetchOpenfootballData(),
@@ -4129,6 +4133,266 @@
                 `${userName}_${matchId}`] || null; }
 
         // ============================================================
+        //  UNIFIED MODAL CLOSE SYSTEM
+        // ============================================================
+
+        // Store all modal configurations
+        const modalConfigs = {
+            'matchPredictionsModal': {
+                overlay: 'matchPredictionsModal',
+                closeBtn: 'matchPredictionsCloseBtn',
+                content: 'matchPredictionsContent',
+                onClose: null
+            },
+            'predictionModal': {
+                overlay: 'predictionModal',
+                closeBtn: 'modalCloseBtn',
+                content: null,
+                onClose: function() { isEditing = false; }
+            },
+            'playerPredictionsModal': {
+                overlay: 'playerPredictionsModal',
+                closeBtn: 'playerModalCloseBtn',
+                content: null,
+                onClose: null
+            },
+            'viewPredictionsModal': {
+                overlay: 'viewPredictionsModal',
+                closeBtn: 'viewModalCloseBtn',
+                content: null,
+                onClose: null
+            },
+            'bracketMatchModal': {
+                overlay: 'bracketMatchModal',
+                closeBtn: 'bracketModalCloseBtn',
+                content: null,
+                onClose: null
+            },
+            'testResultsModal': {
+                overlay: 'testResultsModal',
+                closeBtn: 'testResultsCloseBtn',
+                content: null,
+                onClose: null
+            },
+            'analyticsModal': {
+                overlay: 'analyticsModal',
+                closeBtn: 'analyticsCloseBtn',
+                content: null,
+                onClose: function() { destroyCharts(); }
+            },
+            'compareModal': {
+                overlay: 'compareModal',
+                closeBtn: 'compareModalCloseBtn',
+                content: null,
+                onClose: null
+            },
+            'teamStatsModal': {
+                overlay: 'teamStatsModal',
+                closeBtn: 'teamStatsCloseBtn',
+                content: null,
+                onClose: null
+            },
+            'streamModal': {
+                overlay: 'streamModal',
+                closeBtn: 'streamModalCloseBtn',
+                content: null,
+                onClose: function() {
+                    const iframe = document.getElementById('streamIframe');
+                    if (iframe) {
+                        try {
+                            iframe.contentWindow.postMessage('stop', '*');
+                        } catch(e) { /* ignore cross-origin */ }
+                        iframe.src = 'about:blank';
+                        iframe.srcdoc = '';
+                    }
+                }
+            },
+            'nameModal': {
+                overlay: 'nameModal',
+                closeBtn: 'nameCloseBtn',
+                content: null,
+                onClose: function() {
+                    isNameVerified = false;
+                    document.getElementById('nameStatus').style.display = 'none';
+                }
+            },
+            'passwordOverlay': {
+                overlay: 'passwordOverlay',
+                closeBtn: 'passwordCloseBtn',
+                content: null,
+                onClose: function() {
+                    document.getElementById('passwordError').textContent = '';
+                }
+            }
+        };
+
+        // Core close function
+        function closeModal(modalId) {
+            const config = modalConfigs[modalId];
+            if (!config) return;
+            
+            const overlay = document.getElementById(config.overlay);
+            if (!overlay) return;
+            
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+            
+            if (config.onClose && typeof config.onClose === 'function') {
+                config.onClose();
+            }
+        }
+
+        // Setup modal close handlers (call once during init)
+        function setupModalCloseHandlers() {
+            // For each modal, setup close button, overlay click, and escape key
+            
+            Object.keys(modalConfigs).forEach(modalId => {
+                const config = modalConfigs[modalId];
+                const overlay = document.getElementById(config.overlay);
+                if (!overlay) return;
+                
+                // Remove any existing listeners by cloning and replacing
+                const newOverlay = overlay.cloneNode(true);
+                overlay.parentNode.replaceChild(newOverlay, overlay);
+                
+                // Store reference to updated overlay
+                const updatedOverlay = document.getElementById(config.overlay);
+                
+                // Close button
+                const closeBtn = document.getElementById(config.closeBtn);
+                if (closeBtn) {
+                    const newCloseBtn = closeBtn.cloneNode(true);
+                    closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+                    newCloseBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        closeModal(modalId);
+                    });
+                }
+                
+                // Click outside
+                updatedOverlay.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal(modalId);
+                    }
+                });
+            });
+            
+            // Global escape key handler (single listener)
+            document.removeEventListener('keydown', handleEscapeKey);
+            document.addEventListener('keydown', handleEscapeKey);
+        }
+
+        function handleEscapeKey(e) {
+            if (e.key === 'Escape') {
+                // Find the first active modal and close it (reverse order - topmost first)
+                const activeModals = Object.keys(modalConfigs)
+                    .map(id => document.getElementById(id))
+                    .filter(el => el && el.classList.contains('active'));
+                
+                if (activeModals.length > 0) {
+                    // Close the topmost (last added) modal
+                    const topModal = activeModals[activeModals.length - 1];
+                    const modalId = topModal.id;
+                    closeModal(modalId);
+                }
+            }
+        }
+
+        // Override the old close functions with new unified system
+        function closePredictionModal() {
+            closeModal('predictionModal');
+        }
+
+        function closeNameModal() {
+            closeModal('nameModal');
+        }
+
+        function closeBracketModal() {
+            closeModal('bracketMatchModal');
+        }
+
+        function closeStreamModal() {
+            closeModal('streamModal');
+        }
+
+        function hidePasswordOverlay() {
+            closeModal('passwordOverlay');
+        }
+
+        // Fix for close buttons that need special handling
+        document.getElementById('modalCloseBtn')?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closePredictionModal();
+        });
+
+        document.getElementById('nameCloseBtn')?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeNameModal();
+        });
+
+        document.getElementById('bracketModalCloseBtn')?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeBracketModal();
+        });
+
+        document.getElementById('streamModalCloseBtn')?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeStreamModal();
+        });
+
+        document.getElementById('passwordCloseBtn')?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            hidePasswordOverlay();
+        });
+
+        // Fix: Player predictions close
+        document.getElementById('playerModalCloseBtn')?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeModal('playerPredictionsModal');
+        });
+
+        // Fix: View predictions close
+        document.getElementById('viewModalCloseBtn')?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeModal('viewPredictionsModal');
+        });
+
+        // Fix: Test results close
+        document.getElementById('testResultsCloseBtn')?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeModal('testResultsModal');
+        });
+
+        // Fix: Team stats close
+        document.getElementById('teamStatsCloseBtn')?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeModal('teamStatsModal');
+        });
+
+        // Fix: Compare modal close
+        document.getElementById('compareModalCloseBtn')?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeModal('compareModal');
+        });
+
+        // Fix: Analytics modal close
+        document.getElementById('analyticsCloseBtn')?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeModal('analyticsModal');
+        });
+
+        // Close all modals function (emergency)
+        function closeAllModals() {
+            Object.keys(modalConfigs).forEach(id => {
+                const el = document.getElementById(id);
+                if (el && el.classList.contains('active')) {
+                    closeModal(id);
+                }
+            });
+            showCopyToast('✅ تم إغلاق جميع النوافذ المنبثقة');
+        }
+
+        // ============================================================
         //  TEAM STATS
         // ============================================================
         function getTeamStats(teamName) {
@@ -4386,7 +4650,7 @@
                 </div>
               </div>
               <div style="text-align:center;margin-top:16px;">
-                <button class="tab-btn" onclick="document.getElementById('teamStatsModal').classList.remove('active');document.body.style.overflow='';" style="background:var(--gold-glow);border-color:var(--border-gold);color:var(--gold-light);">إغلاق</button>
+                <button class="tab-btn" onclick="closeModal('teamStatsModal')" style="background:var(--gold-glow);border-color:var(--border-gold);color:var(--gold-light);">إغلاق</button>
               </div>
             `;
             modal.classList.add('active');
@@ -4749,13 +5013,24 @@
         }
 
         // ============================================================
-        //  STREAM MODAL
+        //  STREAM MODAL - SECURE IFRAME
         // ============================================================
+
         function openStreamModal() {
             const modal = document.getElementById('streamModal');
             const iframe = document.getElementById('streamIframe');
-            // Use a clean stream URL with no ads - using a simple embed
+            if (!iframe || !modal) return;
+            
+            // Use a more secure iframe with sandbox attributes
+            // Note: Some streams require specific sandbox permissions
+            // The sandbox attribute helps prevent popups and redirects
+            iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-forms allow-popups');
+            
+            // Use a clean stream URL (albaplayer is known for minimal ads)
+            // Note: Full ad-blocking is not possible due to browser Same-Origin policy
+            // The stream source itself may contain ads that cannot be blocked from the parent page
             iframe.src = 'https://me.hosseto.online/albaplayer/socket/?serv=1';
+            
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
@@ -4763,15 +5038,19 @@
         function closeStreamModal() {
             const modal = document.getElementById('streamModal');
             const iframe = document.getElementById('streamIframe');
-            iframe.src = 'about:blank';
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
+            if (iframe) {
+                // Stop any media and clear source to prevent background audio/video
+                try {
+                    iframe.contentWindow.postMessage('stop', '*');
+                } catch(e) { /* ignore cross-origin */ }
+                iframe.src = 'about:blank';
+                iframe.srcdoc = '';
+            }
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
         }
-
-        document.getElementById('streamModalCloseBtn').addEventListener('click', closeStreamModal);
-        document.getElementById('streamModal').addEventListener('click', function(e) {
-            if (e.target === this) closeStreamModal();
-        });
 
         // ============================================================
         //  RENDER UPCOMING
@@ -4904,14 +5183,6 @@
             document.body.style.overflow = 'hidden';
             setTimeout(() => document.getElementById('nameInput').focus(), 300);
         }
-
-        function closeNameModal() {
-            document.getElementById('nameModal').classList.remove('active');
-            document.body.style.overflow = '';
-            isNameVerified = false;
-        }
-        document.getElementById('nameCloseBtn').addEventListener('click', closeNameModal);
-        document.getElementById('nameModal').addEventListener('click', function(e) { if (e.target === this) closeNameModal(); });
 
         document.getElementById('nameSubmitBtn').addEventListener('click', async function() {
             const name = document.getElementById('nameInput').value.trim();
@@ -5556,14 +5827,6 @@
             document.body.style.overflow = 'hidden';
         }
 
-        function closeBracketModal() {
-            document.getElementById('bracketMatchModal').classList.remove('active');
-            document.body.style.overflow = '';
-        }
-        document.getElementById('bracketModalCloseBtn').addEventListener('click', closeBracketModal);
-        document.getElementById('bracketMatchModal').addEventListener('click', function(e) { if (e.target === this)
-                closeBracketModal(); });
-
         // ============================================================
         //  SCORERS
         // ============================================================
@@ -6169,15 +6432,6 @@
             document.body.style.overflow = 'hidden';
         }
 
-        function closePredictionModal() {
-            document.getElementById('predictionModal').classList.remove('active');
-            document.body.style.overflow = '';
-            isEditing = false;
-        }
-        document.getElementById('modalCloseBtn').addEventListener('click', closePredictionModal);
-        document.getElementById('predictionModal').addEventListener('click', function(e) { if (e.target === this)
-                closePredictionModal(); });
-
         document.getElementById('modalSubmitBtn').addEventListener('click', async function() {
             const userName = currentUserName || localStorage.getItem('lastUserName') || '';
             const selected = document.querySelector('input[name="prediction"]:checked');
@@ -6218,7 +6472,7 @@
                 await renderAllPredictionsAdmin();
                 renderUpcoming();
                 updateNewsTicker();
-                setTimeout(closePredictionModal, 1200);
+                setTimeout(() => closeModal('predictionModal'), 1200);
             } else {
                 msgEl.textContent = result.message || '❌ فشل الحفظ';
                 msgEl.className = 'modal-message error';
@@ -6479,15 +6733,11 @@
                 ${results.map(r => `<div style="padding:4px 8px;border-bottom:1px solid var(--border-subtle);font-size:0.8rem;">${r}</div>`).join('')}
               </div>
               <div style="text-align:center;margin-top:16px;">
-                <button class="tab-btn" onclick="document.getElementById('testResultsModal').classList.remove('active');document.body.style.overflow='';" style="background:var(--gold-glow);border-color:var(--border-gold);color:var(--gold-light);">إغلاق</button>
+                <button class="tab-btn" onclick="closeModal('testResultsModal')" style="background:var(--gold-glow);border-color:var(--border-gold);color:var(--gold-light);">إغلاق</button>
               </div>
             `;
             }, 500);
         }
-        document.getElementById('testResultsCloseBtn').addEventListener('click', function() {
-            document.getElementById('testResultsModal').classList.remove('active');
-            document.body.style.overflow = '';
-        });
 
         // ============================================================
         //  SHARE FUNCTIONS
@@ -6649,11 +6899,6 @@
             document.body.style.overflow = 'hidden';
         }
 
-        function hidePasswordOverlay() {
-            document.getElementById('passwordOverlay').classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
         function checkPassword() {
             const input = document.getElementById('passwordInput').value.trim();
             const errorEl = document.getElementById('passwordError');
@@ -6677,9 +6922,6 @@
         document.getElementById('passwordSubmitBtn').addEventListener('click', checkPassword);
         document.getElementById('passwordInput').addEventListener('keydown', function(e) { if (e.key === 'Enter')
                 checkPassword(); if (e.key === 'Escape') hidePasswordOverlay(); });
-        document.getElementById('passwordCloseBtn').addEventListener('click', hidePasswordOverlay);
-        document.getElementById('passwordOverlay').addEventListener('click', function(e) { if (e.target === this)
-                hidePasswordOverlay(); });
 
         // ============================================================
         //  TABS
@@ -6757,6 +6999,12 @@
                     showCopyToast('🔓 تم إظهار لوحة الإدارة'); } else { showCopyToast('🔒 تم إخفاء لوحة الإدارة'); }
             } else { showPasswordOverlay(); }
         });
+
+        // Double click footer to close all modals (emergency)
+        document.getElementById('footerTrigger').addEventListener('dblclick', function(e) {
+            closeAllModals();
+        });
+
         document.getElementById('prevSearchInput')?.addEventListener('input', renderPreviousGamesFiltered);
         document.getElementById('groupFilter')?.addEventListener('change', renderUpcoming);
         document.querySelectorAll('.day-btn').forEach(btn => {
@@ -6802,6 +7050,8 @@
         window.togglePredictionsAdmin = togglePredictionsAdmin;
         window.openStreamModal = openStreamModal;
         window.closeStreamModal = closeStreamModal;
+        window.closeModal = closeModal;
+        window.closeAllModals = closeAllModals;
 
         // ============================================================
         //  START
