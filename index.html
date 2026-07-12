@@ -3286,36 +3286,7 @@
         }
 
         // ============================================================
-        //  INIT
-        // ============================================================
-        async function init() {
-            console.log("🚀 INIT START (محسن)");
-            
-            // Setup modal close handlers FIRST
-            setupModalCloseHandlers();
-            
-            await Promise.all([
-                loadPreviousGamesFull(),
-                fetchOpenfootballData(),
-                getAllPredictions()
-            ]);
-            state.loaded = true;
-            await renderAllPredictionsAdmin();
-            updateScorers();
-            renderUpcoming();
-            calculateStandings();
-            renderTeamStats();
-            renderScorers();
-            renderBracket();
-            initTabs();
-            checkUrlForMatch();
-            startAutoUpdate();
-            updateNewsTicker();
-            console.log("✅ INIT DONE (محسن)");
-        }
-
-        // ============================================================
-        //  GLOBALS
+        //  GLOBALS (before init)
         // ============================================================
         const SECRET_CODE = "1406";
         let isAuthorized = false;
@@ -3341,7 +3312,7 @@
         const stadiums = {
             "1": "ملعب آزتيكا (المكسيك)",
             "2": "ملعب سيول (كوريا)",
-            "3": "ملعب تورنتو (كندا)",
+            "3": "ملعب تورونتو (كندا)",
             "4": "ملعب لندن (إنجلترا)",
             "5": "ملعب برلين (ألمانيا)",
             "6": "ملعب بوينس آيرس (الأرجنتين)",
@@ -4073,7 +4044,7 @@
                 `${userName}_${matchId}`] || null; }
 
         // ============================================================
-        //  UNIFIED MODAL CLOSE SYSTEM (with password fix)
+        //  UNIFIED MODAL CLOSE SYSTEM (with re-attach of name & modal submit)
         // ============================================================
 
         // Store all modal configurations
@@ -4132,7 +4103,6 @@
                 content: null,
                 onClose: null
             },
-            // streamModal removed – replaced by Livematch page
             'nameModal': {
                 overlay: 'nameModal',
                 closeBtn: 'nameCloseBtn',
@@ -4168,10 +4138,194 @@
             }
         }
 
-        // Setup modal close handlers (call once during init)
+        // ============================================================
+        //  EVENT HANDLERS (extracted to named functions for re-attach)
+        // ============================================================
+
+        // ---- NAME SUBMIT ----
+        async function handleNameSubmit(e) {
+            const btn = e.currentTarget;
+            const name = document.getElementById('nameInput').value.trim();
+            const errorEl = document.getElementById('nameError');
+            const statusEl = document.getElementById('nameStatus');
+            
+            if (!name) { errorEl.textContent = '⚠️ الرجاء إدخال اسمك'; return; }
+            if (!supabaseClient) {
+                errorEl.textContent = '❌ خطأ في الاتصال بقاعدة البيانات';
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ جاري التحقق...';
+            errorEl.textContent = '';
+            statusEl.style.display = 'block';
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from("predictions")
+                    .select("user_name")
+                    .eq("user_name", name)
+                    .limit(1);
+                if (error) throw error;
+                
+                const isExisting = data && data.length > 0;
+                if (isExisting) {
+                    statusEl.className = 'user-status existing';
+                    statusEl.textContent = `👤 مرحباً بعودتك "${name}"! سيتم إضافة التوقع إلى حسابك.`;
+                    localStorage.setItem('lastUserName', name);
+                    currentUserName = name;
+                    isNameVerified = true;
+                    await loadUserPredictions(name);
+                    
+                    const existingPred = await getUserPrediction(name, nameModalMatchId);
+                    if (existingPred) {
+                        errorEl.textContent = `⚠️ لقد توقعت هذه المباراة مسبقاً: ${existingPred.prediction === 'DRAW' ? 'تعادل' : existingPred.prediction}`;
+                        btn.disabled = false;
+                        btn.textContent = 'متابعة →';
+                        renderUpcoming();
+                        return;
+                    }
+                    
+                    btn.textContent = '✅ متابعة للتوقع';
+                    setTimeout(() => {
+                        closeNameModal();
+                        openPredictionModal(nameModalMatchId, nameModalTeam1, nameModalTeam2, nameModalTimeISO, name);
+                    }, 600);
+                } else {
+                    statusEl.className = 'user-status new';
+                    statusEl.textContent = `👤 مرحباً "${name}"! أنت لاعب جديد. سيتم تسجيل توقعاتك.`;
+                    localStorage.setItem('lastUserName', name);
+                    currentUserName = name;
+                    isNameVerified = true;
+                    userPredictionsMap = {};
+                    btn.textContent = '✅ متابعة للتوقع';
+                    setTimeout(() => {
+                        closeNameModal();
+                        openPredictionModal(nameModalMatchId, nameModalTeam1, nameModalTeam2, nameModalTimeISO, name);
+                    }, 600);
+                }
+            } catch (e) {
+                console.error("❌ التحقق من الاسم:", e);
+                errorEl.textContent = '❌ حدث خطأ أثناء التحقق من الاسم';
+                btn.disabled = false;
+                btn.textContent = 'متابعة →';
+                statusEl.style.display = 'none';
+            }
+        }
+
+        // ---- NAME INPUT KEYDOWN ----
+        function handleNameKeydown(e) {
+            if (e.key === 'Enter') {
+                const btn = document.getElementById('nameSubmitBtn');
+                if (btn) btn.click();
+            }
+            if (e.key === 'Escape') {
+                closeNameModal();
+            }
+        }
+
+        // ---- MODAL SUBMIT (prediction) ----
+        async function handleModalSubmit(e) {
+            const btn = e.currentTarget;
+            const userName = currentUserName || localStorage.getItem('lastUserName') || '';
+            const selected = document.querySelector('input[name="prediction"]:checked');
+            const msgEl = document.getElementById('modalMessage');
+            
+            if (!userName) { msgEl.textContent = '⚠️ الرجاء إدخال اسمك';
+                msgEl.className = 'modal-message warning'; return; }
+            if (!selected) { msgEl.textContent = '⚠️ الرجاء اختيار توقع';
+                msgEl.className = 'modal-message warning'; return; }
+            
+            let prediction = selected.value;
+            if (prediction === 'HOME') {
+                prediction = currentTeam1;
+            } else if (prediction === 'AWAY') {
+                prediction = currentTeam2;
+            }
+            
+            if (isMatchFinished(currentTimeISO)) { msgEl.textContent = '⛔ هذه المباراة انتهت، لا يمكن حفظ التوقع.';
+                msgEl.className = 'modal-message error'; return; }
+            if (isMatchLive(currentTimeISO)) { msgEl.textContent = '⛔ لا يمكن التوقع على مباراة جارية';
+                msgEl.className = 'modal-message error'; return; }
+            if (!canPredict(currentTimeISO)) { msgEl.textContent =
+                    '⛔ لا يمكن التوقع الآن، المباراة على وشك البدء أو بدأت بالفعل (يُسمح حتى 5 دقائق قبل البداية).';
+                msgEl.className = 'modal-message error'; return; }
+            if (!isEditing && isMatchSubmitted(currentMatchId)) {
+                msgEl.textContent = '⚠️ لقد توقعت هذه المباراة مسبقاً';
+                msgEl.className = 'modal-message warning';
+                return;
+            }
+            
+            btn.disabled = true;
+            msgEl.textContent = '⏳ جاري الحفظ...';
+            msgEl.className = 'modal-message';
+            
+            const result = await savePrediction(userName, currentMatchId, prediction);
+            if (result.success) {
+                msgEl.textContent = result.updated ? '✅ تم تحديث التوقع بنجاح! 🎉' : '✅ تم حفظ التوقع بنجاح! 🎉';
+                msgEl.className = 'modal-message success';
+                btn.disabled = false;
+                if (userName) {
+                    await loadUserPredictions(userName);
+                }
+                await renderAllPredictionsAdmin();
+                renderUpcoming();
+                updateNewsTicker();
+                setTimeout(() => closeModal('predictionModal'), 1200);
+            } else {
+                msgEl.textContent = result.message || '❌ فشل الحفظ';
+                msgEl.className = 'modal-message error';
+                btn.disabled = false;
+            }
+        }
+
+        // ---- CLOSE NAME MODAL helper ----
+        function closeNameModal() {
+            closeModal('nameModal');
+        }
+
+        // ---- CLOSE BRACKET MODAL helper ----
+        function closeBracketModal() {
+            closeModal('bracketMatchModal');
+        }
+
+        // ---- PASSWORD CHECK (already defined) ----
+        function checkPassword() {
+            const input = document.getElementById('passwordInput').value.trim();
+            const errorEl = document.getElementById('passwordError');
+            if (input === SECRET_CODE) {
+                isAuthorized = true;
+                errorEl.textContent = '';
+                closeModal('passwordOverlay');
+                document.getElementById('shareAllContainer').classList.add('visible');
+                document.getElementById('adminControls').classList.add('visible');
+                if (document.getElementById('matchPredictionsModal').classList.contains('active')) {
+                    document.getElementById('modalCompactBtn').classList.add('visible');
+                }
+                updateShareAllCount();
+                document.querySelectorAll('.edit-btn').forEach(el => el.classList.add('visible'));
+                showCopyToast('✅ تم تفعيل لوحة الإدارة');
+            } else {
+                errorEl.textContent = '❌ رمز غير صحيح';
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
+            }
+        }
+        function passwordKeyHandler(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                checkPassword();
+            }
+            if (e.key === 'Escape') {
+                closeModal('passwordOverlay');
+            }
+        }
+
+        // ============================================================
+        //  SETUP MODAL CLOSE HANDLERS (with re-attach of lost listeners)
+        // ============================================================
         function setupModalCloseHandlers() {
             // For each modal, setup close button, overlay click, and escape key
-            
             Object.keys(modalConfigs).forEach(modalId => {
                 const config = modalConfigs[modalId];
                 const overlay = document.getElementById(config.overlay);
@@ -4202,12 +4356,33 @@
                     }
                 });
             });
-            
-            // --- FIX PASSWORD BUTTON ---
-            // Re-bind password submit button because it was cloned and lost its listener
+
+            // ---- RE-ATTACH LOST LISTENERS AFTER CLONING ----
+
+            // 1. Name submit button
+            const nameSubmitBtn = document.getElementById('nameSubmitBtn');
+            if (nameSubmitBtn) {
+                nameSubmitBtn.removeEventListener('click', handleNameSubmit);
+                nameSubmitBtn.addEventListener('click', handleNameSubmit);
+            }
+
+            // 2. Name input keydown
+            const nameInput = document.getElementById('nameInput');
+            if (nameInput) {
+                nameInput.removeEventListener('keydown', handleNameKeydown);
+                nameInput.addEventListener('keydown', handleNameKeydown);
+            }
+
+            // 3. Modal submit button (prediction)
+            const modalSubmitBtn = document.getElementById('modalSubmitBtn');
+            if (modalSubmitBtn) {
+                modalSubmitBtn.removeEventListener('click', handleModalSubmit);
+                modalSubmitBtn.addEventListener('click', handleModalSubmit);
+            }
+
+            // 4. Password submit (already fixed pattern but re-apply)
             const passwordSubmitBtn = document.getElementById('passwordSubmitBtn');
             if (passwordSubmitBtn) {
-                // Remove any existing listener to avoid duplicates
                 passwordSubmitBtn.removeEventListener('click', checkPassword);
                 passwordSubmitBtn.addEventListener('click', checkPassword);
             }
@@ -4224,22 +4399,18 @@
                     closeModal('passwordOverlay');
                 });
             }
-            // --- END FIX ---
-            
-            // Global escape key handler (single listener)
+
+            // ---- Global escape key handler (single) ----
             document.removeEventListener('keydown', handleEscapeKey);
             document.addEventListener('keydown', handleEscapeKey);
         }
 
         function handleEscapeKey(e) {
             if (e.key === 'Escape') {
-                // Find the first active modal and close it (reverse order - topmost first)
                 const activeModals = Object.keys(modalConfigs)
                     .map(id => document.getElementById(id))
                     .filter(el => el && el.classList.contains('active'));
-                
                 if (activeModals.length > 0) {
-                    // Close the topmost (last added) modal
                     const topModal = activeModals[activeModals.length - 1];
                     const modalId = topModal.id;
                     closeModal(modalId);
@@ -4247,92 +4418,7 @@
             }
         }
 
-        // Password key handler
-        function passwordKeyHandler(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                checkPassword();
-            }
-            if (e.key === 'Escape') {
-                closeModal('passwordOverlay');
-            }
-        }
-
-        // Override the old close functions with new unified system
-        function closePredictionModal() {
-            closeModal('predictionModal');
-        }
-
-        function closeNameModal() {
-            closeModal('nameModal');
-        }
-
-        function closeBracketModal() {
-            closeModal('bracketMatchModal');
-        }
-
-        function hidePasswordOverlay() {
-            closeModal('passwordOverlay');
-        }
-
-        // Fix for close buttons that need special handling
-        document.getElementById('modalCloseBtn')?.addEventListener('click', function(e) {
-            e.stopPropagation();
-            closePredictionModal();
-        });
-
-        document.getElementById('nameCloseBtn')?.addEventListener('click', function(e) {
-            e.stopPropagation();
-            closeNameModal();
-        });
-
-        document.getElementById('bracketModalCloseBtn')?.addEventListener('click', function(e) {
-            e.stopPropagation();
-            closeBracketModal();
-        });
-
-        document.getElementById('passwordCloseBtn')?.addEventListener('click', function(e) {
-            e.stopPropagation();
-            hidePasswordOverlay();
-        });
-
-        // Fix: Player predictions close
-        document.getElementById('playerModalCloseBtn')?.addEventListener('click', function(e) {
-            e.stopPropagation();
-            closeModal('playerPredictionsModal');
-        });
-
-        // Fix: View predictions close
-        document.getElementById('viewModalCloseBtn')?.addEventListener('click', function(e) {
-            e.stopPropagation();
-            closeModal('viewPredictionsModal');
-        });
-
-        // Fix: Test results close
-        document.getElementById('testResultsCloseBtn')?.addEventListener('click', function(e) {
-            e.stopPropagation();
-            closeModal('testResultsModal');
-        });
-
-        // Fix: Team stats close
-        document.getElementById('teamStatsCloseBtn')?.addEventListener('click', function(e) {
-            e.stopPropagation();
-            closeModal('teamStatsModal');
-        });
-
-        // Fix: Compare modal close
-        document.getElementById('compareModalCloseBtn')?.addEventListener('click', function(e) {
-            e.stopPropagation();
-            closeModal('compareModal');
-        });
-
-        // Fix: Analytics modal close
-        document.getElementById('analyticsCloseBtn')?.addEventListener('click', function(e) {
-            e.stopPropagation();
-            closeModal('analyticsModal');
-        });
-
-        // Close all modals function (emergency)
+        // ---- Close all modals emergency ----
         function closeAllModals() {
             Object.keys(modalConfigs).forEach(id => {
                 const el = document.getElementById(id);
@@ -4343,273 +4429,12 @@
             showCopyToast('✅ تم إغلاق جميع النوافذ المنبثقة');
         }
 
-        // ============================================================
-        //  TEAM STATS
-        // ============================================================
-        function getTeamStats(teamName) {
-            const games = state.previousGamesData || [];
-            let wins = 0,
-                losses = 0,
-                draws = 0,
-                goalsFor = 0,
-                goalsAgainst = 0;
-            const results = [];
-            const scorers = {};
-            for (let game of games) {
-                let isHome = game.homeAr === teamName;
-                let isAway = game.awayAr === teamName;
-                if (!isHome && !isAway) continue;
-                const homeScore = game.homeScore || 0;
-                const awayScore = game.awayScore || 0;
-                const result = { homeScore, awayScore, homeAr: game.homeAr, awayAr: game.awayAr, 
-                                 homePenalty: game.homePenalty, awayPenalty: game.awayPenalty, 
-                                 hadPenalties: game.hadPenalties };
-                const winner = determineWinner(result);
-                if (isHome) {
-                    goalsFor += homeScore;
-                    goalsAgainst += awayScore;
-                    if (winner === teamName) { wins++; results.push('W'); }
-                    else if (winner === game.awayAr) { losses++; results.push('L'); }
-                    else { draws++; results.push('D'); }
-                } else {
-                    goalsFor += awayScore;
-                    goalsAgainst += homeScore;
-                    if (winner === teamName) { wins++; results.push('W'); }
-                    else if (winner === game.homeAr) { losses++; results.push('L'); }
-                    else { draws++; results.push('D'); }
-                }
-            }
-            const total = wins + losses + draws;
-            const winRate = total > 0 ? (wins / total) * 100 : 0;
-            const goalDiff = goalsFor - goalsAgainst;
-            const recentResults = results.slice(-5);
-            const streak = recentResults.map(r => r === 'W' ? '✅' : r === 'L' ? '❌' : '➖').join('');
-            if (state.openfootballMatches) {
-                for (let match of state.openfootballMatches) {
-                    const homeTeam = translateToArabic(match.team1 || '');
-                    const awayTeam = translateToArabic(match.team2 || '');
-                    if (homeTeam !== teamName && awayTeam !== teamName) continue;
-                    const goals = [...(match.goals1 || []), ...(match.goals2 || [])];
-                    for (let g of goals) {
-                        if (!g.name) continue;
-                        let playerName = g.name;
-                        if (!scorers[playerName]) scorers[playerName] = 0;
-                        scorers[playerName]++;
-                    }
-                }
-            }
-            const topScorers = Object.entries(scorers)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 2)
-                .map(([name, goals]) => ({ name, goals }));
-            return { wins, losses, draws, total, winRate, goalsFor, goalsAgainst, goalDiff, streak: streak ||
-                    'لا مباريات سابقة', results, topScorers };
-        }
-
-        function getTeamStatsFull(teamName) {
-            const games = state.previousGamesData || [];
-            let wins = 0,
-                losses = 0,
-                draws = 0,
-                goalsFor = 0,
-                goalsAgainst = 0;
-            const results = [];
-            const scorers = {};
-            for (let game of games) {
-                let isHome = game.homeAr === teamName;
-                let isAway = game.awayAr === teamName;
-                if (!isHome && !isAway) continue;
-                const homeScore = game.homeScore || 0;
-                const awayScore = game.awayScore || 0;
-                const result = { homeScore, awayScore, homeAr: game.homeAr, awayAr: game.awayAr, 
-                                 homePenalty: game.homePenalty, awayPenalty: game.awayPenalty, 
-                                 hadPenalties: game.hadPenalties };
-                const winner = determineWinner(result);
-                if (isHome) {
-                    goalsFor += homeScore;
-                    goalsAgainst += awayScore;
-                    if (winner === teamName) { wins++; results.push('W'); }
-                    else if (winner === game.awayAr) { losses++; results.push('L'); }
-                    else { draws++; results.push('D'); }
-                } else {
-                    goalsFor += awayScore;
-                    goalsAgainst += homeScore;
-                    if (winner === teamName) { wins++; results.push('W'); }
-                    else if (winner === game.homeAr) { losses++; results.push('L'); }
-                    else { draws++; results.push('D'); }
-                }
-            }
-            const total = wins + losses + draws;
-            const winRate = total > 0 ? (wins / total) * 100 : 0;
-            const goalDiff = goalsFor - goalsAgainst;
-            if (state.openfootballMatches) {
-                for (let match of state.openfootballMatches) {
-                    const homeTeam = translateToArabic(match.team1 || '');
-                    const awayTeam = translateToArabic(match.team2 || '');
-                    if (homeTeam !== teamName && awayTeam !== teamName) continue;
-                    const goals = [...(match.goals1 || []), ...(match.goals2 || [])];
-                    for (let g of goals) {
-                        if (!g.name) continue;
-                        let playerName = g.name;
-                        if (!scorers[playerName]) scorers[playerName] = 0;
-                        scorers[playerName]++;
-                    }
-                }
-            }
-            const topScorers = Object.entries(scorers)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5)
-                .map(([name, goals]) => ({ name, goals }));
-            return { wins, losses, draws, total, winRate, goalsFor, goalsAgainst, goalDiff, results, topScorers };
-        }
-
-        function getTeamScorers(teamName) {
-            const scorers = {};
-            const ownGoalBlacklist = [
-                'Damian Bobadilla', 'بوباديا', 'داميان بوباديا',
-                'Cameron Burgess', 'كاميرون بورغيس',
-                'Elvis Muheim', 'إلفيس موهيم',
-                'Mohamed Hany', 'محمد هاني',
-                'Ellyes Skhiri', 'إلياس السخيري',
-                'Hassan Al-Tambakti', 'حسن التمبكتي',
-                'Yazan Al-Arab', 'يزن العرب',
-                'Aymen Hussein', 'أيمن حسين',
-                'Mohamed Manai', 'محمد المناعي',
-                'Abduvohid Nematov', 'عبد الواحد نيماتوف',
-                'Yassine Bounou', 'ياسين بونو'
-            ];
-            const isOwnGoalScorer = (playerName) => {
-                if (!playerName) return false;
-                const nameLower = playerName.toLowerCase();
-                return ownGoalBlacklist.some(name => 
-                    nameLower.includes(name.toLowerCase()) ||
-                    name.toLowerCase().includes(nameLower)
-                );
-            };
-            if (state.openfootballMatches) {
-                for (let match of state.openfootballMatches) {
-                    const homeTeam = translateToArabic(match.team1 || '');
-                    const awayTeam = translateToArabic(match.team2 || '');
-                    if (homeTeam !== teamName && awayTeam !== teamName) continue;
-                    const goals = [...(match.goals1 || []), ...(match.goals2 || [])];
-                    for (let g of goals) {
-                        if (!g.name) continue;
-                        let playerName = g.name;
-                        if (isOwnGoalScorer(playerName)) continue;
-                        const isHomePlayer = match.goals1 && match.goals1.some(gg => gg.name === g.name);
-                        const isAwayPlayer = match.goals2 && match.goals2.some(gg => gg.name === g.name);
-                        if (isHomePlayer && homeTeam !== teamName) continue;
-                        if (isAwayPlayer && awayTeam !== teamName) continue;
-                        if (!scorers[playerName]) scorers[playerName] = 0;
-                        scorers[playerName]++;
-                    }
-                }
-            }
-            return Object.entries(scorers)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5)
-                .map(([name, goals]) => ({ name, goals }));
-        }
-
-        function openTeamStatsModal(team1, team2) {
-            const modal = document.getElementById('teamStatsModal');
-            const content = document.getElementById('teamStatsContent');
-            const stats1 = getTeamStatsFull(team1);
-            const stats2 = getTeamStatsFull(team2);
-            const getResultSymbol = (teamName, game) => {
-                const result = findMatchResult(game.homeAr, game.awayAr);
-                if (!result) return '⏳';
-                const winner = determineWinner(result);
-                if (winner === teamName) return '✅';
-                else if (winner === null || winner === 'DRAW') return '➖';
-                else return '❌';
-            };
-            const getStreakHtml = (teamName, games) => {
-                const teamGames = games.filter(g => g.homeAr === teamName || g.awayAr === teamName);
-                const recentGames = teamGames.slice(-10);
-                return recentGames.map(g => getResultSymbol(teamName, g)).join(' ');
-            };
-            const getScorersHtml = (teamName) => {
-                const scorers = getTeamScorers(teamName);
-                if (scorers.length === 0) return '<span style="color:var(--text-secondary);font-size:0.6rem;">لا توجد أهداف مسجلة</span>';
-                return scorers.map(s => 
-                    `<span class="scorer" style="display:inline-block;background:var(--gold-glow);padding:1px 8px;border-radius:20px;border:1px solid var(--border-gold);margin:2px;font-size:0.6rem;">⚽ ${s.name} <span class="goals" style="color:var(--gold-light);font-weight:700;">${s.goals}</span></span>`
-                ).join('');
-            };
-            const allGames = state.previousGamesData || [];
-            const streak1 = getStreakHtml(team1, allGames);
-            const goalsFor1 = stats1.goalsFor || 0;
-            const goalsAgainst1 = stats1.goalsAgainst || 0;
-            const wins1 = stats1.wins || 0;
-            const losses1 = stats1.losses || 0;
-            const draws1 = stats1.draws || 0;
-            const total1 = stats1.total || 0;
-            const streak2 = getStreakHtml(team2, allGames);
-            const goalsFor2 = stats2.goalsFor || 0;
-            const goalsAgainst2 = stats2.goalsAgainst || 0;
-            const wins2 = stats2.wins || 0;
-            const losses2 = stats2.losses || 0;
-            const draws2 = stats2.draws || 0;
-            const total2 = stats2.total || 0;
-            const scorers1 = getScorersHtml(team1);
-            const scorers2 = getScorersHtml(team2);
-            content.innerHTML = `
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;">
-                <div style="background:rgba(255,255,255,0.02);border-radius:var(--radius-md);padding:16px;border:1px solid var(--border-subtle);">
-                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;border-bottom:1px solid var(--border-gold);padding-bottom:8px;">
-                    <span style="font-size:1.5rem;">${getFlag(team1)}</span>
-                    <span style="font-weight:800;font-size:1rem;color:var(--gold-light);">${team1}</span>
-                  </div>
-                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.7rem;margin-bottom:8px;">
-                    <div><span style="color:var(--text-secondary);">🏆 فوز:</span> <strong style="color:var(--success);">${wins1}</strong></div>
-                    <div><span style="color:var(--text-secondary);">❌ خسارة:</span> <strong style="color:var(--danger);">${losses1}</strong></div>
-                    <div><span style="color:var(--text-secondary);">➖ تعادل:</span> <strong style="color:var(--gold-light);">${draws1}</strong></div>
-                    <div><span style="color:var(--text-secondary);">📊 مباريات:</span> <strong>${total1}</strong></div>
-                    <div><span style="color:var(--text-secondary);">⚽ أهداف له:</span> <strong style="color:var(--gold-light);">${goalsFor1}</strong></div>
-                    <div><span style="color:var(--text-secondary);">⚽ أهداف عليه:</span> <strong style="color:var(--danger);">${goalsAgainst1}</strong></div>
-                  </div>
-                  <div style="margin-top:8px;border-top:1px solid var(--border-subtle);padding-top:8px;">
-                    <div style="font-size:0.6rem;color:var(--text-secondary);margin-bottom:4px;">📈 سلسلة النتائج (آخر 10 مباريات):</div>
-                    <div style="font-size:1rem;letter-spacing:2px;word-break:break-all;">${streak1 || 'لا توجد مباريات سابقة'}</div>
-                  </div>
-                  <div style="margin-top:8px;border-top:1px solid var(--border-subtle);padding-top:8px;">
-                    <div style="font-size:0.6rem;color:var(--text-secondary);margin-bottom:4px;">⚽ الهدافون:</div>
-                    <div style="display:flex;flex-wrap:wrap;gap:4px;">${scorers1}</div>
-                  </div>
-                </div>
-                <div style="background:rgba(255,255,255,0.02);border-radius:var(--radius-md);padding:16px;border:1px solid var(--border-subtle);">
-                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;border-bottom:1px solid var(--border-gold);padding-bottom:8px;">
-                    <span style="font-size:1.5rem;">${getFlag(team2)}</span>
-                    <span style="font-weight:800;font-size:1rem;color:var(--gold-light);">${team2}</span>
-                  </div>
-                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.7rem;margin-bottom:8px;">
-                    <div><span style="color:var(--text-secondary);">🏆 فوز:</span> <strong style="color:var(--success);">${wins2}</strong></div>
-                    <div><span style="color:var(--text-secondary);">❌ خسارة:</span> <strong style="color:var(--danger);">${losses2}</strong></div>
-                    <div><span style="color:var(--text-secondary);">➖ تعادل:</span> <strong style="color:var(--gold-light);">${draws2}</strong></div>
-                    <div><span style="color:var(--text-secondary);">📊 مباريات:</span> <strong>${total2}</strong></div>
-                    <div><span style="color:var(--text-secondary);">⚽ أهداف له:</span> <strong style="color:var(--gold-light);">${goalsFor2}</strong></div>
-                    <div><span style="color:var(--text-secondary);">⚽ أهداف عليه:</span> <strong style="color:var(--danger);">${goalsAgainst2}</strong></div>
-                  </div>
-                  <div style="margin-top:8px;border-top:1px solid var(--border-subtle);padding-top:8px;">
-                    <div style="font-size:0.6rem;color:var(--text-secondary);margin-bottom:4px;">📈 سلسلة النتائج (آخر 10 مباريات):</div>
-                    <div style="font-size:1rem;letter-spacing:2px;word-break:break-all;">${streak2 || 'لا توجد مباريات سابقة'}</div>
-                  </div>
-                  <div style="margin-top:8px;border-top:1px solid var(--border-subtle);padding-top:8px;">
-                    <div style="font-size:0.6rem;color:var(--text-secondary);margin-bottom:4px;">⚽ الهدافون:</div>
-                    <div style="display:flex;flex-wrap:wrap;gap:4px;">${scorers2}</div>
-                  </div>
-                </div>
-              </div>
-              <div style="text-align:center;margin-top:16px;">
-                <button class="tab-btn" onclick="closeModal('teamStatsModal')" style="background:var(--gold-glow);border-color:var(--border-gold);color:var(--gold-light);">إغلاق</button>
-              </div>
-            `;
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
+        // ---- Close button overrides (already defined via modalConfigs, but ensure they work) ----
+        // Most close buttons are handled by the unified system.
+        // The remaining ones are already covered.
 
         // ============================================================
-        //  SAVE PREDICTION
+        //  PREDICTION FUNCTIONS (save, get, etc.)
         // ============================================================
         async function savePrediction(userName, matchId, prediction) {
             if (!supabaseClient) return { success: false, message: "Supabase غير متصل" };
@@ -4873,17 +4698,10 @@
             const matchTimeMs = matchTime(m.timeISO);
             const nowMs = now();
             const diffMs = matchTimeMs - nowMs;
-            const isStreamAvailableForUser = diffMs <= 15 * 60 * 1000; // 15 minutes before
-
+            const isStreamAvailable = diffMs <= 15 * 60 * 1000; // 15 minutes before
             let streamBtnHtml = '';
-            // إذا كان المستخدم مديراً (isAuthorized) نعرض الزر بدون قيود
-            if (isAuthorized) {
-                streamBtnHtml = `<button class="stream-btn" onclick="openStreamModal()" style="background:linear-gradient(135deg, #e67e22, #d35400);">
-                    <span class="live-dot"></span> 📡 البث المباشر (مدير)
-                </button>`;
-            } else if (isUpcoming && !isFinished) {
-                // للمستخدمين العاديين نطبق القيد الزمني
-                if (isStreamAvailableForUser) {
+            if (isUpcoming && !isFinished) {
+                if (isStreamAvailable) {
                     streamBtnHtml = `<button class="stream-btn" onclick="openStreamModal()">
                         <span class="live-dot"></span> 📡 تغطية تجريبية
                     </button>`;
@@ -4974,7 +4792,6 @@
         //  STREAM MODAL – now opens Livematch page in new window
         // ============================================================
         function openStreamModal() {
-            // Open Livematch_index.html in a new window with specific features
             window.open('Livematch_index.html', '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
         }
 
@@ -5110,76 +4927,7 @@
             setTimeout(() => document.getElementById('nameInput').focus(), 300);
         }
 
-        // الدالة المعدلة لزر "متابعة" في نافذة إدخال الاسم
-        document.getElementById('nameSubmitBtn').addEventListener('click', async function() {
-            const name = document.getElementById('nameInput').value.trim();
-            const errorEl = document.getElementById('nameError');
-            const statusEl = document.getElementById('nameStatus');
-            if (!name) { errorEl.textContent = '⚠️ الرجاء إدخال اسمك';
-                return; }
-            if (!supabaseClient) {
-                errorEl.textContent = '❌ خطأ في الاتصال بقاعدة البيانات';
-                return;
-            }
-            this.disabled = true;
-            this.textContent = '⏳ جاري التحقق...';
-            errorEl.textContent = '';
-            statusEl.style.display = 'block';
-            try {
-                const { data, error } = await supabaseClient
-                    .from("predictions")
-                    .select("user_name")
-                    .eq("user_name", name)
-                    .limit(1);
-                if (error) throw error;
-                const isExisting = data && data.length > 0;
-                if (isExisting) {
-                    statusEl.className = 'user-status existing';
-                    statusEl.textContent = `👤 مرحباً بعودتك "${name}"! سيتم إضافة التوقع إلى حسابك.`;
-                    localStorage.setItem('lastUserName', name);
-                    currentUserName = name;
-                    isNameVerified = true;
-                    await loadUserPredictions(name);
-                    const existingPred = await getUserPrediction(name, nameModalMatchId);
-                    if (existingPred) {
-                        errorEl.textContent = `⚠️ لقد توقعت هذه المباراة مسبقاً: ${existingPred.prediction === 'DRAW' ? 'تعادل' : existingPred.prediction}`;
-                        this.disabled = false;
-                        this.textContent = 'متابعة →';
-                        renderUpcoming();
-                        return;
-                    }
-                    // إغلاق النافذة هنا فقط بعد التأكد من عدم وجود توقع سابق
-                    closeNameModal();
-                    this.textContent = '✅ متابعة للتوقع';
-                    openPredictionModal(nameModalMatchId, nameModalTeam1, nameModalTeam2, nameModalTimeISO, name);
-                } else {
-                    statusEl.className = 'user-status new';
-                    statusEl.textContent = `👤 مرحباً "${name}"! أنت لاعب جديد. سيتم تسجيل توقعاتك.`;
-                    localStorage.setItem('lastUserName', name);
-                    currentUserName = name;
-                    isNameVerified = true;
-                    userPredictionsMap = {};
-                    // إغلاق النافذة هنا فقط بعد التأكيد
-                    closeNameModal();
-                    this.textContent = '✅ متابعة للتوقع';
-                    openPredictionModal(nameModalMatchId, nameModalTeam1, nameModalTeam2, nameModalTimeISO, name);
-                }
-            } catch (e) {
-                console.error("❌ التحقق من الاسم:", e);
-                errorEl.textContent = '❌ حدث خطأ أثناء التحقق من الاسم';
-                this.disabled = false;
-                this.textContent = 'متابعة →';
-                statusEl.style.display = 'none';
-            }
-        });
-        document.getElementById('nameInput').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('nameSubmitBtn').click();
-            }
-            if (e.key === 'Escape') {
-                closeNameModal();
-            }
-        });
+        // Name modal button and input events are now handled by handleNameSubmit and handleNameKeydown (re-attached)
 
         async function loadUserPredictions(userName) {
             if (!supabaseClient || !userName) return;
@@ -6104,7 +5852,6 @@
                 const parts = p.match_id ? p.match_id.split('_') : [];
                 const team1 = parts.length > 1 ? parts[1] : '?';
                 const team2 = parts.length > 2 ? parts[2] : '?';
-                // Hide prediction - only show user and match
                 const status = getPredictionStatus(p);
                 let cardClass = 'pending';
                 let badgeClass = 'pending';
@@ -6175,7 +5922,6 @@
                 const parts = p.match_id ? p.match_id.split('_') : [];
                 const team1 = parts.length > 1 ? parts[1] : '?';
                 const team2 = parts.length > 2 ? parts[2] : '?';
-                // Hide prediction result - only show user and match
                 html += `
               <div class="player-prediction-item">
                 <div class="num">#${idx + 1}</div>
@@ -6272,7 +6018,6 @@
             } else {
                 let html = '';
                 predictions.forEach((p, idx) => {
-                    // Hide prediction result - show only user
                     const status = getPredictionStatus(p);
                     let statusText = '⏳ قيد الانتظار';
                     let statusClass = 'pending';
@@ -6355,53 +6100,7 @@
             document.body.style.overflow = 'hidden';
         }
 
-        document.getElementById('modalSubmitBtn').addEventListener('click', async function() {
-            const userName = currentUserName || localStorage.getItem('lastUserName') || '';
-            const selected = document.querySelector('input[name="prediction"]:checked');
-            const msgEl = document.getElementById('modalMessage');
-            if (!userName) { msgEl.textContent = '⚠️ الرجاء إدخال اسمك';
-                msgEl.className = 'modal-message warning'; return; }
-            if (!selected) { msgEl.textContent = '⚠️ الرجاء اختيار توقع';
-                msgEl.className = 'modal-message warning'; return; }
-            let prediction = selected.value;
-            if (prediction === 'HOME') {
-                prediction = currentTeam1;
-            } else if (prediction === 'AWAY') {
-                prediction = currentTeam2;
-            }
-            if (isMatchFinished(currentTimeISO)) { msgEl.textContent = '⛔ هذه المباراة انتهت، لا يمكن حفظ التوقع.';
-                msgEl.className = 'modal-message error'; return; }
-            if (isMatchLive(currentTimeISO)) { msgEl.textContent = '⛔ لا يمكن التوقع على مباراة جارية';
-                msgEl.className = 'modal-message error'; return; }
-            if (!canPredict(currentTimeISO)) { msgEl.textContent =
-                    '⛔ لا يمكن التوقع الآن، المباراة على وشك البدء أو بدأت بالفعل (يُسمح حتى 5 دقائق قبل البداية).';
-                msgEl.className = 'modal-message error'; return; }
-            if (!isEditing && isMatchSubmitted(currentMatchId)) {
-                msgEl.textContent = '⚠️ لقد توقعت هذه المباراة مسبقاً';
-                msgEl.className = 'modal-message warning';
-                return;
-            }
-            this.disabled = true;
-            msgEl.textContent = '⏳ جاري الحفظ...';
-            msgEl.className = 'modal-message';
-            const result = await savePrediction(userName, currentMatchId, prediction);
-            if (result.success) {
-                msgEl.textContent = result.updated ? '✅ تم تحديث التوقع بنجاح! 🎉' : '✅ تم حفظ التوقع بنجاح! 🎉';
-                msgEl.className = 'modal-message success';
-                this.disabled = false;
-                if (userName) {
-                    await loadUserPredictions(userName);
-                }
-                await renderAllPredictionsAdmin();
-                renderUpcoming();
-                updateNewsTicker();
-                setTimeout(() => closeModal('predictionModal'), 1200);
-            } else {
-                msgEl.textContent = result.message || '❌ فشل الحفظ';
-                msgEl.className = 'modal-message error';
-                this.disabled = false;
-            }
-        });
+        // Modal submit is now handled by handleModalSubmit (re-attached)
 
         // ============================================================
         //  TOGGLE BRACKET ADMIN
@@ -6811,7 +6510,7 @@
         }
 
         // ============================================================
-        //  PASSWORD (FIXED)
+        //  PASSWORD
         // ============================================================
         function showPasswordOverlay() {
             document.getElementById('passwordOverlay').classList.add('active');
@@ -6822,27 +6521,7 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // This function is called by the password button click (re-bound in setupModalCloseHandlers)
-        function checkPassword() {
-            const input = document.getElementById('passwordInput').value.trim();
-            const errorEl = document.getElementById('passwordError');
-            if (input === SECRET_CODE) {
-                isAuthorized = true;
-                errorEl.textContent = '';
-                closeModal('passwordOverlay'); // use unified close
-                document.getElementById('shareAllContainer').classList.add('visible');
-                document.getElementById('adminControls').classList.add('visible');
-                if (document.getElementById('matchPredictionsModal').classList.contains('active')) { document
-                        .getElementById('modalCompactBtn').classList.add('visible'); }
-                updateShareAllCount();
-                document.querySelectorAll('.edit-btn').forEach(el => el.classList.add('visible'));
-                showCopyToast('✅ تم تفعيل لوحة الإدارة');
-            } else {
-                errorEl.textContent = '❌ رمز غير صحيح';
-                document.getElementById('passwordInput').value = '';
-                document.getElementById('passwordInput').focus();
-            }
-        }
+        // Password check is now handled by checkPassword function (re-attached)
 
         // ============================================================
         //  TABS
@@ -6969,13 +6648,304 @@
         window.toggleBracketAdmin = toggleBracketAdmin;
         window.openTeamStatsModal = openTeamStatsModal;
         window.togglePredictionsAdmin = togglePredictionsAdmin;
-        window.openStreamModal = openStreamModal; // now opens Livematch page
+        window.openStreamModal = openStreamModal;
         window.closeModal = closeModal;
         window.closeAllModals = closeAllModals;
 
         // ============================================================
-        //  START
+        //  TEAM STATS helper (used in modal)
         // ============================================================
+        function getTeamStats(teamName) {
+            const games = state.previousGamesData || [];
+            let wins = 0,
+                losses = 0,
+                draws = 0,
+                goalsFor = 0,
+                goalsAgainst = 0;
+            const results = [];
+            const scorers = {};
+            for (let game of games) {
+                let isHome = game.homeAr === teamName;
+                let isAway = game.awayAr === teamName;
+                if (!isHome && !isAway) continue;
+                const homeScore = game.homeScore || 0;
+                const awayScore = game.awayScore || 0;
+                const result = { homeScore, awayScore, homeAr: game.homeAr, awayAr: game.awayAr, 
+                                 homePenalty: game.homePenalty, awayPenalty: game.awayPenalty, 
+                                 hadPenalties: game.hadPenalties };
+                const winner = determineWinner(result);
+                if (isHome) {
+                    goalsFor += homeScore;
+                    goalsAgainst += awayScore;
+                    if (winner === teamName) { wins++; results.push('W'); }
+                    else if (winner === game.awayAr) { losses++; results.push('L'); }
+                    else { draws++; results.push('D'); }
+                } else {
+                    goalsFor += awayScore;
+                    goalsAgainst += homeScore;
+                    if (winner === teamName) { wins++; results.push('W'); }
+                    else if (winner === game.homeAr) { losses++; results.push('L'); }
+                    else { draws++; results.push('D'); }
+                }
+            }
+            const total = wins + losses + draws;
+            const winRate = total > 0 ? (wins / total) * 100 : 0;
+            const goalDiff = goalsFor - goalsAgainst;
+            const recentResults = results.slice(-5);
+            const streak = recentResults.map(r => r === 'W' ? '✅' : r === 'L' ? '❌' : '➖').join('');
+            if (state.openfootballMatches) {
+                for (let match of state.openfootballMatches) {
+                    const homeTeam = translateToArabic(match.team1 || '');
+                    const awayTeam = translateToArabic(match.team2 || '');
+                    if (homeTeam !== teamName && awayTeam !== teamName) continue;
+                    const goals = [...(match.goals1 || []), ...(match.goals2 || [])];
+                    for (let g of goals) {
+                        if (!g.name) continue;
+                        let playerName = g.name;
+                        if (!scorers[playerName]) scorers[playerName] = 0;
+                        scorers[playerName]++;
+                    }
+                }
+            }
+            const topScorers = Object.entries(scorers)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 2)
+                .map(([name, goals]) => ({ name, goals }));
+            return { wins, losses, draws, total, winRate, goalsFor, goalsAgainst, goalDiff, streak: streak ||
+                    'لا مباريات سابقة', results, topScorers };
+        }
+
+        function getTeamStatsFull(teamName) {
+            const games = state.previousGamesData || [];
+            let wins = 0,
+                losses = 0,
+                draws = 0,
+                goalsFor = 0,
+                goalsAgainst = 0;
+            const results = [];
+            const scorers = {};
+            for (let game of games) {
+                let isHome = game.homeAr === teamName;
+                let isAway = game.awayAr === teamName;
+                if (!isHome && !isAway) continue;
+                const homeScore = game.homeScore || 0;
+                const awayScore = game.awayScore || 0;
+                const result = { homeScore, awayScore, homeAr: game.homeAr, awayAr: game.awayAr, 
+                                 homePenalty: game.homePenalty, awayPenalty: game.awayPenalty, 
+                                 hadPenalties: game.hadPenalties };
+                const winner = determineWinner(result);
+                if (isHome) {
+                    goalsFor += homeScore;
+                    goalsAgainst += awayScore;
+                    if (winner === teamName) { wins++; results.push('W'); }
+                    else if (winner === game.awayAr) { losses++; results.push('L'); }
+                    else { draws++; results.push('D'); }
+                } else {
+                    goalsFor += awayScore;
+                    goalsAgainst += homeScore;
+                    if (winner === teamName) { wins++; results.push('W'); }
+                    else if (winner === game.homeAr) { losses++; results.push('L'); }
+                    else { draws++; results.push('D'); }
+                }
+            }
+            const total = wins + losses + draws;
+            const winRate = total > 0 ? (wins / total) * 100 : 0;
+            const goalDiff = goalsFor - goalsAgainst;
+            if (state.openfootballMatches) {
+                for (let match of state.openfootballMatches) {
+                    const homeTeam = translateToArabic(match.team1 || '');
+                    const awayTeam = translateToArabic(match.team2 || '');
+                    if (homeTeam !== teamName && awayTeam !== teamName) continue;
+                    const goals = [...(match.goals1 || []), ...(match.goals2 || [])];
+                    for (let g of goals) {
+                        if (!g.name) continue;
+                        let playerName = g.name;
+                        if (!scorers[playerName]) scorers[playerName] = 0;
+                        scorers[playerName]++;
+                    }
+                }
+            }
+            const topScorers = Object.entries(scorers)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5)
+                .map(([name, goals]) => ({ name, goals }));
+            return { wins, losses, draws, total, winRate, goalsFor, goalsAgainst, goalDiff, results, topScorers };
+        }
+
+        function getTeamScorers(teamName) {
+            const scorers = {};
+            const ownGoalBlacklist = [
+                'Damian Bobadilla', 'بوباديا', 'داميان بوباديا',
+                'Cameron Burgess', 'كاميرون بورغيس',
+                'Elvis Muheim', 'إلفيس موهيم',
+                'Mohamed Hany', 'محمد هاني',
+                'Ellyes Skhiri', 'إلياس السخيري',
+                'Hassan Al-Tambakti', 'حسن التمبكتي',
+                'Yazan Al-Arab', 'يزن العرب',
+                'Aymen Hussein', 'أيمن حسين',
+                'Mohamed Manai', 'محمد المناعي',
+                'Abduvohid Nematov', 'عبد الواحد نيماتوف',
+                'Yassine Bounou', 'ياسين بونو'
+            ];
+            const isOwnGoalScorer = (playerName) => {
+                if (!playerName) return false;
+                const nameLower = playerName.toLowerCase();
+                return ownGoalBlacklist.some(name => 
+                    nameLower.includes(name.toLowerCase()) ||
+                    name.toLowerCase().includes(nameLower)
+                );
+            };
+            if (state.openfootballMatches) {
+                for (let match of state.openfootballMatches) {
+                    const homeTeam = translateToArabic(match.team1 || '');
+                    const awayTeam = translateToArabic(match.team2 || '');
+                    if (homeTeam !== teamName && awayTeam !== teamName) continue;
+                    const goals = [...(match.goals1 || []), ...(match.goals2 || [])];
+                    for (let g of goals) {
+                        if (!g.name) continue;
+                        let playerName = g.name;
+                        if (isOwnGoalScorer(playerName)) continue;
+                        const isHomePlayer = match.goals1 && match.goals1.some(gg => gg.name === g.name);
+                        const isAwayPlayer = match.goals2 && match.goals2.some(gg => gg.name === g.name);
+                        if (isHomePlayer && homeTeam !== teamName) continue;
+                        if (isAwayPlayer && awayTeam !== teamName) continue;
+                        if (!scorers[playerName]) scorers[playerName] = 0;
+                        scorers[playerName]++;
+                    }
+                }
+            }
+            return Object.entries(scorers)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5)
+                .map(([name, goals]) => ({ name, goals }));
+        }
+
+        function openTeamStatsModal(team1, team2) {
+            const modal = document.getElementById('teamStatsModal');
+            const content = document.getElementById('teamStatsContent');
+            const stats1 = getTeamStatsFull(team1);
+            const stats2 = getTeamStatsFull(team2);
+            const getResultSymbol = (teamName, game) => {
+                const result = findMatchResult(game.homeAr, game.awayAr);
+                if (!result) return '⏳';
+                const winner = determineWinner(result);
+                if (winner === teamName) return '✅';
+                else if (winner === null || winner === 'DRAW') return '➖';
+                else return '❌';
+            };
+            const getStreakHtml = (teamName, games) => {
+                const teamGames = games.filter(g => g.homeAr === teamName || g.awayAr === teamName);
+                const recentGames = teamGames.slice(-10);
+                return recentGames.map(g => getResultSymbol(teamName, g)).join(' ');
+            };
+            const getScorersHtml = (teamName) => {
+                const scorers = getTeamScorers(teamName);
+                if (scorers.length === 0) return '<span style="color:var(--text-secondary);font-size:0.6rem;">لا توجد أهداف مسجلة</span>';
+                return scorers.map(s => 
+                    `<span class="scorer" style="display:inline-block;background:var(--gold-glow);padding:1px 8px;border-radius:20px;border:1px solid var(--border-gold);margin:2px;font-size:0.6rem;">⚽ ${s.name} <span class="goals" style="color:var(--gold-light);font-weight:700;">${s.goals}</span></span>`
+                ).join('');
+            };
+            const allGames = state.previousGamesData || [];
+            const streak1 = getStreakHtml(team1, allGames);
+            const goalsFor1 = stats1.goalsFor || 0;
+            const goalsAgainst1 = stats1.goalsAgainst || 0;
+            const wins1 = stats1.wins || 0;
+            const losses1 = stats1.losses || 0;
+            const draws1 = stats1.draws || 0;
+            const total1 = stats1.total || 0;
+            const streak2 = getStreakHtml(team2, allGames);
+            const goalsFor2 = stats2.goalsFor || 0;
+            const goalsAgainst2 = stats2.goalsAgainst || 0;
+            const wins2 = stats2.wins || 0;
+            const losses2 = stats2.losses || 0;
+            const draws2 = stats2.draws || 0;
+            const total2 = stats2.total || 0;
+            const scorers1 = getScorersHtml(team1);
+            const scorers2 = getScorersHtml(team2);
+            content.innerHTML = `
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;">
+                <div style="background:rgba(255,255,255,0.02);border-radius:var(--radius-md);padding:16px;border:1px solid var(--border-subtle);">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;border-bottom:1px solid var(--border-gold);padding-bottom:8px;">
+                    <span style="font-size:1.5rem;">${getFlag(team1)}</span>
+                    <span style="font-weight:800;font-size:1rem;color:var(--gold-light);">${team1}</span>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.7rem;margin-bottom:8px;">
+                    <div><span style="color:var(--text-secondary);">🏆 فوز:</span> <strong style="color:var(--success);">${wins1}</strong></div>
+                    <div><span style="color:var(--text-secondary);">❌ خسارة:</span> <strong style="color:var(--danger);">${losses1}</strong></div>
+                    <div><span style="color:var(--text-secondary);">➖ تعادل:</span> <strong style="color:var(--gold-light);">${draws1}</strong></div>
+                    <div><span style="color:var(--text-secondary);">📊 مباريات:</span> <strong>${total1}</strong></div>
+                    <div><span style="color:var(--text-secondary);">⚽ أهداف له:</span> <strong style="color:var(--gold-light);">${goalsFor1}</strong></div>
+                    <div><span style="color:var(--text-secondary);">⚽ أهداف عليه:</span> <strong style="color:var(--danger);">${goalsAgainst1}</strong></div>
+                  </div>
+                  <div style="margin-top:8px;border-top:1px solid var(--border-subtle);padding-top:8px;">
+                    <div style="font-size:0.6rem;color:var(--text-secondary);margin-bottom:4px;">📈 سلسلة النتائج (آخر 10 مباريات):</div>
+                    <div style="font-size:1rem;letter-spacing:2px;word-break:break-all;">${streak1 || 'لا توجد مباريات سابقة'}</div>
+                  </div>
+                  <div style="margin-top:8px;border-top:1px solid var(--border-subtle);padding-top:8px;">
+                    <div style="font-size:0.6rem;color:var(--text-secondary);margin-bottom:4px;">⚽ الهدافون:</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:4px;">${scorers1}</div>
+                  </div>
+                </div>
+                <div style="background:rgba(255,255,255,0.02);border-radius:var(--radius-md);padding:16px;border:1px solid var(--border-subtle);">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;border-bottom:1px solid var(--border-gold);padding-bottom:8px;">
+                    <span style="font-size:1.5rem;">${getFlag(team2)}</span>
+                    <span style="font-weight:800;font-size:1rem;color:var(--gold-light);">${team2}</span>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.7rem;margin-bottom:8px;">
+                    <div><span style="color:var(--text-secondary);">🏆 فوز:</span> <strong style="color:var(--success);">${wins2}</strong></div>
+                    <div><span style="color:var(--text-secondary);">❌ خسارة:</span> <strong style="color:var(--danger);">${losses2}</strong></div>
+                    <div><span style="color:var(--text-secondary);">➖ تعادل:</span> <strong style="color:var(--gold-light);">${draws2}</strong></div>
+                    <div><span style="color:var(--text-secondary);">📊 مباريات:</span> <strong>${total2}</strong></div>
+                    <div><span style="color:var(--text-secondary);">⚽ أهداف له:</span> <strong style="color:var(--gold-light);">${goalsFor2}</strong></div>
+                    <div><span style="color:var(--text-secondary);">⚽ أهداف عليه:</span> <strong style="color:var(--danger);">${goalsAgainst2}</strong></div>
+                  </div>
+                  <div style="margin-top:8px;border-top:1px solid var(--border-subtle);padding-top:8px;">
+                    <div style="font-size:0.6rem;color:var(--text-secondary);margin-bottom:4px;">📈 سلسلة النتائج (آخر 10 مباريات):</div>
+                    <div style="font-size:1rem;letter-spacing:2px;word-break:break-all;">${streak2 || 'لا توجد مباريات سابقة'}</div>
+                  </div>
+                  <div style="margin-top:8px;border-top:1px solid var(--border-subtle);padding-top:8px;">
+                    <div style="font-size:0.6rem;color:var(--text-secondary);margin-bottom:4px;">⚽ الهدافون:</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:4px;">${scorers2}</div>
+                  </div>
+                </div>
+              </div>
+              <div style="text-align:center;margin-top:16px;">
+                <button class="tab-btn" onclick="closeModal('teamStatsModal')" style="background:var(--gold-glow);border-color:var(--border-gold);color:var(--gold-light);">إغلاق</button>
+              </div>
+            `;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // ============================================================
+        //  INIT
+        // ============================================================
+        async function init() {
+            console.log("🚀 INIT START (محسن)");
+            
+            // Setup modal close handlers FIRST
+            setupModalCloseHandlers();
+            
+            await Promise.all([
+                loadPreviousGamesFull(),
+                fetchOpenfootballData(),
+                getAllPredictions()
+            ]);
+            state.loaded = true;
+            await renderAllPredictionsAdmin();
+            updateScorers();
+            renderUpcoming();
+            calculateStandings();
+            renderTeamStats();
+            renderScorers();
+            renderBracket();
+            initTabs();
+            checkUrlForMatch();
+            startAutoUpdate();
+            updateNewsTicker();
+            console.log("✅ INIT DONE (محسن)");
+        }
+
         init();
     </script>
 </body>
