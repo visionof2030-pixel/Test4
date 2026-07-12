@@ -4873,10 +4873,17 @@
             const matchTimeMs = matchTime(m.timeISO);
             const nowMs = now();
             const diffMs = matchTimeMs - nowMs;
-            const isStreamAvailable = diffMs <= 15 * 60 * 1000; // 15 minutes before
+            const isStreamAvailableForUser = diffMs <= 15 * 60 * 1000; // 15 minutes before
+
             let streamBtnHtml = '';
-            if (isUpcoming && !isFinished) {
-                if (isStreamAvailable) {
+            // إذا كان المستخدم مديراً (isAuthorized) نعرض الزر بدون قيود
+            if (isAuthorized) {
+                streamBtnHtml = `<button class="stream-btn" onclick="openStreamModal()" style="background:linear-gradient(135deg, #e67e22, #d35400);">
+                    <span class="live-dot"></span> 📡 البث المباشر (مدير)
+                </button>`;
+            } else if (isUpcoming && !isFinished) {
+                // للمستخدمين العاديين نطبق القيد الزمني
+                if (isStreamAvailableForUser) {
                     streamBtnHtml = `<button class="stream-btn" onclick="openStreamModal()">
                         <span class="live-dot"></span> 📡 تغطية تجريبية
                     </button>`;
@@ -5103,6 +5110,7 @@
             setTimeout(() => document.getElementById('nameInput').focus(), 300);
         }
 
+        // الدالة المعدلة لزر "متابعة" في نافذة إدخال الاسم
         document.getElementById('nameSubmitBtn').addEventListener('click', async function() {
             const name = document.getElementById('nameInput').value.trim();
             const errorEl = document.getElementById('nameError');
@@ -5140,12 +5148,10 @@
                         renderUpcoming();
                         return;
                     }
+                    // إغلاق النافذة هنا فقط بعد التأكد من عدم وجود توقع سابق
+                    closeNameModal();
                     this.textContent = '✅ متابعة للتوقع';
-                    setTimeout(() => {
-                        closeNameModal();
-                        openPredictionModal(nameModalMatchId, nameModalTeam1, nameModalTeam2, nameModalTimeISO,
-                        name);
-                    }, 600);
+                    openPredictionModal(nameModalMatchId, nameModalTeam1, nameModalTeam2, nameModalTimeISO, name);
                 } else {
                     statusEl.className = 'user-status new';
                     statusEl.textContent = `👤 مرحباً "${name}"! أنت لاعب جديد. سيتم تسجيل توقعاتك.`;
@@ -5153,12 +5159,10 @@
                     currentUserName = name;
                     isNameVerified = true;
                     userPredictionsMap = {};
+                    // إغلاق النافذة هنا فقط بعد التأكيد
+                    closeNameModal();
                     this.textContent = '✅ متابعة للتوقع';
-                    setTimeout(() => {
-                        closeNameModal();
-                        openPredictionModal(nameModalMatchId, nameModalTeam1, nameModalTeam2, nameModalTimeISO,
-                        name);
-                    }, 600);
+                    openPredictionModal(nameModalMatchId, nameModalTeam1, nameModalTeam2, nameModalTimeISO, name);
                 }
             } catch (e) {
                 console.error("❌ التحقق من الاسم:", e);
