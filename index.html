@@ -1500,69 +1500,8 @@
             50% { opacity: 0.3; }
         }
 
-        /* ===== IFRAME STREAM MODAL ===== */
-        .stream-modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.92);
-            backdrop-filter: blur(20px);
-            z-index: 99999;
-            justify-content: center;
-            align-items: center;
-            animation: fadeInModal 0.3s ease;
-        }
-        .stream-modal-overlay.active {
-            display: flex;
-        }
-        .stream-modal-content {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-gold);
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            max-width: 1200px;
-            width: 95%;
-            max-height: 95vh;
-            position: relative;
-            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.80);
-        }
-        .stream-modal-content .modal-close {
-            position: absolute;
-            top: 12px;
-            right: 16px;
-            background: rgba(255, 255, 255, 0.10);
-            border: none;
-            color: #fff;
-            font-size: 1.4rem;
-            cursor: pointer;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            z-index: 10;
-        }
-        .stream-modal-content .modal-close:hover {
-            background: var(--danger-bg);
-            color: var(--danger);
-        }
-        .stream-modal-content iframe {
-            width: 100%;
-            height: 75vh;
-            border: none;
-            border-radius: var(--radius-md);
-            background: #000;
-        }
-        @media (max-width: 640px) {
-            .stream-modal-content iframe {
-                height: 50vh;
-            }
-        }
+        /* ===== IFRAME STREAM MODAL (removed - replaced by new window) ===== */
+        /* Removed .stream-modal-overlay and related styles */
 
         .copy-toast {
             position: fixed;
@@ -2633,9 +2572,7 @@
                 font-size: 0.55rem;
                 padding: 4px 12px;
             }
-            .stream-modal-content iframe {
-                height: 40vh;
-            }
+            /* Removed .stream-modal-content iframe */
         }
         @media (min-width: 768px) {
             .matches-grid {
@@ -3016,15 +2953,7 @@
         </div>
     </div>
 
-    <!-- ===== STREAM IFRAME MODAL ===== -->
-    <div class="stream-modal-overlay" id="streamModal">
-        <div class="stream-modal-content">
-            <button class="modal-close" id="streamModalCloseBtn">✕</button>
-            <div style="text-align:center;margin-bottom:8px;font-weight:700;color:var(--gold-light);">📡 تغطية تجريبية - كأس العالم 2026</div>
-            <iframe id="streamIframe" src="about:blank" allow="autoplay; encrypted-media; fullscreen" sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
-            <div style="text-align:center;margin-top:8px;font-size:0.6rem;color:var(--text-secondary);">⚠️ بث تجريبي - قد يتوقف أو يتأثر بجودة الاتصال</div>
-        </div>
-    </div>
+    <!-- ===== STREAM MODAL REMOVED – replaced by Livematch page ===== -->
 
     <div class="copy-toast" id="copyToast">✅ تم نسخ الرابط!</div>
 
@@ -4133,7 +4062,7 @@
                 `${userName}_${matchId}`] || null; }
 
         // ============================================================
-        //  UNIFIED MODAL CLOSE SYSTEM
+        //  UNIFIED MODAL CLOSE SYSTEM (with password fix)
         // ============================================================
 
         // Store all modal configurations
@@ -4192,21 +4121,7 @@
                 content: null,
                 onClose: null
             },
-            'streamModal': {
-                overlay: 'streamModal',
-                closeBtn: 'streamModalCloseBtn',
-                content: null,
-                onClose: function() {
-                    const iframe = document.getElementById('streamIframe');
-                    if (iframe) {
-                        try {
-                            iframe.contentWindow.postMessage('stop', '*');
-                        } catch(e) { /* ignore cross-origin */ }
-                        iframe.src = 'about:blank';
-                        iframe.srcdoc = '';
-                    }
-                }
-            },
+            // streamModal removed – replaced by Livematch page
             'nameModal': {
                 overlay: 'nameModal',
                 closeBtn: 'nameCloseBtn',
@@ -4277,6 +4192,29 @@
                 });
             });
             
+            // --- FIX PASSWORD BUTTON ---
+            // Re-bind password submit button because it was cloned and lost its listener
+            const passwordSubmitBtn = document.getElementById('passwordSubmitBtn');
+            if (passwordSubmitBtn) {
+                // Remove any existing listener to avoid duplicates
+                passwordSubmitBtn.removeEventListener('click', checkPassword);
+                passwordSubmitBtn.addEventListener('click', checkPassword);
+            }
+            const passwordInput = document.getElementById('passwordInput');
+            if (passwordInput) {
+                passwordInput.removeEventListener('keydown', passwordKeyHandler);
+                passwordInput.addEventListener('keydown', passwordKeyHandler);
+            }
+            const passwordCloseBtn = document.getElementById('passwordCloseBtn');
+            if (passwordCloseBtn) {
+                passwordCloseBtn.removeEventListener('click', function() { closeModal('passwordOverlay'); });
+                passwordCloseBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    closeModal('passwordOverlay');
+                });
+            }
+            // --- END FIX ---
+            
             // Global escape key handler (single listener)
             document.removeEventListener('keydown', handleEscapeKey);
             document.addEventListener('keydown', handleEscapeKey);
@@ -4298,6 +4236,17 @@
             }
         }
 
+        // Password key handler
+        function passwordKeyHandler(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                checkPassword();
+            }
+            if (e.key === 'Escape') {
+                closeModal('passwordOverlay');
+            }
+        }
+
         // Override the old close functions with new unified system
         function closePredictionModal() {
             closeModal('predictionModal');
@@ -4309,10 +4258,6 @@
 
         function closeBracketModal() {
             closeModal('bracketMatchModal');
-        }
-
-        function closeStreamModal() {
-            closeModal('streamModal');
         }
 
         function hidePasswordOverlay() {
@@ -4333,11 +4278,6 @@
         document.getElementById('bracketModalCloseBtn')?.addEventListener('click', function(e) {
             e.stopPropagation();
             closeBracketModal();
-        });
-
-        document.getElementById('streamModalCloseBtn')?.addEventListener('click', function(e) {
-            e.stopPropagation();
-            closeStreamModal();
         });
 
         document.getElementById('passwordCloseBtn')?.addEventListener('click', function(e) {
@@ -4765,7 +4705,7 @@
         }
 
         // ============================================================
-        //  RENDER MATCH CARD (with live stream button)
+        //  RENDER MATCH CARD (with live stream button – opens Livematch page)
         // ============================================================
         function renderMatchCard(m, isUpcoming) {
             const st = getMatchStatus(m);
@@ -4918,7 +4858,7 @@
                 predictBtnExtra = `onclick="openNameModal('${matchId}','${m.team1}','${m.team2}','${m.timeISO}')"`;
             }
 
-            // Live stream button logic
+            // ===== STREAM BUTTON – opens Livematch page =====
             const matchTimeMs = matchTime(m.timeISO);
             const nowMs = now();
             const diffMs = matchTimeMs - nowMs;
@@ -5013,43 +4953,11 @@
         }
 
         // ============================================================
-        //  STREAM MODAL - SECURE IFRAME
+        //  STREAM MODAL – now opens Livematch page in new window
         // ============================================================
-
         function openStreamModal() {
-            const modal = document.getElementById('streamModal');
-            const iframe = document.getElementById('streamIframe');
-            if (!iframe || !modal) return;
-            
-            // Use a more secure iframe with sandbox attributes
-            // Note: Some streams require specific sandbox permissions
-            // The sandbox attribute helps prevent popups and redirects
-            iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-forms allow-popups');
-            
-            // Use a clean stream URL (albaplayer is known for minimal ads)
-            // Note: Full ad-blocking is not possible due to browser Same-Origin policy
-            // The stream source itself may contain ads that cannot be blocked from the parent page
-            iframe.src = 'https://me.hosseto.online/albaplayer/socket/?serv=1';
-            
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeStreamModal() {
-            const modal = document.getElementById('streamModal');
-            const iframe = document.getElementById('streamIframe');
-            if (iframe) {
-                // Stop any media and clear source to prevent background audio/video
-                try {
-                    iframe.contentWindow.postMessage('stop', '*');
-                } catch(e) { /* ignore cross-origin */ }
-                iframe.src = 'about:blank';
-                iframe.srcdoc = '';
-            }
-            if (modal) {
-                modal.classList.remove('active');
-                document.body.style.overflow = '';
-            }
+            // Open Livematch_index.html in a new window with specific features
+            window.open('Livematch_index.html', '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
         }
 
         // ============================================================
@@ -6888,7 +6796,7 @@
         }
 
         // ============================================================
-        //  PASSWORD
+        //  PASSWORD (FIXED)
         // ============================================================
         function showPasswordOverlay() {
             document.getElementById('passwordOverlay').classList.add('active');
@@ -6899,13 +6807,14 @@
             document.body.style.overflow = 'hidden';
         }
 
+        // This function is called by the password button click (re-bound in setupModalCloseHandlers)
         function checkPassword() {
             const input = document.getElementById('passwordInput').value.trim();
             const errorEl = document.getElementById('passwordError');
             if (input === SECRET_CODE) {
                 isAuthorized = true;
                 errorEl.textContent = '';
-                hidePasswordOverlay();
+                closeModal('passwordOverlay'); // use unified close
                 document.getElementById('shareAllContainer').classList.add('visible');
                 document.getElementById('adminControls').classList.add('visible');
                 if (document.getElementById('matchPredictionsModal').classList.contains('active')) { document
@@ -6919,9 +6828,6 @@
                 document.getElementById('passwordInput').focus();
             }
         }
-        document.getElementById('passwordSubmitBtn').addEventListener('click', checkPassword);
-        document.getElementById('passwordInput').addEventListener('keydown', function(e) { if (e.key === 'Enter')
-                checkPassword(); if (e.key === 'Escape') hidePasswordOverlay(); });
 
         // ============================================================
         //  TABS
@@ -7048,8 +6954,7 @@
         window.toggleBracketAdmin = toggleBracketAdmin;
         window.openTeamStatsModal = openTeamStatsModal;
         window.togglePredictionsAdmin = togglePredictionsAdmin;
-        window.openStreamModal = openStreamModal;
-        window.closeStreamModal = closeStreamModal;
+        window.openStreamModal = openStreamModal; // now opens Livematch page
         window.closeModal = closeModal;
         window.closeAllModals = closeAllModals;
 
