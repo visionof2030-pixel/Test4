@@ -5519,6 +5519,80 @@
             document.querySelectorAll('input[name="prediction"]').forEach(el => el.checked = false);
             document.getElementById('predictionModal').classList.add('active');
             document.body.style.overflow = 'hidden';
+
+            // ===== FIX: Re-bind submit button to ensure it works =====
+            const submitBtn = document.getElementById('modalSubmitBtn');
+            // Remove any existing listeners to avoid duplicates
+            const newSubmitBtn = submitBtn.cloneNode(true);
+            submitBtn.parentNode.replaceChild(newSubmitBtn, submitBtn);
+            
+            // Add fresh click listener
+            newSubmitBtn.addEventListener('click', async function() {
+                const userName = currentUserName || localStorage.getItem('lastUserName') || '';
+                const selected = document.querySelector('input[name="prediction"]:checked');
+                const msgEl = document.getElementById('modalMessage');
+                
+                if (!userName) { 
+                    msgEl.textContent = '⚠️ الرجاء إدخال اسمك';
+                    msgEl.className = 'modal-message warning';
+                    return;
+                }
+                if (!selected) {
+                    msgEl.textContent = '⚠️ الرجاء اختيار توقع';
+                    msgEl.className = 'modal-message warning';
+                    return;
+                }
+                
+                let prediction = selected.value;
+                if (prediction === 'HOME') {
+                    prediction = currentTeam1;
+                } else if (prediction === 'AWAY') {
+                    prediction = currentTeam2;
+                }
+                
+                if (isMatchFinished(currentTimeISO)) {
+                    msgEl.textContent = '⛔ هذه المباراة انتهت، لا يمكن حفظ التوقع.';
+                    msgEl.className = 'modal-message error';
+                    return;
+                }
+                if (isMatchLive(currentTimeISO)) {
+                    msgEl.textContent = '⛔ لا يمكن التوقع على مباراة جارية';
+                    msgEl.className = 'modal-message error';
+                    return;
+                }
+                if (!canPredict(currentTimeISO)) {
+                    msgEl.textContent = '⛔ لا يمكن التوقع الآن، المباراة على وشك البدء أو بدأت بالفعل (يُسمح حتى 5 دقائق قبل البداية).';
+                    msgEl.className = 'modal-message error';
+                    return;
+                }
+                if (!isEditing && isMatchSubmitted(currentMatchId)) {
+                    msgEl.textContent = '⚠️ لقد توقعت هذه المباراة مسبقاً';
+                    msgEl.className = 'modal-message warning';
+                    return;
+                }
+                
+                this.disabled = true;
+                msgEl.textContent = '⏳ جاري الحفظ...';
+                msgEl.className = 'modal-message';
+                
+                const result = await savePrediction(userName, currentMatchId, prediction);
+                if (result.success) {
+                    msgEl.textContent = result.updated ? '✅ تم تحديث التوقع بنجاح! 🎉' : '✅ تم حفظ التوقع بنجاح! 🎉';
+                    msgEl.className = 'modal-message success';
+                    this.disabled = false;
+                    if (userName) {
+                        await loadUserPredictions(userName);
+                    }
+                    await renderAllPredictionsAdmin();
+                    renderUpcoming();
+                    updateNewsTicker();
+                    setTimeout(() => closeModal('predictionModal'), 1200);
+                } else {
+                    msgEl.textContent = result.message || '❌ فشل الحفظ';
+                    msgEl.className = 'modal-message error';
+                    this.disabled = false;
+                }
+            });
         }
 
         // ============================================================
@@ -6705,54 +6779,6 @@
             document.getElementById('predictionModal').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
-
-        document.getElementById('modalSubmitBtn').addEventListener('click', async function() {
-            const userName = currentUserName || localStorage.getItem('lastUserName') || '';
-            const selected = document.querySelector('input[name="prediction"]:checked');
-            const msgEl = document.getElementById('modalMessage');
-            if (!userName) { msgEl.textContent = '⚠️ الرجاء إدخال اسمك';
-                msgEl.className = 'modal-message warning'; return; }
-            if (!selected) { msgEl.textContent = '⚠️ الرجاء اختيار توقع';
-                msgEl.className = 'modal-message warning'; return; }
-            let prediction = selected.value;
-            if (prediction === 'HOME') {
-                prediction = currentTeam1;
-            } else if (prediction === 'AWAY') {
-                prediction = currentTeam2;
-            }
-            if (isMatchFinished(currentTimeISO)) { msgEl.textContent = '⛔ هذه المباراة انتهت، لا يمكن حفظ التوقع.';
-                msgEl.className = 'modal-message error'; return; }
-            if (isMatchLive(currentTimeISO)) { msgEl.textContent = '⛔ لا يمكن التوقع على مباراة جارية';
-                msgEl.className = 'modal-message error'; return; }
-            if (!canPredict(currentTimeISO)) { msgEl.textContent =
-                    '⛔ لا يمكن التوقع الآن، المباراة على وشك البدء أو بدأت بالفعل (يُسمح حتى 5 دقائق قبل البداية).';
-                msgEl.className = 'modal-message error'; return; }
-            if (!isEditing && isMatchSubmitted(currentMatchId)) {
-                msgEl.textContent = '⚠️ لقد توقعت هذه المباراة مسبقاً';
-                msgEl.className = 'modal-message warning';
-                return;
-            }
-            this.disabled = true;
-            msgEl.textContent = '⏳ جاري الحفظ...';
-            msgEl.className = 'modal-message';
-            const result = await savePrediction(userName, currentMatchId, prediction);
-            if (result.success) {
-                msgEl.textContent = result.updated ? '✅ تم تحديث التوقع بنجاح! 🎉' : '✅ تم حفظ التوقع بنجاح! 🎉';
-                msgEl.className = 'modal-message success';
-                this.disabled = false;
-                if (userName) {
-                    await loadUserPredictions(userName);
-                }
-                await renderAllPredictionsAdmin();
-                renderUpcoming();
-                updateNewsTicker();
-                setTimeout(() => closeModal('predictionModal'), 1200);
-            } else {
-                msgEl.textContent = result.message || '❌ فشل الحفظ';
-                msgEl.className = 'modal-message error';
-                this.disabled = false;
-            }
-        });
 
         // ============================================================
         //  TOGGLE BRACKET ADMIN
