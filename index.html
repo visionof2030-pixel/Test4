@@ -5322,7 +5322,7 @@
         }
 
         // ============================================================
-        //  NAME MODAL
+        //  NAME MODAL - FIXED: Re-bind click handler every time modal opens
         // ============================================================
         let nameModalMatchId = '',
             nameModalTeam1 = '',
@@ -5341,27 +5341,60 @@
             document.getElementById('nameInput').value = localStorage.getItem('lastUserName') || '';
             document.getElementById('nameStatus').style.display = 'none';
             document.getElementById('nameError').textContent = '';
-            document.getElementById('nameSubmitBtn').disabled = false;
-            document.getElementById('nameSubmitBtn').textContent = 'متابعة →';
+            const submitBtn = document.getElementById('nameSubmitBtn');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'متابعة →';
+            
+            // REMOVE any existing listeners to prevent duplicates
+            const newSubmitBtn = submitBtn.cloneNode(true);
+            submitBtn.parentNode.replaceChild(newSubmitBtn, submitBtn);
+            
+            // Add fresh click listener
+            newSubmitBtn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                await handleNameSubmit();
+            });
+            
+            // Also handle Enter key on input
+            const nameInput = document.getElementById('nameInput');
+            const newNameInput = nameInput.cloneNode(true);
+            nameInput.parentNode.replaceChild(newNameInput, nameInput);
+            newNameInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    document.getElementById('nameSubmitBtn').click();
+                }
+                if (e.key === 'Escape') {
+                    closeNameModal();
+                }
+            });
+            
             document.getElementById('nameModal').classList.add('active');
             document.body.style.overflow = 'hidden';
             setTimeout(() => document.getElementById('nameInput').focus(), 300);
         }
 
-        document.getElementById('nameSubmitBtn').addEventListener('click', async function() {
-            const name = document.getElementById('nameInput').value.trim();
+        // Separate async function for name submission logic
+        async function handleNameSubmit() {
+            const nameInput = document.getElementById('nameInput');
+            const name = nameInput.value.trim();
             const errorEl = document.getElementById('nameError');
             const statusEl = document.getElementById('nameStatus');
+            const submitBtn = document.getElementById('nameSubmitBtn');
+            
             if (!name) { errorEl.textContent = '⚠️ الرجاء إدخال اسمك';
                 return; }
             if (!supabaseClient) {
                 errorEl.textContent = '❌ خطأ في الاتصال بقاعدة البيانات';
                 return;
             }
-            this.disabled = true;
-            this.textContent = '⏳ جاري التحقق...';
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ جاري التحقق...';
             errorEl.textContent = '';
             statusEl.style.display = 'block';
+            
             try {
                 const { data, error } = await supabaseClient
                     .from("predictions")
@@ -5380,17 +5413,14 @@
                     const existingPred = await getUserPrediction(name, nameModalMatchId);
                     if (existingPred) {
                         errorEl.textContent = `⚠️ لقد توقعت هذه المباراة مسبقاً: ${existingPred.prediction === 'DRAW' ? 'تعادل' : existingPred.prediction}`;
-                        this.disabled = false;
-                        this.textContent = 'متابعة →';
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'متابعة →';
                         renderUpcoming();
                         return;
                     }
-                    this.textContent = '✅ متابعة للتوقع';
-                    setTimeout(() => {
-                        closeNameModal();
-                        openPredictionModal(nameModalMatchId, nameModalTeam1, nameModalTeam2, nameModalTimeISO,
-                        name);
-                    }, 600);
+                    submitBtn.textContent = '✅ متابعة للتوقع';
+                    closeNameModal();
+                    openPredictionModal(nameModalMatchId, nameModalTeam1, nameModalTeam2, nameModalTimeISO, name);
                 } else {
                     statusEl.className = 'user-status new';
                     statusEl.textContent = `👤 مرحباً "${name}"! أنت لاعب جديد. سيتم تسجيل توقعاتك.`;
@@ -5398,29 +5428,28 @@
                     currentUserName = name;
                     isNameVerified = true;
                     userPredictionsMap = {};
-                    this.textContent = '✅ متابعة للتوقع';
-                    setTimeout(() => {
-                        closeNameModal();
-                        openPredictionModal(nameModalMatchId, nameModalTeam1, nameModalTeam2, nameModalTimeISO,
-                        name);
-                    }, 600);
+                    submitBtn.textContent = '✅ متابعة للتوقع';
+                    closeNameModal();
+                    openPredictionModal(nameModalMatchId, nameModalTeam1, nameModalTeam2, nameModalTimeISO, name);
                 }
             } catch (e) {
                 console.error("❌ التحقق من الاسم:", e);
                 errorEl.textContent = '❌ حدث خطأ أثناء التحقق من الاسم';
-                this.disabled = false;
-                this.textContent = 'متابعة →';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'متابعة →';
                 statusEl.style.display = 'none';
             }
-        });
-        document.getElementById('nameInput').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('nameSubmitBtn').click();
-            }
-            if (e.key === 'Escape') {
-                closeNameModal();
-            }
-        });
+        }
+
+        // Override the default close for name modal to clean up
+        const originalCloseNameModal = closeNameModal;
+        closeNameModal = function() {
+            // Reset state
+            isNameVerified = false;
+            document.getElementById('nameStatus').style.display = 'none';
+            document.getElementById('nameError').textContent = '';
+            closeModal('nameModal');
+        };
 
         async function loadUserPredictions(userName) {
             if (!supabaseClient || !userName) return;
@@ -5493,18 +5522,37 @@
         }
 
         // ============================================================
-        //  MATCH PREDICTIONS MODAL
+        //  MATCH PREDICTIONS MODAL - FIXED for previous matches
         // ============================================================
         async function openMatchPredictions(matchId, team1, team2, homeScore, awayScore) {
             if (!state.loaded) {
                 await loadPreviousGames();
                 await getAllPredictions();
             }
-            document.getElementById('mpTeam1').textContent = team1;
-            document.getElementById('mpTeam2').textContent = team2;
-            document.getElementById('mpFlag1').textContent = getFlag(team1);
-            document.getElementById('mpFlag2').textContent = getFlag(team2);
-            let result = findMatchResult(team1, team2);
+            
+            // If matchId is not in our format, try to find it
+            let actualMatchId = matchId;
+            let actualTeam1 = team1;
+            let actualTeam2 = team2;
+            
+            // Check if this is a previous match from API that might not have a matchId in our format
+            const foundMatch = matchesData.find(m => 
+                (m.team1 === team1 && m.team2 === team2) || 
+                (m.team1 === team2 && m.team2 === team1)
+            );
+            
+            if (foundMatch) {
+                actualMatchId = `${foundMatch.timeISO}_${foundMatch.team1}_${foundMatch.team2}`;
+                actualTeam1 = foundMatch.team1;
+                actualTeam2 = foundMatch.team2;
+            }
+            
+            document.getElementById('mpTeam1').textContent = actualTeam1;
+            document.getElementById('mpTeam2').textContent = actualTeam2;
+            document.getElementById('mpFlag1').textContent = getFlag(actualTeam1);
+            document.getElementById('mpFlag2').textContent = getFlag(actualTeam2);
+            
+            let result = findMatchResult(actualTeam1, actualTeam2);
             let penaltyText = '';
             if (result) {
                 homeScore = result.homeScore;
@@ -5517,24 +5565,26 @@
             } else {
                 document.getElementById('mpResult').textContent = `⚠️ لم يتم العثور على نتيجة هذه المباراة بعد`;
             }
+            
             if (isAuthorized) { document.getElementById('modalCompactBtn').classList.add('visible'); } else { document
                     .getElementById('modalCompactBtn').classList.remove('visible'); }
             if (isModalCompact) { isModalCompact = false;
                 document.getElementById('matchPredictionsContent').classList.remove('compact-mode');
                 document.getElementById('modalCompactBtn').textContent = '📐 تصغير'; }
+                
             const scorersDiv = document.getElementById('mpScorersDetail');
             let scorersHtml = '';
             let matchOF = state.openfootballMatches.find(m => {
                 const h = translateToArabic(m.team1 || '');
                 const a = translateToArabic(m.team2 || '');
-                return (h === team1 && a === team2) || (h === team2 && a === team1);
+                return (h === actualTeam1 && a === actualTeam2) || (h === actualTeam2 && a === actualTeam1);
             });
             if (matchOF) {
                 const goals = [...(matchOF.goals1 || []), ...(matchOF.goals2 || [])];
                 if (goals.length) {
                     scorersHtml += `<div style="margin:4px 0;"><strong>⚽ الأهداف:</strong></div>`;
                     if (matchOF.goals1 && matchOF.goals1.length) {
-                        scorersHtml += `<div>${getFlag(team1)} <strong>${team1}</strong>: `;
+                        scorersHtml += `<div>${getFlag(actualTeam1)} <strong>${actualTeam1}</strong>: `;
                         scorersHtml += matchOF.goals1.map(g => {
                             let minute = g.minute ? ` ${g.minute}'` : '';
                             let name = g.name || 'لاعب';
@@ -5543,7 +5593,7 @@
                         scorersHtml += `</div>`;
                     }
                     if (matchOF.goals2 && matchOF.goals2.length) {
-                        scorersHtml += `<div>${getFlag(team2)} <strong>${team2}</strong>: `;
+                        scorersHtml += `<div>${getFlag(actualTeam2)} <strong>${actualTeam2}</strong>: `;
                         scorersHtml += matchOF.goals2.map(g => {
                             let minute = g.minute ? ` ${g.minute}'` : '';
                             let name = g.name || 'لاعب';
@@ -5569,14 +5619,30 @@
             wrongSpan.textContent = '...';
             totalSpan.textContent = '...';
 
+            // Use actualMatchId for fetching predictions
             let predictions = state.predictions;
             if (!predictions || !predictions.length) {
                 await getAllPredictions();
                 predictions = state.predictions;
             }
-            const matchPredictions = predictions
-                .filter(p => p.match_id === matchId)
-                .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            
+            // Filter by match_id - try both the actual matchId and also check if any prediction has a match_id that matches
+            let matchPredictions = predictions.filter(p => p.match_id === actualMatchId);
+            
+            // If no predictions found with exact match, try to find by team names
+            if (matchPredictions.length === 0) {
+                // Try to find predictions where match_id contains the team names
+                matchPredictions = predictions.filter(p => {
+                    const parts = p.match_id ? p.match_id.split('_') : [];
+                    if (parts.length < 3) return false;
+                    const pTeam1 = parts[1];
+                    const pTeam2 = parts[2];
+                    return (pTeam1 === actualTeam1 && pTeam2 === actualTeam2) ||
+                           (pTeam1 === actualTeam2 && pTeam2 === actualTeam1);
+                });
+            }
+            
+            matchPredictions.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
             totalSpan.textContent = matchPredictions.length;
             if (matchPredictions.length === 0) {
@@ -5588,7 +5654,8 @@
                 document.body.style.overflow = 'hidden';
                 return;
             }
-            let result2 = findMatchResult(team1, team2);
+            
+            let result2 = findMatchResult(actualTeam1, actualTeam2);
             let correctResult = null;
             if (result2) {
                 correctResult = determineWinner(result2);
@@ -5611,6 +5678,7 @@
                 document.body.style.overflow = 'hidden';
                 return;
             }
+            
             let correctCount = 0,
                 wrongCount = 0;
             let rows = '';
@@ -6177,6 +6245,18 @@
                 if (winner) {
                     winnerText = `🏆 ${winner}`;
                 }
+                // Generate matchId for this previous game
+                const matchObj = matchesData.find(m => 
+                    (m.team1 === g.homeAr && m.team2 === g.awayAr) || 
+                    (m.team1 === g.awayAr && m.team2 === g.homeAr)
+                );
+                let matchId = '';
+                if (matchObj) {
+                    matchId = `${matchObj.timeISO}_${matchObj.team1}_${matchObj.team2}`;
+                } else {
+                    // Fallback: generate a matchId based on team names
+                    matchId = `prev_${g.homeAr}_${g.awayAr}`;
+                }
                 return `
               <div class="match-card finished-match" onclick="openPreviousMatchPredictions('${g.homeAr}', '${g.awayAr}', ${g.homeScore}, ${g.awayScore})">
                 <div class="match-teams">
@@ -6193,19 +6273,52 @@
                 </div>
                 <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
                   <button class="view-btn" onclick="event.stopPropagation();openPreviousMatchPredictions('${g.homeAr}','${g.awayAr}',${g.homeScore},${g.awayScore})" style="padding:6px 14px;border-radius:40px;font-size:0.6rem;font-weight:600;background:var(--info-bg);border:1px solid rgba(74,158,255,0.10);color:var(--info);cursor:pointer;font-family:inherit;">📋 عرض التوقعات</button>
-                  <button class="share-link-btn" onclick="event.stopPropagation();copyMatchLink('${g.homeAr}_${g.awayAr}','${g.homeAr}','${g.awayAr}')" style="padding:4px 12px;border-radius:40px;font-size:0.55rem;font-weight:600;background:var(--info-bg);border:1px solid rgba(74,158,255,0.10);color:var(--info);cursor:pointer;font-family:inherit;">🔗 مشاركة</button>
+                  <button class="share-link-btn" onclick="event.stopPropagation();copyMatchLink('${matchId}','${g.homeAr}','${g.awayAr}')" style="padding:4px 12px;border-radius:40px;font-size:0.55rem;font-weight:600;background:var(--info-bg);border:1px solid rgba(74,158,255,0.10);color:var(--info);cursor:pointer;font-family:inherit;">🔗 مشاركة</button>
                 </div>
               </div>
             `;
             }).join('');
         }
 
+        // ============================================================
+        //  OPEN PREVIOUS MATCH PREDICTIONS - FIXED
+        // ============================================================
         function openPreviousMatchPredictions(team1, team2, homeScore, awayScore) {
-            const match = matchesData.find(m => (m.team1 === team1 && m.team2 === team2) || (m.team1 === team2 && m.team2 ===
-                team1));
-            if (match) { const matchId = `${match.timeISO}_${match.team1}_${match.team2}`;
-                openMatchPredictions(matchId, team1, team2, homeScore, awayScore); } else { showCopyToast(
-                    '⚠️ لا توجد توقعات لهذه المباراة'); }
+            // Try to find the match in matchesData
+            const match = matchesData.find(m => 
+                (m.team1 === team1 && m.team2 === team2) || 
+                (m.team1 === team2 && m.team2 === team1)
+            );
+            
+            let matchId = '';
+            let actualTeam1 = team1;
+            let actualTeam2 = team2;
+            
+            if (match) {
+                matchId = `${match.timeISO}_${match.team1}_${match.team2}`;
+                actualTeam1 = match.team1;
+                actualTeam2 = match.team2;
+            } else {
+                // If not found in matchesData, create a matchId using the team names
+                // This ensures we can still find predictions
+                matchId = `prev_${team1}_${team2}`;
+                // Also try to find by checking if any prediction has these teams
+                const predictions = state.predictions || [];
+                const foundPrediction = predictions.find(p => {
+                    const parts = p.match_id ? p.match_id.split('_') : [];
+                    if (parts.length < 3) return false;
+                    const pTeam1 = parts[1];
+                    const pTeam2 = parts[2];
+                    return (pTeam1 === team1 && pTeam2 === team2) || 
+                           (pTeam1 === team2 && pTeam2 === team1);
+                });
+                if (foundPrediction) {
+                    matchId = foundPrediction.match_id;
+                }
+            }
+            
+            // Open the match predictions with the found matchId
+            openMatchPredictions(matchId, actualTeam1, actualTeam2, homeScore, awayScore);
         }
 
         // ============================================================
