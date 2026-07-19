@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>🏆 كأس العالم 2026 — التوقع التفاعلي + IPTV</title>
+    <title>🏆 كأس العالم 2026 — التوقع التفاعلي + بث مباشر</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
     </script>
@@ -2781,40 +2781,31 @@
         }
 
         /* ============================================================
-           IPTV STYLES (namespaced)
+           IPTV STYLES (MERGED)
            ============================================================ */
-        .iptv-wrapper {
-            --ios-message-bg: var(--gold-glow);
-            background: transparent;
-            padding: 0;
-            border: none;
-            box-shadow: none;
-            text-align: center;
-        }
-        .iptv-wrapper .container {
+        .iptv-container {
             background: var(--bg-secondary);
-            padding: 30px 25px;
+            padding: 20px 16px;
             border-radius: var(--radius-lg);
-            max-width: 100%;
-            width: 100%;
             border: 1px solid var(--border-gold);
             box-shadow: var(--shadow-card), var(--shadow-glow);
             text-align: center;
             transition: var(--transition);
-        }
-        .iptv-wrapper .header {
-            padding-bottom: 20px;
-            border-bottom: 2px solid var(--gold);
             margin-bottom: 20px;
         }
-        .iptv-wrapper .header .icon {
-            font-size: 50px;
-            display: block;
-            margin-bottom: 5px;
+        .iptv-container .header {
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--gold);
+            margin-bottom: 16px;
         }
-        .iptv-wrapper .header h1 {
+        .iptv-container .header .icon {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .iptv-container .header h1 {
             color: var(--gold);
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 800;
             background: var(--gold-gradient);
             -webkit-background-clip: text;
@@ -2823,100 +2814,97 @@
             text-shadow: 0 0 40px rgba(212, 167, 69, 0.10);
             line-height: 1.4;
         }
-        .iptv-wrapper .header .badge {
+        .iptv-container .header .badge {
             display: inline-block;
             background: var(--danger);
             color: #fff;
             font-size: 10px;
             padding: 3px 16px;
             border-radius: 20px;
-            margin-top: 5px;
+            margin-top: 4px;
             animation: blink 1.2s infinite;
             font-weight: 700;
         }
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-        .iptv-wrapper .header p {
+        .iptv-container .header p {
             color: var(--text-secondary);
             font-size: 13px;
-            margin-top: 6px;
+            margin-top: 4px;
         }
-        .iptv-wrapper .app-download-section {
+        /* App Download Section */
+        .iptv-container .app-download-section {
             background: var(--bg-card);
             backdrop-filter: blur(12px);
             border-radius: var(--radius-md);
-            padding: 16px 18px;
-            margin-bottom: 16px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
             border: 1px solid var(--border-gold);
             box-shadow: var(--shadow-card);
             text-align: center;
         }
-        .iptv-wrapper .app-download-section .app-title {
+        .iptv-container .app-download-section .app-title {
             font-size: 13px;
             font-weight: 700;
             color: var(--gold-light);
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
             line-height: 1.6;
         }
-        .iptv-wrapper .app-download-section .app-title .icon-small {
+        .iptv-container .app-download-section .app-title .icon-small {
             font-size: 18px;
         }
-        .iptv-wrapper .app-cards {
+        .iptv-container .app-cards {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             margin-bottom: 0;
         }
-        .iptv-wrapper .app-card {
+        .iptv-container .app-card {
             background: rgba(255, 255, 255, 0.02);
             border-radius: var(--radius-sm);
-            padding: 12px 16px;
+            padding: 10px 14px;
             border: 1px solid var(--border-subtle);
             transition: var(--transition);
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             text-align: left;
         }
-        .iptv-wrapper .app-card:hover {
+        .iptv-container .app-card:hover {
             border-color: var(--border-gold);
             background: rgba(212, 167, 69, 0.04);
             transform: translateY(-1px);
         }
-        .iptv-wrapper .app-card .app-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
+        .iptv-container .app-card .app-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
             object-fit: cover;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.30);
             border: 1px solid rgba(255, 255, 255, 0.06);
             flex-shrink: 0;
             transition: var(--transition);
         }
-        .iptv-wrapper .app-card .app-icon:hover {
+        .iptv-container .app-card .app-icon:hover {
             transform: scale(1.05);
         }
-        .iptv-wrapper .app-card .app-info {
+        .iptv-container .app-card .app-info {
             flex: 1;
             display: flex;
             flex-direction: column;
             gap: 2px;
             min-width: 0;
         }
-        .iptv-wrapper .app-card .app-info .app-name {
-            font-size: 14px;
+        .iptv-container .app-card .app-info .app-name {
+            font-size: 13px;
             font-weight: 700;
             color: var(--text-primary);
             line-height: 1.3;
         }
-        .iptv-wrapper .app-card .app-info .app-desc {
-            font-size: 11px;
+        .iptv-container .app-card .app-info .app-desc {
+            font-size: 10px;
             color: var(--text-muted);
             line-height: 1.4;
             display: -webkit-box;
@@ -2924,11 +2912,11 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-        .iptv-wrapper .app-card .app-download-btn {
+        .iptv-container .app-card .app-download-btn {
             flex-shrink: 0;
-            padding: 6px 16px;
+            padding: 5px 14px;
             border-radius: 40px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             text-decoration: none;
             transition: var(--transition);
@@ -2942,50 +2930,76 @@
             color: #0a0e1a;
             box-shadow: 0 2px 12px rgba(212, 167, 69, 0.15);
         }
-        .iptv-wrapper .app-card .app-download-btn:hover {
+        .iptv-container .app-card .app-download-btn:hover {
             transform: translateY(-2px) scale(1.03);
             box-shadow: 0 4px 20px rgba(212, 167, 69, 0.25);
         }
-        .iptv-wrapper .app-card .app-download-btn:active {
+        .iptv-container .app-card .app-download-btn:active {
             transform: scale(0.95);
         }
-        .iptv-wrapper .app-card .app-download-btn.ios-btn {
+        .iptv-container .app-card .app-download-btn.ios-btn {
             background: linear-gradient(135deg, #007aff, #0055cc);
             color: #fff;
             box-shadow: 0 2px 12px rgba(0, 122, 255, 0.20);
         }
-        .iptv-wrapper .app-card .app-download-btn.ios-btn:hover {
+        .iptv-container .app-card .app-download-btn.ios-btn:hover {
             box-shadow: 0 4px 20px rgba(0, 122, 255, 0.30);
         }
-        .iptv-wrapper .app-card .app-download-btn.android-btn {
+        .iptv-container .app-card .app-download-btn.android-btn {
             background: linear-gradient(135deg, #34a853, #1a8d3d);
             color: #fff;
             box-shadow: 0 2px 12px rgba(52, 168, 83, 0.20);
         }
-        .iptv-wrapper .app-card .app-download-btn.android-btn:hover {
+        .iptv-container .app-card .app-download-btn.android-btn:hover {
             box-shadow: 0 4px 20px rgba(52, 168, 83, 0.30);
         }
-        .iptv-wrapper .app-card .app-download-btn.mx-btn {
+        .iptv-container .app-card .app-download-btn.mx-btn {
             background: linear-gradient(135deg, #e74c3c, #c0392b);
             color: #fff;
             box-shadow: 0 2px 12px rgba(231, 76, 60, 0.20);
         }
-        .iptv-wrapper .app-card .app-download-btn.mx-btn:hover {
+        .iptv-container .app-card .app-download-btn.mx-btn:hover {
             box-shadow: 0 4px 20px rgba(231, 76, 60, 0.30);
         }
-        .iptv-wrapper .app-card .app-platform-badge {
+
+        .iptv-container .show-issue-btn {
             display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            margin-top: 6px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-gold);
+            border-radius: 40px;
+            background: rgba(212, 167, 69, 0.06);
+            color: var(--gold-light);
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
         }
-        .iptv-wrapper .ios-message-section {
+        .iptv-container .show-issue-btn:hover {
+            background: var(--gold-glow);
+            transform: translateY(-2px);
+        }
+        .iptv-container .show-issue-btn .btn-emoji {
+            font-size: 14px;
+        }
+        .iptv-container .show-issue-btn.visible {
+            display: inline-flex;
+        }
+
+        .iptv-container .ios-message-section {
             display: none;
             background: var(--ios-message-bg);
             border: 1px solid var(--border-gold);
             border-radius: var(--radius-md);
-            padding: 16px 18px;
-            margin-bottom: 16px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
             text-align: right;
         }
-        .iptv-wrapper .ios-message-section.visible {
+        .iptv-container .ios-message-section.visible {
             display: block;
             animation: fadeIn 0.4s ease;
         }
@@ -2993,54 +3007,54 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .iptv-wrapper .ios-message-section .msg-title {
-            font-size: 14px;
+        .iptv-container .ios-message-section .msg-title {
+            font-size: 13px;
             font-weight: 700;
             color: var(--gold-light);
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             justify-content: center;
         }
-        .iptv-wrapper .ios-message-section .msg-title .icon-msg {
-            font-size: 20px;
+        .iptv-container .ios-message-section .msg-title .icon-msg {
+            font-size: 18px;
         }
-        .iptv-wrapper .ios-message-section .msg-content {
-            font-size: 13px;
+        .iptv-container .ios-message-section .msg-content {
+            font-size: 12px;
             color: var(--text-secondary);
-            line-height: 1.9;
+            line-height: 1.8;
             text-align: right;
         }
-        .iptv-wrapper .ios-message-section .msg-content .highlight {
+        .iptv-container .ios-message-section .msg-content .highlight {
             color: var(--gold-light);
             font-weight: 700;
         }
-        .iptv-wrapper .ios-message-section .msg-content .step {
+        .iptv-container .ios-message-section .msg-content .step {
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 12px;
-            padding: 6px 0;
+            gap: 10px;
+            padding: 4px 0;
             direction: rtl;
         }
-        .iptv-wrapper .ios-message-section .msg-content .step .num {
+        .iptv-container .ios-message-section .msg-content .step .num {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             background: var(--gold-gradient);
             color: #0a0e1a;
-            min-width: 24px;
-            width: 24px;
-            height: 24px;
+            min-width: 22px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             font-weight: 800;
-            font-size: 12px;
-            line-height: 24px;
+            font-size: 11px;
+            line-height: 22px;
             flex-shrink: 0;
             order: 1;
         }
-        .iptv-wrapper .ios-message-section .msg-content .step .step-text {
+        .iptv-container .ios-message-section .msg-content .step .step-text {
             display: flex;
             align-items: center;
             gap: 6px;
@@ -3049,37 +3063,37 @@
             flex: 1;
             justify-content: flex-end;
         }
-        .iptv-wrapper .ios-message-section .msg-content .step .step-text .highlight-btn {
+        .iptv-container .ios-message-section .msg-content .step .step-text .highlight-btn {
             display: inline-block;
             background: var(--gold-glow);
             border: 1px solid var(--border-gold);
-            padding: 2px 14px;
+            padding: 1px 12px;
             border-radius: 20px;
             color: var(--gold-light);
             font-weight: 700;
-            font-size: 12px;
+            font-size: 11px;
         }
-        .iptv-wrapper .ios-screenshot-wrapper {
-            margin: 12px 0 8px;
+        .iptv-container .ios-screenshot-wrapper {
+            margin: 10px 0 6px;
             text-align: center;
             background: rgba(0, 0, 0, 0.20);
             border-radius: var(--radius-sm);
-            padding: 10px;
+            padding: 8px;
             border: 1px solid var(--border-subtle);
         }
-        .iptv-wrapper .ios-screenshot-wrapper .screenshot-label {
-            font-size: 11px;
+        .iptv-container .ios-screenshot-wrapper .screenshot-label {
+            font-size: 10px;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
         }
-        .iptv-wrapper .ios-screenshot-wrapper .screenshot-label .arrow-icon {
-            font-size: 16px;
+        .iptv-container .ios-screenshot-wrapper .screenshot-label .arrow-icon {
+            font-size: 14px;
         }
-        .iptv-wrapper .ios-screenshot-wrapper img {
+        .iptv-container .ios-screenshot-wrapper img {
             max-width: 100%;
             height: auto;
             border-radius: var(--radius-sm);
@@ -3087,145 +3101,119 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.30);
             display: block;
         }
-        .iptv-wrapper .ios-screenshot-wrapper .img-credit {
-            font-size: 9px;
+        .iptv-container .ios-screenshot-wrapper .img-credit {
+            font-size: 8px;
             color: var(--text-muted);
-            margin-top: 4px;
+            margin-top: 3px;
         }
-        .iptv-wrapper .ios-screenshot-wrapper .img-credit a {
+        .iptv-container .ios-screenshot-wrapper .img-credit a {
             color: var(--text-muted);
             text-decoration: none;
         }
-        .iptv-wrapper .ios-screenshot-wrapper .img-credit a:hover {
+        .iptv-container .ios-screenshot-wrapper .img-credit a:hover {
             color: var(--gold-light);
         }
-        .iptv-wrapper .ios-message-section .msg-content .screenshot-note {
-            margin-top: 10px;
-            padding: 10px 14px;
+        .iptv-container .ios-message-section .msg-content .screenshot-note {
+            margin-top: 8px;
+            padding: 8px 12px;
             background: rgba(255, 255, 255, 0.03);
             border-radius: var(--radius-sm);
             border: 1px dashed var(--border-gold);
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
             text-align: center;
         }
-        .iptv-wrapper .ios-message-section .msg-content .screenshot-note .highlight-play {
+        .iptv-container .ios-message-section .msg-content .screenshot-note .highlight-play {
             color: var(--gold-light);
             font-weight: 700;
-            font-size: 13px;
+            font-size: 12px;
         }
-        .iptv-wrapper .ios-message-section .msg-content .screenshot-note .highlight-always {
+        .iptv-container .ios-message-section .msg-content .screenshot-note .highlight-always {
             color: var(--info);
             font-weight: 700;
-            font-size: 13px;
+            font-size: 12px;
         }
-        .iptv-wrapper .ios-message-section .msg-content .final-note {
-            margin-top: 10px;
-            padding: 8px 14px;
+        .iptv-container .ios-message-section .msg-content .final-note {
+            margin-top: 8px;
+            padding: 6px 12px;
             background: var(--gold-glow);
             border-radius: var(--radius-sm);
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-primary);
             border: 1px solid var(--border-gold);
         }
-        .iptv-wrapper .ios-message-section .msg-content .final-note strong {
+        .iptv-container .ios-message-section .msg-content .final-note strong {
             color: var(--gold-light);
         }
-        .iptv-wrapper .show-issue-btn {
-            display: none;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 20px;
-            margin-top: 8px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border-gold);
-            border-radius: 40px;
-            background: rgba(212, 167, 69, 0.06);
-            color: var(--gold-light);
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: inherit;
-        }
-        .iptv-wrapper .show-issue-btn:hover {
-            background: var(--gold-glow);
-            transform: translateY(-2px);
-        }
-        .iptv-wrapper .show-issue-btn .btn-emoji {
-            font-size: 16px;
-        }
-        .iptv-wrapper .show-issue-btn.visible {
-            display: inline-flex;
-        }
-        .iptv-wrapper .channel-list {
+
+        .iptv-container .channel-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-top: 5px;
+            gap: 10px;
+            margin-top: 4px;
         }
-        .iptv-wrapper .channel-item {
+        .iptv-container .channel-item {
             background: var(--bg-card);
             backdrop-filter: blur(12px);
             border-radius: var(--radius-md);
-            padding: 16px 20px;
+            padding: 14px 18px;
             border: 1px solid var(--border-subtle);
             transition: var(--transition);
             box-shadow: var(--shadow-card);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            min-height: 76px;
+            min-height: 68px;
             cursor: pointer;
             position: relative;
         }
-        .iptv-wrapper .channel-item:active {
+        .iptv-container .channel-item:active {
             transform: scale(0.98);
             border-color: var(--gold);
         }
-        .iptv-wrapper .channel-item:hover {
+        .iptv-container .channel-item:hover {
             border-color: var(--border-gold);
             transform: translateY(-2px);
             box-shadow: var(--shadow-card), 0 8px 30px rgba(212, 167, 69, 0.04);
         }
-        .iptv-wrapper .channel-left {
+        .iptv-container .channel-left {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
             flex: 1;
         }
-        .iptv-wrapper .channel-left .channel-icon {
-            width: 76px;
-            height: 76px;
-            border-radius: 12px;
+        .iptv-container .channel-left .channel-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 10px;
             object-fit: cover;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.40);
             border: 1px solid rgba(255, 255, 255, 0.06);
             transition: var(--transition);
             flex-shrink: 0;
         }
-        .iptv-wrapper .channel-left .channel-icon:hover {
+        .iptv-container .channel-left .channel-icon:hover {
             transform: scale(1.03);
             box-shadow: 0 6px 24px rgba(212, 167, 69, 0.15);
         }
-        .iptv-wrapper .channel-left .channel-name-text {
-            font-size: 16px;
+        .iptv-container .channel-left .channel-name-text {
+            font-size: 14px;
             font-weight: 700;
             color: var(--text-primary);
             letter-spacing: 0.3px;
         }
-        .iptv-wrapper .channel-right {
+        .iptv-container .channel-right {
             display: flex;
             align-items: center;
             flex-shrink: 0;
         }
-        .iptv-wrapper .channel-right .flag {
-            font-size: 22px;
+        .iptv-container .channel-right .flag {
+            font-size: 20px;
             opacity: 0.8;
         }
-        .iptv-wrapper .channel-right .multi-link-badge {
-            font-size: 12px;
+        .iptv-container .channel-right .multi-link-badge {
+            font-size: 11px;
             background: rgba(212, 167, 69, 0.15);
             color: var(--gold-light);
             padding: 2px 10px;
@@ -3234,7 +3222,40 @@
             font-weight: 600;
             border: 1px solid var(--border-gold);
         }
-        .iptv-wrapper .links-overlay {
+        .iptv-container .divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 12px 0 6px;
+        }
+        .iptv-container .divider::before,
+        .iptv-container .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-subtle);
+        }
+        .iptv-container .divider span {
+            color: var(--text-muted);
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .iptv-container .footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 9px;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-subtle);
+            cursor: default;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        /* Links Overlay (popup) */
+        .links-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -3252,11 +3273,11 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        .iptv-wrapper .links-modal {
+        .links-modal {
             background: var(--bg-secondary);
             border: 1px solid var(--border-gold);
             border-radius: var(--radius-lg);
-            padding: 24px 20px;
+            padding: 20px 18px;
             max-width: 420px;
             width: 95%;
             max-height: 80vh;
@@ -3264,78 +3285,78 @@
             box-shadow: 0 40px 80px rgba(0, 0, 0, 0.60);
             text-align: center;
         }
-        .iptv-wrapper .links-modal .modal-header {
+        .links-modal .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
             border-bottom: 1px solid var(--border-subtle);
         }
-        .iptv-wrapper .links-modal .modal-header .modal-title {
-            font-size: 16px;
+        .links-modal .modal-header .modal-title {
+            font-size: 15px;
             font-weight: 800;
             color: var(--gold-light);
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .iptv-wrapper .links-modal .modal-header .modal-close {
+        .links-modal .modal-header .modal-close {
             background: rgba(255, 255, 255, 0.04);
             border: none;
             color: var(--text-muted);
-            font-size: 22px;
+            font-size: 20px;
             cursor: pointer;
             padding: 0 8px;
             border-radius: 8px;
             transition: var(--transition);
             font-family: inherit;
         }
-        .iptv-wrapper .links-modal .modal-header .modal-close:hover {
+        .links-modal .modal-header .modal-close:hover {
             color: var(--text-primary);
             background: rgba(255, 255, 255, 0.08);
         }
-        .iptv-wrapper .link-item {
+        .link-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 16px;
-            margin-bottom: 8px;
+            padding: 10px 14px;
+            margin-bottom: 6px;
             background: var(--bg-card);
             border-radius: var(--radius-sm);
             border: 1px solid var(--border-subtle);
             transition: var(--transition);
             cursor: pointer;
         }
-        .iptv-wrapper .link-item:hover {
+        .link-item:hover {
             border-color: var(--border-gold);
             background: rgba(212, 167, 69, 0.04);
         }
-        .iptv-wrapper .link-item .link-number {
-            font-size: 12px;
+        .link-item .link-number {
+            font-size: 11px;
             font-weight: 700;
             color: var(--text-muted);
             background: rgba(255, 255, 255, 0.03);
-            padding: 2px 12px;
+            padding: 2px 10px;
             border-radius: 20px;
-            min-width: 30px;
+            min-width: 28px;
         }
-        .iptv-wrapper .link-item .link-url {
-            font-size: 11px;
+        .link-item .link-url {
+            font-size: 10px;
             color: var(--text-secondary);
             font-family: monospace;
             flex: 1;
-            margin: 0 12px;
+            margin: 0 10px;
             text-align: left;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             direction: ltr;
         }
-        .iptv-wrapper .link-item .link-play-btn {
-            padding: 4px 16px;
+        .link-item .link-play-btn {
+            padding: 4px 14px;
             border-radius: 40px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             border: none;
             background: var(--gold-gradient);
@@ -3345,59 +3366,26 @@
             font-family: inherit;
             flex-shrink: 0;
         }
-        .iptv-wrapper .link-item .link-play-btn:hover {
+        .link-item .link-play-btn:hover {
             transform: scale(1.05);
         }
-        .iptv-wrapper .links-modal .no-links {
+        .links-modal .no-links {
             color: var(--text-muted);
-            font-size: 14px;
-            padding: 20px 0;
+            font-size: 13px;
+            padding: 16px 0;
         }
-        .iptv-wrapper .divider {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 16px 0 8px;
-        }
-        .iptv-wrapper .divider::before,
-        .iptv-wrapper .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border-subtle);
-        }
-        .iptv-wrapper .divider span {
-            color: var(--text-muted);
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .iptv-wrapper .footer {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 10px;
-            margin-top: 16px;
-            padding-top: 12px;
-            border-top: 1px solid var(--border-subtle);
-            cursor: default;
-            transition: var(--transition);
-            user-select: none;
-        }
-        .iptv-wrapper .footer:hover {
-            color: var(--text-muted);
-        }
-        .iptv-wrapper .toast {
+
+        .iptv-container .toast {
             position: fixed;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
             background: var(--gold-gradient);
             color: #0a0e1a;
-            padding: 12px 24px;
+            padding: 10px 22px;
             border-radius: 60px;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13px;
             opacity: 0;
             transition: opacity 0.4s;
             pointer-events: none;
@@ -3406,72 +3394,65 @@
             max-width: 90%;
             text-align: center;
         }
-        .iptv-wrapper .toast.show {
+        .iptv-container .toast.show {
             opacity: 1;
         }
 
         @media (max-width: 400px) {
-            .iptv-wrapper .channel-item {
-                padding: 12px 14px;
-                min-height: 62px;
+            .iptv-container .channel-item {
+                padding: 10px 12px;
+                min-height: 56px;
             }
-            .iptv-wrapper .channel-left .channel-icon {
-                width: 56px;
-                height: 56px;
-                border-radius: 10px;
+            .iptv-container .channel-left .channel-icon {
+                width: 44px;
+                height: 44px;
+                border-radius: 8px;
             }
-            .iptv-wrapper .channel-left .channel-name-text {
-                font-size: 13px;
-            }
-            .iptv-wrapper .channel-left {
-                gap: 12px;
-            }
-            .iptv-wrapper .channel-right .flag {
-                font-size: 18px;
-            }
-            .iptv-wrapper .channel-right .multi-link-badge {
-                font-size: 9px;
-                padding: 1px 8px;
-            }
-            .iptv-wrapper .container {
-                padding: 20px 16px;
-            }
-            .iptv-wrapper .header h1 {
-                font-size: 17px;
-            }
-            .iptv-wrapper .app-card {
-                flex-wrap: wrap;
-                gap: 10px;
-                padding: 12px;
-            }
-            .iptv-wrapper .app-card .app-download-btn {
-                width: 100%;
-                justify-content: center;
-                padding: 8px;
-            }
-            .iptv-wrapper .app-card .app-info .app-desc {
-                font-size: 10px;
-            }
-            .iptv-wrapper .ios-message-section .msg-content .step {
+            .iptv-container .channel-left .channel-name-text {
                 font-size: 12px;
             }
-            .iptv-wrapper .ios-screenshot-wrapper {
-                padding: 6px;
+            .iptv-container .channel-left {
+                gap: 10px;
             }
-            .iptv-wrapper .link-item {
+            .iptv-container .channel-right .flag {
+                font-size: 16px;
+            }
+            .iptv-container .channel-right .multi-link-badge {
+                font-size: 8px;
+                padding: 1px 6px;
+            }
+            .iptv-container .app-card .app-icon {
+                width: 36px;
+                height: 36px;
+            }
+            .iptv-container .app-card .app-info .app-name {
+                font-size: 11px;
+            }
+            .iptv-container .app-card .app-download-btn {
+                font-size: 9px;
+                padding: 4px 10px;
+            }
+            .iptv-container .header h1 {
+                font-size: 15px;
+            }
+            .links-modal {
+                padding: 16px 12px;
+            }
+            .link-item {
                 flex-wrap: wrap;
-                gap: 8px;
+                gap: 6px;
             }
-            .iptv-wrapper .link-item .link-url {
+            .link-item .link-url {
                 width: 100%;
                 text-align: center;
-                margin: 4px 0;
+                margin: 2px 0;
             }
-            .iptv-wrapper .link-item .link-play-btn {
+            .link-item .link-play-btn {
                 width: 100%;
-                padding: 8px;
+                padding: 6px;
             }
         }
+        /* ===== END IPTV STYLES ===== */
     </style>
 </head>
 <body>
@@ -3491,7 +3472,7 @@
         <!-- ===== STICKY HEADER ===== -->
         <header class="sticky-header">
             <div class="brand">
-                <div><h1>🏆 المتابعة التفاعلية</h1><span class="sub">⚡ تابع المباريات وتوقع النتائج</span></div>
+                <div><h1>🏆 المتابعة التفاعلية</h1><span class="sub">⚡ تابع المباريات وتوقع النتائج + بث مباشر</span></div>
             </div>
             <div class="header-actions">
                 <button class="header-btn" id="themeToggleBtn" onclick="toggleTheme()">🌙 الوضع المظلم</button>
@@ -3571,7 +3552,7 @@
                 </div>
                 <div id="bracketContainer"><div class="empty-state"><span class="icon">⏳</span> جاري تحميل المخطط...</div></div>
             </div>
-            <!-- ===== NEW: PLAYER PREDICTION ADMIN SECTION ===== -->
+            <!-- ===== NEW: PLAYER PREDICTION ADMIN SECTION (FIXED) ===== -->
             <div class="player-prediction-admin-section" id="playerPredictionAdminSection">
                 <div class="player-pred-title">👑 إدارة توقعات اللاعبين <span class="count-badge" id="playerPredAdminCount">0</span></div>
                 <div class="player-pred-form" id="playerPredForm">
@@ -3668,102 +3649,8 @@
 
         <!-- ===== IPTV TAB (NEW) ===== -->
         <div id="iptvTab" class="tab-content">
-            <div class="iptv-wrapper">
-                <div class="container">
-                    <div class="header">
-                        <span class="icon">📡</span>
-                        <h1>مجلس معلمي سعيد بن العاص للبث المباشر</h1>
-                        <span class="badge">● LIVE</span>
-                        <p id="subText">اختر القناة للبدء</p>
-                    </div>
-
-                    <!-- ===== تحميل التطبيقات ===== -->
-                    <div class="app-download-section" id="appDownloadSection">
-                        <div class="app-title" id="appTitle">
-                            <span class="icon-small">📲</span>
-                            <!-- سيتم تعبئتها بواسطة JavaScript حسب الجهاز -->
-                        </div>
-                        <div class="app-cards" id="appCardsContainer">
-                            <!-- سيتم تعبئتها بواسطة JavaScript حسب الجهاز -->
-                        </div>
-                    </div>
-
-                    <!-- ===== زر عرض المشكلة + رسالة iPhone ===== -->
-                    <div id="iosMessageWrapper">
-                        <button class="show-issue-btn" id="showIssueBtn" onclick="toggleIosMessage()">
-                            <span class="btn-emoji">📱</span>
-                            خطوات عمل المشغل للآيفون
-                            <span id="toggleIcon">▼</span>
-                        </button>
-
-                        <div class="ios-message-section" id="iosMessageSection">
-                            <div class="msg-title">
-                                <span class="icon-msg">📱</span>
-                                خطوات عمل المشغل للآيفون
-                            </div>
-                            <div class="msg-content">
-                                <div class="step">
-                                    <span class="num">١</span>
-                                    <span class="step-text">
-                                        بعد الضغط على القناة، ستظهر لك رسالة مثل الصورة أدناه.
-                                    </span>
-                                </div>
-                                <div class="step">
-                                    <span class="num">٢</span>
-                                    <span class="step-text">
-                                        اضغط على <span class="highlight">"Play"</span> لتشغيل البث مباشرة.
-                                    </span>
-                                </div>
-                                <div class="step">
-                                    <span class="num">٣</span>
-                                    <span class="step-text">
-                                        أو اضغط على <span class="highlight">"Always Play URLs"</span> لتشغيل البث تلقائياً في المستقبل.
-                                    </span>
-                                </div>
-
-                                <div class="ios-screenshot-wrapper">
-                                    <div class="screenshot-label">
-                                        <span class="arrow-icon">👇</span>
-                                        <span>الرسالة التي ستظهر لك</span>
-                                    </div>
-                                    <a href="https://ibb.co/Pz3sY6yD" target="_blank">
-                                        <img src="https://i.ibb.co/YTY4WLS0/IMG-4278.png" alt="شرح تشغيل البث على iPhone" border="0" loading="lazy" />
-                                    </a>
-                                    <div class="img-credit">
-                                        <a href="https://imgbb.com/" target="_blank">📸 اضغط لتكبير الصورة</a>
-                                    </div>
-                                </div>
-
-                                <div class="screenshot-note">
-                                    📌 ستظهر لك هذه الرسالة:
-                                    <div style="background:rgba(0,0,0,0.20);padding:8px 12px;border-radius:8px;margin-top:6px;font-family:monospace;font-size:11px;color:var(--text-secondary);direction:ltr;text-align:center;">
-                                        "Would you like to download or play this URL?"
-                                    </div>
-                                    <div style="margin-top:6px;">
-                                        👆 اضغط على <span class="highlight-play">"Play"</span> أو <span class="highlight-always">"Always Play URLs"</span>
-                                    </div>
-                                </div>
-
-                                <div class="final-note">
-                                    ✅ <strong>نصيحة:</strong> اضغط على <strong>"Always Play URLs"</strong> لتشغيل جميع البثوث تلقائياً في المستقبل دون الحاجة للضغط على Play في كل مرة.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="channel-list" id="channelList">
-                        <!-- سيتم إنشاء القنوات بواسطة JavaScript -->
-                    </div>
-
-                    <div class="divider"><span>📌 ملاحظة</span></div>
-
-                    <p style="color:var(--text-secondary);font-size:12px;margin:5px 0;">
-                        🔹 اختر القناة المناسبة للبث المباشر<br>
-                        🔹 تأكد من تثبيت المشغل أولاً
-                    </p>
-
-                    <div class="footer">⚡ IPTV</div>
-                </div>
+            <div class="iptv-container" id="iptvContainer">
+                <!-- سيتم تعبئتها بواسطة JavaScript -->
             </div>
         </div>
 
@@ -4341,8 +4228,8 @@
             // Populate admin player form
             populatePlayerSelect();
             populateMatchSelect();
-            // Initialize IPTV
-            initializeIPTV();
+            // Init IPTV tab
+            renderIPTV();
             console.log("✅ INIT DONE (محسن)");
         }
 
@@ -8042,11 +7929,8 @@
                     if (id === 'standings' && state.previousGamesData.length) calculateStandings();
                     if (id === 'scorers') renderScorers();
                     if (id === 'stats') renderTeamStats();
-                    // IPTV tab doesn't need refresh, but we can ensure it's initialized
-                    if (id === 'iptv' && !window.iptvInitialized) {
-                        initializeIPTV();
-                        window.iptvInitialized = true;
-                    }
+                    // If IPTV tab, ensure it's rendered
+                    if (id === 'iptv') renderIPTV();
                 });
             });
             const activeTab = document.querySelector('.tab-btn.active');
@@ -8610,446 +8494,535 @@
         }
 
         // ============================================================
-        //  IPTV FUNCTIONS (fully integrated, renamed showToast to showIPTVToast)
+        //  IPTV FUNCTIONS (MERGED)
         // ============================================================
-        function initializeIPTV() {
-            // Only initialize once
-            if (window.iptvInitialized) return;
-            
-            console.log("📺 Initializing IPTV...");
-            
-            const APP_ICONS = {
-                vlc: "https://i.ibb.co/xKbLhXTx/FB62-A254-E0-D0-4900-B7-E0-62501661-F5-C8.png",
-                mx: "https://i.ibb.co/tpWSsYvQ/928-DE876-714-A-489-F-B008-4-CB6-A1-ED524-A.png"
-            };
 
-            const CHANNEL_ICONS = {
-                "Bein Max 1 HD": "https://i.ibb.co/JhQzHhf/496e5898-6e49-47a9-af51-1ef444b13ac0.png",
-                "Bein Max 2 HD": "https://i.ibb.co/Zpjcw1jX/2d939d57-59ae-48a7-9d9e-338991d2521c.png",
-                "Bein Max 3 HD": "https://i.ibb.co/XkXvqgKX/fc61192e-8345-4ad4-8b6a-541ba5c592b6.png",
-                "Bein Max 4 HD": "https://i.ibb.co/dJQWtfMd/63c97a85-0ee5-496e-81d2-df2997d53f14.png",
-                "ALWAN 1 4K": "https://i.ibb.co/zVRdJWMy/f5a2fa06-36d9-450a-a037-641c809e8147.png",
-                "ALWAN 2 4K": "https://i.ibb.co/zVRdJWMy/f5a2fa06-36d9-450a-a037-641c809e8147.png",
-                "Bein TOD HDR": "https://i.ibb.co/3yYwCbxS/34a7f8a7-9183-4d97-ae30-cf05b5f72513.png"
-            };
+        // أيقونات التطبيقات
+        const APP_ICONS = {
+            vlc: "https://i.ibb.co/xKbLhXTx/FB62-A254-E0-D0-4900-B7-E0-62501661-F5-C8.png",
+            mx: "https://i.ibb.co/tpWSsYvQ/928-DE876-714-A-489-F-B008-4-CB6-A1-ED524-A.png"
+        };
 
-            const channels = [
-                {
-                    name: "Bein Max 1 HD",
-                    flag: "⚽",
-                    urls: [
-                        "http://akar13.xyz:8080/live/15034094901029/18800196589372/460862.ts",
-                        "http://195.182.16.45:8080/live/omar777/01103978590/460861.ts",
-                        "http://195.182.16.45:8080/live/omar777/01103978590/460862.ts",
-                        "http://195.182.16.44:8080/live/357643467990765/Ofgo3yz8CH/460861.ts"
-                    ]
-                },
-                {
-                    name: "Bein Max 2 HD",
-                    flag: "⚽",
-                    urls: [
-                        "http://akar13.xyz:8080/live/15034094901029/18800196589372/460865.ts",
-                        "http://195.182.16.45:8080/live/omar777/01103978590/460864.ts",
-                        "http://195.182.16.45:8080/live/115581720170/135965685413/460865.ts",
-                        "http://195.182.16.44:8080/live/357643467990765/Ofgo3yz8CH/460864.ts"
-                    ]
-                },
-                {
-                    name: "Bein Max 3 HD",
-                    flag: "⚽",
-                    urls: [
-                        "http://akar13.xyz:8080/live/15034094901029/18800196589372/460868.ts",
-                        "http://195.182.16.45:8080/live/omar777/01103978590/460867.ts",
-                        "http://195.182.16.45:8080/live/115581720170/135965685413/460868.ts",
-                        "http://195.182.16.44:8080/live/357643467990765/Ofgo3yz8CH/460867.ts"
-                    ]
-                },
-                {
-                    name: "Bein Max 4 HD",
-                    flag: "⚽",
-                    urls: [
-                        "http://akar13.xyz:8080/live/15034094901029/18800196589372/460871.ts",
-                        "http://195.182.16.45:8080/live/omar777/01103978590/460870.ts",
-                        "http://195.182.16.45:8080/live/115581720170/135965685413/460871.ts",
-                        "http://195.182.16.44:8080/live/357643467990765/Ofgo3yz8CH/460870.ts"
-                    ]
-                },
-                {
-                    name: "ALWAN 1 4K",
-                    flag: "📺",
-                    urls: [
-                        "http://akar13.xyz:8080/live/15034094901029/18800196589372/418111.ts"
-                    ]
-                },
-                {
-                    name: "ALWAN 2 4K",
-                    flag: "📺",
-                    urls: [
-                        "http://akar13.xyz:8080/live/15034094901029/18800196589372/418114.ts"
-                    ]
-                },
-                {
-                    name: "Bein TOD HDR",
-                    flag: "🎬",
-                    urls: [
-                        "https://mavpro.xyz:8080/live/8454745cdsdw/8455144xsfdd/405509.M3U8"
-                    ]
-                }
-            ];
+        // أيقونات القنوات
+        const CHANNEL_ICONS = {
+            "Bein Max 1 HD": "https://i.ibb.co/JhQzHhf/496e5898-6e49-47a9-af51-1ef444b13ac0.png",
+            "Bein Max 2 HD": "https://i.ibb.co/Zpjcw1jX/2d939d57-59ae-48a7-9d9e-338991d2521c.png",
+            "Bein Max 3 HD": "https://i.ibb.co/XkXvqgKX/fc61192e-8345-4ad4-8b6a-541ba5c592b6.png",
+            "Bein Max 4 HD": "https://i.ibb.co/dJQWtfMd/63c97a85-0ee5-496e-81d2-df2997d53f14.png",
+            "ALWAN 1 4K": "https://i.ibb.co/zVRdJWMy/f5a2fa06-36d9-450a-a037-641c809e8147.png",
+            "ALWAN 2 4K": "https://i.ibb.co/zVRdJWMy/f5a2fa06-36d9-450a-a037-641c809e8147.png",
+            "Bein TOD HDR": "https://i.ibb.co/3yYwCbxS/34a7f8a7-9183-4d97-ae30-cf05b5f72513.png"
+        };
 
-            const APP_LINKS = {
-                vlc: {
-                    android: "https://play.google.com/store/apps/details?id=org.videolan.vlc",
-                    ios: "https://apps.apple.com/sa/app/vlc-media-player/id650377962"
-                },
-                mx: {
-                    android: "https://play.google.com/store/apps/details?id=com.mxtech.videoplayer.ad"
-                }
-            };
+        // قائمة القنوات مع جميع الروابط مجمعة (السابقة + الجديدة)
+        const channels = [
+            {
+                name: "Bein Max 1 HD",
+                flag: "⚽",
+                urls: [
+                    "http://akar13.xyz:8080/live/15034094901029/18800196589372/460862.ts",
+                    "http://195.182.16.45:8080/live/omar777/01103978590/460861.ts",
+                    "http://195.182.16.45:8080/live/omar777/01103978590/460862.ts",
+                    "http://195.182.16.44:8080/live/357643467990765/Ofgo3yz8CH/460861.ts"
+                ]
+            },
+            {
+                name: "Bein Max 2 HD",
+                flag: "⚽",
+                urls: [
+                    "http://akar13.xyz:8080/live/15034094901029/18800196589372/460865.ts",
+                    "http://195.182.16.45:8080/live/omar777/01103978590/460864.ts",
+                    "http://195.182.16.45:8080/live/115581720170/135965685413/460865.ts",
+                    "http://195.182.16.44:8080/live/357643467990765/Ofgo3yz8CH/460864.ts"
+                ]
+            },
+            {
+                name: "Bein Max 3 HD",
+                flag: "⚽",
+                urls: [
+                    "http://akar13.xyz:8080/live/15034094901029/18800196589372/460868.ts",
+                    "http://195.182.16.45:8080/live/omar777/01103978590/460867.ts",
+                    "http://195.182.16.45:8080/live/115581720170/135965685413/460868.ts",
+                    "http://195.182.16.44:8080/live/357643467990765/Ofgo3yz8CH/460867.ts"
+                ]
+            },
+            {
+                name: "Bein Max 4 HD",
+                flag: "⚽",
+                urls: [
+                    "http://akar13.xyz:8080/live/15034094901029/18800196589372/460871.ts",
+                    "http://195.182.16.45:8080/live/omar777/01103978590/460870.ts",
+                    "http://195.182.16.45:8080/live/115581720170/135965685413/460871.ts",
+                    "http://195.182.16.44:8080/live/357643467990765/Ofgo3yz8CH/460870.ts"
+                ]
+            },
+            {
+                name: "ALWAN 1 4K",
+                flag: "📺",
+                urls: [
+                    "http://akar13.xyz:8080/live/15034094901029/18800196589372/418111.ts"
+                ]
+            },
+            {
+                name: "ALWAN 2 4K",
+                flag: "📺",
+                urls: [
+                    "http://akar13.xyz:8080/live/15034094901029/18800196589372/418114.ts"
+                ]
+            },
+            {
+                name: "Bein TOD HDR",
+                flag: "🎬",
+                urls: [
+                    "https://mavpro.xyz:8080/live/8454745cdsdw/8455144xsfdd/405509.M3U8"
+                ]
+            }
+        ];
 
-            function getDeviceType() {
-                const ua = navigator.userAgent.toLowerCase();
-                if (/iphone|ipad|ipod/.test(ua)) return 'ios';
-                if (/android/.test(ua)) return 'android';
-                return 'other';
+        // روابط التطبيقات
+        const APP_LINKS = {
+            vlc: {
+                android: "https://play.google.com/store/apps/details?id=org.videolan.vlc",
+                ios: "https://apps.apple.com/sa/app/vlc-media-player/id650377962"
+            },
+            mx: {
+                android: "https://play.google.com/store/apps/details?id=com.mxtech.videoplayer.ad"
+            }
+        };
+
+        // كشف نوع الجهاز
+        function getDeviceType() {
+            const ua = navigator.userAgent.toLowerCase();
+            if (/iphone|ipad|ipod/.test(ua)) return 'ios';
+            if (/android/.test(ua)) return 'android';
+            return 'other';
+        }
+
+        const device = getDeviceType();
+
+        // عرض بطاقات التطبيقات حسب الجهاز
+        function renderAppCards() {
+            const container = document.getElementById('appCardsContainer');
+            const appTitle = document.getElementById('appTitle');
+
+            if (device === 'ios') {
+                appTitle.innerHTML = `
+                    <span class="icon-small">📲</span>
+                    قبل الضغط على القنوات يرجى تحميل "المشغل" التالي
+                `;
+
+                container.innerHTML = `
+                    <div class="app-card">
+                        <img src="${APP_ICONS.vlc}" alt="VLC" class="app-icon" />
+                        <div class="app-info">
+                            <span class="app-name">VLC Media Player</span>
+                            <span class="app-desc">مشغل فيديو متعدد الإمكانيات</span>
+                        </div>
+                        <a href="${APP_LINKS.vlc.ios}" target="_blank" class="app-download-btn ios-btn">
+                            ⬇️ تنزيل
+                        </a>
+                    </div>
+                `;
+
+                document.getElementById('iosMessageSection').classList.remove('visible');
+                document.getElementById('showIssueBtn').classList.add('visible');
+
+            } else if (device === 'android') {
+                appTitle.innerHTML = `
+                    <span class="icon-small">📲</span>
+                    قبل الضغط على القنوات يرجى تحميل أحد "المشغلين التاليين" أو "كلاهما"
+                `;
+
+                container.innerHTML = `
+                    <div class="app-card">
+                        <img src="${APP_ICONS.vlc}" alt="VLC" class="app-icon" />
+                        <div class="app-info">
+                            <span class="app-name">VLC Media Player</span>
+                            <span class="app-desc">مشغل فيديو متعدد الإمكانيات</span>
+                        </div>
+                        <a href="${APP_LINKS.vlc.android}" target="_blank" class="app-download-btn android-btn">
+                            ⬇️ تنزيل
+                        </a>
+                    </div>
+                    <div class="app-card">
+                        <img src="${APP_ICONS.mx}" alt="MX Player" class="app-icon" />
+                        <div class="app-info">
+                            <span class="app-name">MX Player</span>
+                            <span class="app-desc">مشغل فيديو احترافي</span>
+                        </div>
+                        <a href="${APP_LINKS.mx.android}" target="_blank" class="app-download-btn mx-btn">
+                            ⬇️ تنزيل
+                        </a>
+                    </div>
+                `;
+
+                document.getElementById('showIssueBtn').classList.remove('visible');
+                document.getElementById('iosMessageSection').classList.remove('visible');
+
+            } else {
+                appTitle.innerHTML = `
+                    <span class="icon-small">📲</span>
+                    قبل الضغط على القنوات يرجى تحميل "المشغل" التالي
+                `;
+
+                container.innerHTML = `
+                    <div class="app-card">
+                        <img src="${APP_ICONS.vlc}" alt="VLC" class="app-icon" />
+                        <div class="app-info">
+                            <span class="app-name">VLC Media Player</span>
+                            <span class="app-desc">مشغل فيديو متعدد الإمكانيات</span>
+                        </div>
+                        <a href="${APP_LINKS.vlc.android}" target="_blank" class="app-download-btn">
+                            ⬇️ تنزيل
+                        </a>
+                    </div>
+                `;
+
+                document.getElementById('showIssueBtn').classList.remove('visible');
+                document.getElementById('iosMessageSection').classList.remove('visible');
+            }
+        }
+
+        // دالة إظهار/إخفاء رسالة iPhone
+        function toggleIosMessage() {
+            const section = document.getElementById('iosMessageSection');
+            const icon = document.getElementById('toggleIcon');
+            const btn = document.getElementById('showIssueBtn');
+            if (section.classList.contains('visible')) {
+                section.classList.remove('visible');
+                icon.textContent = '▼';
+                btn.innerHTML = `
+                    <span class="btn-emoji">📱</span>
+                    خطوات عمل المشغل للآيفون
+                    <span id="toggleIcon">▼</span>
+                `;
+            } else {
+                section.classList.add('visible');
+                icon.textContent = '▲';
+                btn.innerHTML = `
+                    <span class="btn-emoji">📱</span>
+                    خطوات عمل المشغل للآيفون
+                    <span id="toggleIcon">▲</span>
+                `;
+            }
+        }
+
+        // تشغيل الرابط مباشرة (للايفون)
+        function playUrlOnIOS(url) {
+            window.location.href = `vlc://${url}`;
+            showToast('📲 جاري فتح VLC... اضغط "Play" أو "Always Play URLs" عند ظهور الرسالة');
+        }
+
+        // تشغيل الرابط على Android
+        function playUrlOnAndroid(url, player) {
+            if (player === 'vlc') {
+                const intentUrl = `intent://${url.replace('http://', '').replace('https://', '')}#Intent;scheme=${url.startsWith('https') ? 'https' : 'http'};package=org.videolan.vlc;type=video/*;end`;
+                window.location.href = intentUrl;
+                showToast('📲 جاري فتح VLC...');
+            } else if (player === 'mx') {
+                const intentUrl = `intent://${url.replace('http://', '').replace('https://', '')}#Intent;scheme=${url.startsWith('https') ? 'https' : 'http'};package=com.mxtech.videoplayer.ad;type=video/*;end`;
+                window.location.href = intentUrl;
+                showToast('📲 جاري فتح MX Player...');
+            }
+        }
+
+        // عرض قائمة الروابط
+        function showLinksOverlay(channel) {
+            const overlay = document.createElement('div');
+            overlay.className = 'links-overlay';
+
+            const iconUrl = CHANNEL_ICONS[channel.name] || '';
+
+            let linksHtml = '';
+            if (channel.urls && channel.urls.length > 0) {
+                channel.urls.forEach((url, index) => {
+                    linksHtml += `
+                        <div class="link-item" onclick="handleLinkClick('${url}')">
+                            <span class="link-number">#${index + 1}</span>
+                            <span class="link-url">${url.substring(0, 50)}${url.length > 50 ? '...' : ''}</span>
+                            <button class="link-play-btn" onclick="event.stopPropagation(); handleLinkClick('${url}')">▶ تشغيل</button>
+                        </div>
+                    `;
+                });
+            } else {
+                linksHtml = `<div class="no-links">⚠️ لا توجد روابط متاحة لهذه القناة</div>`;
             }
 
-            const device = getDeviceType();
-
-            function renderAppCards() {
-                const container = document.getElementById('appCardsContainer');
-                const appTitle = document.getElementById('appTitle');
-
-                if (device === 'ios') {
-                    appTitle.innerHTML = `
-                        <span class="icon-small">📲</span>
-                        قبل الضغط على القنوات يرجى تحميل "المشغل" التالي
-                    `;
-
-                    container.innerHTML = `
-                        <div class="app-card">
-                            <img src="${APP_ICONS.vlc}" alt="VLC" class="app-icon" />
-                            <div class="app-info">
-                                <span class="app-name">VLC Media Player</span>
-                                <span class="app-desc">مشغل فيديو متعدد الإمكانيات</span>
-                            </div>
-                            <a href="${APP_LINKS.vlc.ios}" target="_blank" class="app-download-btn ios-btn">
-                                ⬇️ تنزيل
-                            </a>
+            overlay.innerHTML = `
+                <div class="links-modal">
+                    <div class="modal-header">
+                        <div class="modal-title">
+                            ${iconUrl ? `<img src="${iconUrl}" style="width:24px;height:24px;border-radius:6px;object-fit:cover;" />` : ''}
+                            ${channel.flag} ${channel.name}
+                            <span style="font-size:11px;color:var(--text-muted);font-weight:400;">${channel.urls ? channel.urls.length : 0} روابط</span>
                         </div>
-                    `;
+                        <button class="modal-close" onclick="closeLinksOverlay()">✕</button>
+                    </div>
+                    ${linksHtml}
+                </div>
+            `;
 
-                    document.getElementById('iosMessageSection').classList.remove('visible');
-                    document.getElementById('showIssueBtn').classList.add('visible');
+            document.body.appendChild(overlay);
+            document.body.style.overflow = 'hidden';
 
-                } else if (device === 'android') {
-                    appTitle.innerHTML = `
-                        <span class="icon-small">📲</span>
-                        قبل الضغط على القنوات يرجى تحميل أحد "المشغلين التاليين" أو "كلاهما"
-                    `;
-
-                    container.innerHTML = `
-                        <div class="app-card">
-                            <img src="${APP_ICONS.vlc}" alt="VLC" class="app-icon" />
-                            <div class="app-info">
-                                <span class="app-name">VLC Media Player</span>
-                                <span class="app-desc">مشغل فيديو متعدد الإمكانيات</span>
-                            </div>
-                            <a href="${APP_LINKS.vlc.android}" target="_blank" class="app-download-btn android-btn">
-                                ⬇️ تنزيل
-                            </a>
-                        </div>
-                        <div class="app-card">
-                            <img src="${APP_ICONS.mx}" alt="MX Player" class="app-icon" />
-                            <div class="app-info">
-                                <span class="app-name">MX Player</span>
-                                <span class="app-desc">مشغل فيديو احترافي</span>
-                            </div>
-                            <a href="${APP_LINKS.mx.android}" target="_blank" class="app-download-btn mx-btn">
-                                ⬇️ تنزيل
-                            </a>
-                        </div>
-                    `;
-
-                    document.getElementById('showIssueBtn').classList.remove('visible');
-                    document.getElementById('iosMessageSection').classList.remove('visible');
-
-                } else {
-                    appTitle.innerHTML = `
-                        <span class="icon-small">📲</span>
-                        قبل الضغط على القنوات يرجى تحميل "المشغل" التالي
-                    `;
-
-                    container.innerHTML = `
-                        <div class="app-card">
-                            <img src="${APP_ICONS.vlc}" alt="VLC" class="app-icon" />
-                            <div class="app-info">
-                                <span class="app-name">VLC Media Player</span>
-                                <span class="app-desc">مشغل فيديو متعدد الإمكانيات</span>
-                            </div>
-                            <a href="${APP_LINKS.vlc.android}" target="_blank" class="app-download-btn">
-                                ⬇️ تنزيل
-                            </a>
-                        </div>
-                    `;
-
-                    document.getElementById('showIssueBtn').classList.remove('visible');
-                    document.getElementById('iosMessageSection').classList.remove('visible');
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeLinksOverlay();
                 }
-            }
+            });
 
-            function toggleIosMessage() {
-                const section = document.getElementById('iosMessageSection');
-                const icon = document.getElementById('toggleIcon');
-                const btn = document.getElementById('showIssueBtn');
-                if (section.classList.contains('visible')) {
-                    section.classList.remove('visible');
-                    icon.textContent = '▼';
-                    btn.innerHTML = `
+            window._linksOverlay = overlay;
+        }
+
+        function closeLinksOverlay() {
+            if (window._linksOverlay) {
+                window._linksOverlay.remove();
+                window._linksOverlay = null;
+                document.body.style.overflow = '';
+            }
+        }
+
+        // معالج النقر على الرابط
+        function handleLinkClick(url) {
+            closeLinksOverlay();
+            
+            if (device === 'ios') {
+                playUrlOnIOS(url);
+            } else if (device === 'android') {
+                showAndroidPlayerChoiceForUrl(url);
+            } else {
+                window.open(url, '_blank');
+                showToast('📲 جاري فتح الرابط...');
+            }
+        }
+
+        // نافذة اختيار المشغل للأندرويد (للروابط)
+        function showAndroidPlayerChoiceForUrl(url) {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.80); backdrop-filter: blur(16px);
+                z-index: 1001; display: flex; justify-content: center; align-items: center;
+                animation: fadeInOverlay 0.3s ease;
+            `;
+
+            overlay.innerHTML = `
+                <div style="background: #111927; border: 1px solid rgba(212,167,69,0.20); border-radius: 24px; padding: 28px 24px; max-width: 380px; width: 95%; box-shadow: 0 40px 80px rgba(0,0,0,0.60); text-align: center;">
+                    <div style="font-size: 18px; font-weight: 800; color: #f0d080; margin-bottom: 6px;">🎬 اختر المشغل</div>
+                    <div style="font-size: 13px; color: #8a9bb5; margin-bottom: 20px;">اختر التطبيق الذي تريد تشغيل البث عليه</div>
+                    <div style="font-size: 11px; font-weight: 700; color: #8a9bb5; background: rgba(255,255,255,0.03); padding: 6px 12px; border-radius: 8px; margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.04); direction: ltr; word-break: break-all; font-family: monospace;">
+                        ${url}
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:10px;">
+                        <button onclick="playUrlOnAndroid('${url}', 'vlc'); closeAndroidPlayerChoice();" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 20px;border:none;border-radius:60px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;color:#fff;width:100%;background:linear-gradient(145deg,#ff8800,#e67600);box-shadow:0 4px 20px rgba(255,136,0,0.25);">
+                            <img src="${APP_ICONS.vlc}" style="width:28px;height:28px;border-radius:6px;object-fit:cover;" />
+                            تشغيل على VLC
+                        </button>
+                        <button onclick="playUrlOnAndroid('${url}', 'mx'); closeAndroidPlayerChoice();" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 20px;border:none;border-radius:60px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;color:#fff;width:100%;background:linear-gradient(145deg,#e74c3c,#c0392b);box-shadow:0 4px 20px rgba(231,76,60,0.25);">
+                            <img src="${APP_ICONS.mx}" style="width:28px;height:28px;border-radius:6px;object-fit:cover;" />
+                            تشغيل على MX Player
+                        </button>
+                        <button onclick="closeAndroidPlayerChoice();" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.04);color:#8a9bb5;padding:14px 20px;border-radius:60px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;">✕ إلغاء</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+            document.body.style.overflow = 'hidden';
+
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeAndroidPlayerChoice();
+                }
+            });
+
+            window._androidPlayerChoice = overlay;
+        }
+
+        function closeAndroidPlayerChoice() {
+            if (window._androidPlayerChoice) {
+                window._androidPlayerChoice.remove();
+                window._androidPlayerChoice = null;
+                document.body.style.overflow = '';
+            }
+        }
+
+        // إنشاء عناصر القنوات
+        function renderChannels() {
+            const channelList = document.getElementById('channelList');
+            channelList.innerHTML = '';
+
+            channels.forEach((channel) => {
+                const channelDiv = document.createElement('div');
+                channelDiv.className = 'channel-item';
+
+                const iconUrl = CHANNEL_ICONS[channel.name] || '';
+                const hasMultiple = channel.urls && channel.urls.length > 1;
+
+                channelDiv.innerHTML = `
+                    <div class="channel-left">
+                        ${iconUrl ? `<img src="${iconUrl}" alt="${channel.name}" class="channel-icon" />` : ''}
+                        <span class="channel-name-text">${channel.name}</span>
+                    </div>
+                    <div class="channel-right">
+                        <span class="flag">${channel.flag}</span>
+                        ${hasMultiple ? `<span class="multi-link-badge">🔗 ${channel.urls.length}</span>` : ''}
+                    </div>
+                `;
+
+                channelDiv.addEventListener('click', function() {
+                    if (channel.urls && channel.urls.length > 0) {
+                        if (channel.urls.length === 1) {
+                            // رابط واحد فقط - تشغيل مباشر
+                            const url = channel.urls[0];
+                            if (device === 'ios') {
+                                playUrlOnIOS(url);
+                            } else if (device === 'android') {
+                                showAndroidPlayerChoiceForUrl(url);
+                            } else {
+                                window.open(url, '_blank');
+                                showToast('📲 جاري فتح الرابط...');
+                            }
+                        } else {
+                            // روابط متعددة - عرض القائمة
+                            showLinksOverlay(channel);
+                        }
+                    } else {
+                        showToast('⚠️ لا توجد روابط لهذه القناة');
+                    }
+                });
+
+                channelList.appendChild(channelDiv);
+            });
+        }
+
+        // تحديث النص السفلي
+        function updateNote() {
+            const subText = document.getElementById('subText');
+
+            if (device === 'ios') {
+                subText.textContent = 'اختر القناة للبدء';
+            } else if (device === 'android') {
+                subText.textContent = 'اختر القناة واختر المشغل';
+            } else {
+                subText.textContent = 'اختر القناة للبدء';
+            }
+        }
+
+        // دالة الإشعار (لـ IPTV)
+        function showToast(msg) {
+            const t = document.getElementById('iptvToast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(t._timeout);
+            t._timeout = setTimeout(() => t.classList.remove('show'), 5000);
+        }
+
+        // دالة عرض IPTV بالكامل
+        function renderIPTV() {
+            const container = document.getElementById('iptvContainer');
+            container.innerHTML = `
+                <div class="header">
+                    <span class="icon">📡</span>
+                    <h1>مجلس معلمي سعيد بن العاص للبث المباشر</h1>
+                    <span class="badge">● LIVE</span>
+                    <p id="subText">اختر القناة للبدء</p>
+                </div>
+
+                <div class="app-download-section" id="appDownloadSection">
+                    <div class="app-title" id="appTitle">
+                        <span class="icon-small">📲</span>
+                    </div>
+                    <div class="app-cards" id="appCardsContainer">
+                    </div>
+                </div>
+
+                <div id="iosMessageWrapper">
+                    <button class="show-issue-btn" id="showIssueBtn" onclick="toggleIosMessage()">
                         <span class="btn-emoji">📱</span>
                         خطوات عمل المشغل للآيفون
                         <span id="toggleIcon">▼</span>
-                    `;
-                } else {
-                    section.classList.add('visible');
-                    icon.textContent = '▲';
-                    btn.innerHTML = `
-                        <span class="btn-emoji">📱</span>
-                        خطوات عمل المشغل للآيفون
-                        <span id="toggleIcon">▲</span>
-                    `;
-                }
-            }
+                    </button>
 
-            function playUrlOnIOS(url) {
-                window.location.href = `vlc://${url}`;
-                showIPTVToast('📲 جاري فتح VLC... اضغط "Play" أو "Always Play URLs" عند ظهور الرسالة');
-            }
-
-            function playUrlOnAndroid(url, player) {
-                if (player === 'vlc') {
-                    const intentUrl = `intent://${url.replace('http://', '').replace('https://', '')}#Intent;scheme=${url.startsWith('https') ? 'https' : 'http'};package=org.videolan.vlc;type=video/*;end`;
-                    window.location.href = intentUrl;
-                    showIPTVToast('📲 جاري فتح VLC...');
-                } else if (player === 'mx') {
-                    const intentUrl = `intent://${url.replace('http://', '').replace('https://', '')}#Intent;scheme=${url.startsWith('https') ? 'https' : 'http'};package=com.mxtech.videoplayer.ad;type=video/*;end`;
-                    window.location.href = intentUrl;
-                    showIPTVToast('📲 جاري فتح MX Player...');
-                }
-            }
-
-            function showLinksOverlay(channel) {
-                const overlay = document.createElement('div');
-                overlay.className = 'links-overlay';
-
-                const iconUrl = CHANNEL_ICONS[channel.name] || '';
-
-                let linksHtml = '';
-                if (channel.urls && channel.urls.length > 0) {
-                    channel.urls.forEach((url, index) => {
-                        linksHtml += `
-                            <div class="link-item" onclick="handleLinkClick('${url}')">
-                                <span class="link-number">#${index + 1}</span>
-                                <span class="link-url">${url.substring(0, 50)}${url.length > 50 ? '...' : ''}</span>
-                                <button class="link-play-btn" onclick="event.stopPropagation(); handleLinkClick('${url}')">▶ تشغيل</button>
-                            </div>
-                        `;
-                    });
-                } else {
-                    linksHtml = `<div class="no-links">⚠️ لا توجد روابط متاحة لهذه القناة</div>`;
-                }
-
-                overlay.innerHTML = `
-                    <div class="links-modal">
-                        <div class="modal-header">
-                            <div class="modal-title">
-                                ${iconUrl ? `<img src="${iconUrl}" style="width:24px;height:24px;border-radius:6px;object-fit:cover;" />` : ''}
-                                ${channel.flag} ${channel.name}
-                                <span style="font-size:11px;color:var(--text-muted);font-weight:400;">${channel.urls ? channel.urls.length : 0} روابط</span>
-                            </div>
-                            <button class="modal-close" onclick="closeLinksOverlay()">✕</button>
+                    <div class="ios-message-section" id="iosMessageSection">
+                        <div class="msg-title">
+                            <span class="icon-msg">📱</span>
+                            خطوات عمل المشغل للآيفون
                         </div>
-                        ${linksHtml}
-                    </div>
-                `;
+                        <div class="msg-content">
+                            <div class="step">
+                                <span class="num">١</span>
+                                <span class="step-text">
+                                    بعد الضغط على القناة، ستظهر لك رسالة مثل الصورة أدناه.
+                                </span>
+                            </div>
+                            <div class="step">
+                                <span class="num">٢</span>
+                                <span class="step-text">
+                                    اضغط على <span class="highlight">"Play"</span> لتشغيل البث مباشرة.
+                                </span>
+                            </div>
+                            <div class="step">
+                                <span class="num">٣</span>
+                                <span class="step-text">
+                                    أو اضغط على <span class="highlight">"Always Play URLs"</span> لتشغيل البث تلقائياً في المستقبل.
+                                </span>
+                            </div>
 
-                document.body.appendChild(overlay);
-                document.body.style.overflow = 'hidden';
+                            <div class="ios-screenshot-wrapper">
+                                <div class="screenshot-label">
+                                    <span class="arrow-icon">👇</span>
+                                    <span>الرسالة التي ستظهر لك</span>
+                                </div>
+                                <a href="https://ibb.co/Pz3sY6yD" target="_blank">
+                                    <img src="https://i.ibb.co/YTY4WLS0/IMG-4278.png" alt="شرح تشغيل البث على iPhone" border="0" loading="lazy" />
+                                </a>
+                                <div class="img-credit">
+                                    <a href="https://imgbb.com/" target="_blank">📸 اضغط لتكبير الصورة</a>
+                                </div>
+                            </div>
 
-                overlay.addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        closeLinksOverlay();
-                    }
-                });
+                            <div class="screenshot-note">
+                                📌 ستظهر لك هذه الرسالة:
+                                <div style="background:rgba(0,0,0,0.20);padding:8px 12px;border-radius:8px;margin-top:6px;font-family:monospace;font-size:11px;color:var(--text-secondary);direction:ltr;text-align:center;">
+                                    "Would you like to download or play this URL?"
+                                </div>
+                                <div style="margin-top:6px;">
+                                    👆 اضغط على <span class="highlight-play">"Play"</span> أو <span class="highlight-always">"Always Play URLs"</span>
+                                </div>
+                            </div>
 
-                window._linksOverlay = overlay;
-            }
-
-            function closeLinksOverlay() {
-                if (window._linksOverlay) {
-                    window._linksOverlay.remove();
-                    window._linksOverlay = null;
-                    document.body.style.overflow = '';
-                }
-            }
-
-            function handleLinkClick(url) {
-                closeLinksOverlay();
-                
-                if (device === 'ios') {
-                    playUrlOnIOS(url);
-                } else if (device === 'android') {
-                    showAndroidPlayerChoiceForUrl(url);
-                } else {
-                    window.open(url, '_blank');
-                    showIPTVToast('📲 جاري فتح الرابط...');
-                }
-            }
-
-            function showAndroidPlayerChoiceForUrl(url) {
-                const overlay = document.createElement('div');
-                overlay.style.cssText = `
-                    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-                    background: rgba(0,0,0,0.80); backdrop-filter: blur(16px);
-                    z-index: 1001; display: flex; justify-content: center; align-items: center;
-                    animation: fadeInOverlay 0.3s ease;
-                `;
-
-                overlay.innerHTML = `
-                    <div style="background: #111927; border: 1px solid rgba(212,167,69,0.20); border-radius: 24px; padding: 28px 24px; max-width: 380px; width: 95%; box-shadow: 0 40px 80px rgba(0,0,0,0.60); text-align: center;">
-                        <div style="font-size: 18px; font-weight: 800; color: #f0d080; margin-bottom: 6px;">🎬 اختر المشغل</div>
-                        <div style="font-size: 13px; color: #8a9bb5; margin-bottom: 20px;">اختر التطبيق الذي تريد تشغيل البث عليه</div>
-                        <div style="font-size: 11px; font-weight: 700; color: #8a9bb5; background: rgba(255,255,255,0.03); padding: 6px 12px; border-radius: 8px; margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.04); direction: ltr; word-break: break-all; font-family: monospace;">
-                            ${url}
-                        </div>
-                        <div style="display:flex;flex-direction:column;gap:10px;">
-                            <button onclick="playUrlOnAndroid('${url}', 'vlc'); closeAndroidPlayerChoice();" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 20px;border:none;border-radius:60px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;color:#fff;width:100%;background:linear-gradient(145deg,#ff8800,#e67600);box-shadow:0 4px 20px rgba(255,136,0,0.25);">
-                                <img src="${APP_ICONS.vlc}" style="width:28px;height:28px;border-radius:6px;object-fit:cover;" />
-                                تشغيل على VLC
-                            </button>
-                            <button onclick="playUrlOnAndroid('${url}', 'mx'); closeAndroidPlayerChoice();" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 20px;border:none;border-radius:60px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;color:#fff;width:100%;background:linear-gradient(145deg,#e74c3c,#c0392b);box-shadow:0 4px 20px rgba(231,76,60,0.25);">
-                                <img src="${APP_ICONS.mx}" style="width:28px;height:28px;border-radius:6px;object-fit:cover;" />
-                                تشغيل على MX Player
-                            </button>
-                            <button onclick="closeAndroidPlayerChoice();" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.04);color:#8a9bb5;padding:14px 20px;border-radius:60px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;">✕ إلغاء</button>
+                            <div class="final-note">
+                                ✅ <strong>نصيحة:</strong> اضغط على <strong>"Always Play URLs"</strong> لتشغيل جميع البثوث تلقائياً في المستقبل دون الحاجة للضغط على Play في كل مرة.
+                            </div>
                         </div>
                     </div>
-                `;
+                </div>
 
-                document.body.appendChild(overlay);
-                document.body.style.overflow = 'hidden';
+                <div class="channel-list" id="channelList">
+                </div>
 
-                overlay.addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        closeAndroidPlayerChoice();
-                    }
-                });
+                <div class="divider"><span>📌 ملاحظة</span></div>
 
-                window._androidPlayerChoice = overlay;
-            }
+                <p style="color:var(--text-secondary);font-size:12px;margin:5px 0;">
+                    🔹 اختر القناة المناسبة للبث المباشر<br>
+                    🔹 تأكد من تثبيت المشغل أولاً
+                </p>
 
-            function closeAndroidPlayerChoice() {
-                if (window._androidPlayerChoice) {
-                    window._androidPlayerChoice.remove();
-                    window._androidPlayerChoice = null;
-                    document.body.style.overflow = '';
-                }
-            }
+                <div class="footer">⚡ IPTV</div>
+                <div id="iptvToast" class="toast">✅ جاري الفتح...</div>
+            `;
 
-            function renderChannels() {
-                const channelList = document.getElementById('channelList');
-                channelList.innerHTML = '';
-
-                channels.forEach((channel) => {
-                    const channelDiv = document.createElement('div');
-                    channelDiv.className = 'channel-item';
-
-                    const iconUrl = CHANNEL_ICONS[channel.name] || '';
-                    const hasMultiple = channel.urls && channel.urls.length > 1;
-
-                    channelDiv.innerHTML = `
-                        <div class="channel-left">
-                            ${iconUrl ? `<img src="${iconUrl}" alt="${channel.name}" class="channel-icon" />` : ''}
-                            <span class="channel-name-text">${channel.name}</span>
-                        </div>
-                        <div class="channel-right">
-                            <span class="flag">${channel.flag}</span>
-                            ${hasMultiple ? `<span class="multi-link-badge">🔗 ${channel.urls.length}</span>` : ''}
-                        </div>
-                    `;
-
-                    channelDiv.addEventListener('click', function() {
-                        if (channel.urls && channel.urls.length > 0) {
-                            if (channel.urls.length === 1) {
-                                const url = channel.urls[0];
-                                if (device === 'ios') {
-                                    playUrlOnIOS(url);
-                                } else if (device === 'android') {
-                                    showAndroidPlayerChoiceForUrl(url);
-                                } else {
-                                    window.open(url, '_blank');
-                                    showIPTVToast('📲 جاري فتح الرابط...');
-                                }
-                            } else {
-                                showLinksOverlay(channel);
-                            }
-                        } else {
-                            showIPTVToast('⚠️ لا توجد روابط لهذه القناة');
-                        }
-                    });
-
-                    channelList.appendChild(channelDiv);
-                });
-            }
-
-            function updateNote() {
-                const subText = document.getElementById('subText');
-
-                if (device === 'ios') {
-                    subText.textContent = 'اختر القناة للبدء';
-                } else if (device === 'android') {
-                    subText.textContent = 'اختر القناة واختر المشغل';
-                } else {
-                    subText.textContent = 'اختر القناة للبدء';
-                }
-            }
-
-            function showIPTVToast(msg) {
-                // Check if a toast already exists in IPTV wrapper, if not create one
-                let t = document.querySelector('.iptv-wrapper .toast');
-                if (!t) {
-                    t = document.createElement('div');
-                    t.className = 'toast';
-                    document.querySelector('.iptv-wrapper .container').appendChild(t);
-                }
-                t.textContent = msg;
-                t.classList.add('show');
-                clearTimeout(t._timeout);
-                t._timeout = setTimeout(() => t.classList.remove('show'), 5000);
-            }
-
-            // Expose IPTV global functions
-            window.toggleIosMessage = toggleIosMessage;
-            window.closeLinksOverlay = closeLinksOverlay;
-            window.handleLinkClick = handleLinkClick;
-            window.playUrlOnIOS = playUrlOnIOS;
-            window.playUrlOnAndroid = playUrlOnAndroid;
-            window.closeAndroidPlayerChoice = closeAndroidPlayerChoice;
-            window.showIPTVToast = showIPTVToast;
-
-            // Render
+            // تهيئة IPTV
             renderAppCards();
             renderChannels();
             updateNote();
-
             console.log('📺 IPTV - مجلس معلمي سعيد بن العاص للبث المباشر');
             console.log(`📡 تم تحميل ${channels.length} قناة`);
             console.log(`📱 الجهاز: ${device}`);
             channels.forEach(c => {
                 console.log(`  📺 ${c.name}: ${c.urls ? c.urls.length : 0} رابط`);
             });
-
-            window.iptvInitialized = true;
         }
 
         // ============================================================
@@ -9082,6 +9055,7 @@
         window.openStreamModal = openStreamModal;
         window.closeModal = closeModal;
         window.closeAllModals = closeAllModals;
+        // NEW admin player functions
         window.togglePlayerPredictionAdmin = togglePlayerPredictionAdmin;
         window.populatePlayerSelect = populatePlayerSelect;
         window.populateMatchSelect = populateMatchSelect;
@@ -9089,7 +9063,14 @@
         window.adminSavePrediction = adminSavePrediction;
         window.adminDeletePrediction = adminDeletePrediction;
         window.filterPlayerOptions = filterPlayerOptions;
-        window.initializeIPTV = initializeIPTV;
+        // IPTV functions
+        window.toggleIosMessage = toggleIosMessage;
+        window.playUrlOnIOS = playUrlOnIOS;
+        window.playUrlOnAndroid = playUrlOnAndroid;
+        window.handleLinkClick = handleLinkClick;
+        window.closeLinksOverlay = closeLinksOverlay;
+        window.closeAndroidPlayerChoice = closeAndroidPlayerChoice;
+        window.renderIPTV = renderIPTV;
 
         // ============================================================
         //  START
