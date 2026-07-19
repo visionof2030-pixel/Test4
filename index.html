@@ -1058,6 +1058,68 @@
             }
         }
 
+        /* ===== STREAM IFRAME SECTION (NEW) ===== */
+        .stream-iframe-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-gold);
+            border-radius: var(--radius-lg);
+            padding: 12px;
+            margin: 0 0 28px 0;
+            box-shadow: var(--shadow-card), var(--shadow-glow);
+            transition: var(--transition);
+            backdrop-filter: blur(12px);
+            position: relative;
+            overflow: hidden;
+            display: none;
+        }
+        .stream-iframe-section.visible {
+            display: block;
+        }
+        .stream-iframe-section iframe {
+            width: 100%;
+            height: 650px;
+            border: none;
+            border-radius: var(--radius-md);
+            background: #0a0e17;
+        }
+        .stream-iframe-section .stream-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 0 8px;
+        }
+        .stream-iframe-section .stream-header h2 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--gold-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .stream-iframe-section .stream-header .close-stream-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .stream-iframe-section .stream-header .close-stream-btn:hover {
+            background: var(--danger-bg);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        @media (max-width: 640px) {
+            .stream-iframe-section iframe {
+                height: 400px;
+            }
+        }
+
         /* ===== MATCH GRID ===== */
         .matches-grid {
             display: grid;
@@ -2407,6 +2469,13 @@
             .leaderboard-iframe-section iframe {
                 height: 500px;
             }
+            .stream-iframe-section {
+                padding: 6px;
+                margin: 0 0 20px 0;
+            }
+            .stream-iframe-section iframe {
+                height: 400px;
+            }
             .matches-grid {
                 grid-template-columns: 1fr;
                 gap: 14px;
@@ -2827,6 +2896,15 @@
             <iframe src="https://visionof2030-pixel.github.io/LeaderBoard/" loading="lazy" allow="autoplay; encrypted-media" title="لوحة المتصدرين"></iframe>
         </div>
 
+        <!-- ===== STREAM IFRAME SECTION (NEW) ===== -->
+        <div class="stream-iframe-section" id="streamIframeSection">
+            <div class="stream-header">
+                <h2>📡 قنوات البث المباشر</h2>
+                <button class="close-stream-btn" onclick="closeStreamIframe()">✕ إخفاء البث</button>
+            </div>
+            <iframe src="https://visionof2030-pixel.github.io/Openinvlc/" loading="lazy" allow="autoplay; encrypted-media" title="قنوات البث المباشر"></iframe>
+        </div>
+
         <!-- ===== CONTROLS ===== -->
         <div class="controls-bar">
             <div class="control-group">
@@ -2930,6 +3008,7 @@
                 <button class="tab-btn" data-tab="standings">📊 ترتيب المجموعات</button>
                 <button class="tab-btn" data-tab="scorers">🏅 الهدافين</button>
                 <button class="tab-btn" data-tab="stats">📊 إحصائيات الفرق</button>
+                <button class="tab-btn" data-tab="stream">📡 قنوات البث المباشر</button>
             </div>
             <div class="day-filter-tabs visible" id="dayFilterTabs">
                 <button class="day-btn active" data-day="all">📅 الكل</button>
@@ -2968,6 +3047,18 @@
         <div id="statsTab" class="tab-content">
             <div class="section-title">📊 إحصائيات الفرق (الهجوم والدفاع)</div>
             <div id="teamStatsContainer"><div class="empty-state"><span class="icon">⏳</span> جاري حساب الإحصائيات...</div></div>
+        </div>
+
+        <!-- ===== STREAM TAB (NEW) ===== -->
+        <div id="streamTab" class="tab-content">
+            <div class="section-title">📡 قنوات البث المباشر</div>
+            <div style="background:var(--bg-card);border:1px solid var(--border-gold);border-radius:var(--radius-lg);padding:12px;box-shadow:var(--shadow-card),var(--shadow-glow);backdrop-filter:blur(12px);">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding:0 8px;flex-wrap:wrap;gap:8px;">
+                    <span style="font-size:0.85rem;font-weight:700;color:var(--gold-light);">📺 بث مباشر للمباريات (قنوات متعددة)</span>
+                    <button class="admin-btn secondary" onclick="closeStreamTab()" style="padding:4px 14px;font-size:0.65rem;">✕ إخفاء</button>
+                </div>
+                <iframe src="https://visionof2030-pixel.github.io/Openinvlc/" style="width:100%;height:650px;border:none;border-radius:var(--radius-md);background:#0a0e17;" loading="lazy" allow="autoplay; encrypted-media" title="قنوات البث المباشر"></iframe>
+            </div>
         </div>
 
         <footer class="footer" id="footerTrigger">🏆 كأس العالم 2026 · غرفة معلمي سعيد بن العاص</footer>
@@ -4962,7 +5053,32 @@
         }
 
         // ============================================================
-        //  RENDER MATCH CARD (with live stream button – opens Livematch page)
+        //  STREAM FUNCTIONS (NEW)
+        // ============================================================
+        function openStreamIframe() {
+            const section = document.getElementById('streamIframeSection');
+            section.classList.add('visible');
+            // Also activate the stream tab
+            const streamTab = document.querySelector('.tab-btn[data-tab="stream"]');
+            if (streamTab) streamTab.click();
+            showCopyToast('📡 تم فتح قنوات البث المباشر');
+        }
+
+        function closeStreamIframe() {
+            document.getElementById('streamIframeSection').classList.remove('visible');
+        }
+
+        function closeStreamTab() {
+            document.getElementById('streamTab').classList.remove('active');
+            const streamTab = document.querySelector('.tab-btn[data-tab="stream"]');
+            if (streamTab) streamTab.classList.remove('active');
+            // Reactivate upcoming tab
+            const upcomingTab = document.querySelector('.tab-btn[data-tab="upcoming"]');
+            if (upcomingTab) upcomingTab.click();
+        }
+
+        // ============================================================
+        //  RENDER MATCH CARD (with updated stream button)
         // ============================================================
         function renderMatchCard(m, isUpcoming) {
             const st = getMatchStatus(m);
@@ -5115,7 +5231,7 @@
                 predictBtnExtra = `onclick="openNameModal('${matchId}','${m.team1}','${m.team2}','${m.timeISO}')"`;
             }
 
-            // ===== STREAM BUTTON – opens Livematch page =====
+            // ===== STREAM BUTTON – opens stream iframe instead of new window =====
             const matchTimeMs = matchTime(m.timeISO);
             const nowMs = now();
             const diffMs = matchTimeMs - nowMs;
@@ -5123,7 +5239,7 @@
             let streamBtnHtml = '';
             if (isUpcoming && !isFinished) {
                 if (isStreamAvailable) {
-                    streamBtnHtml = `<button class="stream-btn" onclick="openStreamModal()">
+                    streamBtnHtml = `<button class="stream-btn" onclick="openStreamIframe()">
                         <span class="live-dot"></span> 📡 تغطية تجريبية
                     </button>`;
                 } else {
@@ -5207,13 +5323,6 @@
               ` : ''}
             </div>
           `;
-        }
-
-        // ============================================================
-        //  STREAM MODAL – now opens Livematch page in new window
-        // ============================================================
-        function openStreamModal() {
-            window.open('Livematch_index.html', '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
         }
 
         // ============================================================
@@ -7243,6 +7352,17 @@
                     if (id === 'standings' && state.previousGamesData.length) calculateStandings();
                     if (id === 'scorers') renderScorers();
                     if (id === 'stats') renderTeamStats();
+                    // If stream tab is clicked, show the stream iframe section and scroll to it
+                    if (id === 'stream') {
+                        openStreamIframe();
+                        // Scroll to the stream section
+                        const streamSection = document.getElementById('streamIframeSection');
+                        if (streamSection) {
+                            setTimeout(() => {
+                                streamSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }, 300);
+                        }
+                    }
                 });
             });
             const activeTab = document.querySelector('.tab-btn.active');
@@ -7832,7 +7952,9 @@
         window.toggleBracketAdmin = toggleBracketAdmin;
         window.openTeamStatsModal = openTeamStatsModal;
         window.togglePredictionsAdmin = togglePredictionsAdmin;
-        window.openStreamModal = openStreamModal;
+        window.openStreamIframe = openStreamIframe;
+        window.closeStreamIframe = closeStreamIframe;
+        window.closeStreamTab = closeStreamTab;
         window.closeModal = closeModal;
         window.closeAllModals = closeAllModals;
         // NEW admin player functions (FIXED)
